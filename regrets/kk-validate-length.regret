@@ -1,0 +1,13 @@
+cluster: kk-validate-length
+version: 1
+fingerprint: 39smd5o
+captured: 2026-06-13T14:19:10.529543+00:00
+watches: [validate_kk_length]
+entry: validate_kk_length
+stack: python
+fingerprintLevel: entry
+module: nomiden.kk_logic
+---
+INPUT  "1101011001640000"
+OUTPUT "1101011001640000"
+HASH   39smd5o

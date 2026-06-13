@@ -1,0 +1,13 @@
+cluster: nik-city
+version: 1
+fingerprint: 22lbqi5
+captured: 2026-06-13T14:19:10.528040+00:00
+watches: [city]
+entry: city
+stack: python
+fingerprintLevel: entry
+module: nomiden.nik
+---
+INPUT  "1101016401640000"
+OUTPUT "KAB. ACEH SELATAN"
+HASH   22lbqi5

@@ -1,0 +1,13 @@
+cluster: kk-province
+version: 1
+fingerprint: 46w7cgp
+captured: 2026-06-13T14:19:10.560457+00:00
+watches: [province]
+entry: province
+stack: python
+fingerprintLevel: entry
+module: nomiden.kk
+---
+INPUT  "1101011001640000"
+OUTPUT "ACEH"
+HASH   46w7cgp

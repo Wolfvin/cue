@@ -1,0 +1,14 @@
+cluster: nik-parse-birth
+version: 1
+fingerprint: 2z30h7s
+captured: 2026-06-13T14:19:09.608944+00:00
+watches: [parse_birth_code]
+entry: parse_birth_code
+stack: python
+fingerprintLevel: entry
+multiArgs: True
+module: nomiden.nik_logic
+---
+INPUT  ["010164", 2026]
+OUTPUT {"day": 1, "month": 1, "year": 1964, "is_female": false, "formatted": "01 January 1964"}
+HASH   2z30h7s

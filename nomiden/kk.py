@@ -1,113 +1,128 @@
-import os
-from typing import Union
-from datetime import date, datetime
-import pandas as pd
+"""
+KK (Kartu Keluarga) parser — Indonesian family identity number.
 
-this_dir, this_filename = os.path.split(__file__)
-DATA_PATH = os.path.join(this_dir, "data", "regcode.csv")
-rc = pd.read_csv(DATA_PATH)
+This module provides functions to extract information from a 16-digit KK.
+The KK encodes: province, city, district, registration date, and registration order.
+
+Refactored to:
+- Use shared region lookup from _common.py (eliminates duplication with nik.py)
+- Delegate date parsing to kk_logic.py (pure functions, deterministic)
+- Keep the public API identical to the original
+"""
+
+from typing import Union
+from datetime import date
+
+from nomiden._common import validate_id_length, lookup_province, lookup_city, lookup_district
+from nomiden.kk_logic import (
+    parse_reg_code,
+    extract_nth_pub as _extract_nth_pub,
+    validate_kk_length as _validate_kk_length,
+)
+
 
 def _check_length(idnum: Union[str, int]) -> str:
-    idnum = str(idnum)
-    if len(idnum) == 16:
-        return idnum
-    elif len(idnum) < 16:
-        raise ValueError(f'Identification number (KK) is too short ({len(idnum)} characters), length should be 16')
-    elif len(idnum) > 16:
-        raise ValueError(f'Identification number (KK) is too long ({len(idnum)} characters), length should be 16')
-    else:
-        raise ValueError(f'Identification number (KK) {len(idnum)} characters, length should be 16')
+    """Validate KK length — delegates to shared validator."""
+    return _validate_kk_length(idnum)
+
 
 def _check_reg(idnum: str):
+    """
+    Parse registration date from KK using pure logic.
+    Returns a dict with date components, or NaN if invalid.
+    """
+    from datetime import datetime
     rcode = idnum[6:12]
-    if int(rcode[:2]) > 31:
-        rcode = rcode.replace(rcode[:2], str(int(rcode[:2]) - 40).zfill(2), 1)
-    try:
-        rdtm = datetime.strptime(rcode, "%d%m%y")
-        now = datetime.now()
-        if rdtm > now:
-            rdtm = rdtm.replace(year = rdtm.year - 100)
-    except:
-        # return NaN if registration date is invalid
-        rdtm = float('nan')
-    return rdtm
+    result = parse_reg_code(rcode, datetime.now().year)
+    if result is None:
+        return float('nan')
+    return result
+
 
 def province(idnum: Union[str, int]):
+    """Extract province name from KK."""
     idnum = _check_length(idnum)
-    prov_code = int(idnum[:2])
-    try:
-        prov = rc.loc[rc['code'] == prov_code, 'region'].item()
-    except:
-        prov = float('nan')
-    return prov
+    return lookup_province(idnum)
+
 
 def city(idnum: Union[str, int]):
+    """Extract city name from KK."""
     idnum = _check_length(idnum)
-    city_code = int(idnum[:4])
-    try:
-        city = rc.loc[rc['code'] == city_code, 'region'].item()
-    except:
-        city = float('nan')
-    return city
+    return lookup_city(idnum)
+
 
 def district(idnum: Union[str, int]):
+    """Extract district name from KK."""
     idnum = _check_length(idnum)
-    dist_code = int(idnum[:6])
-    try:
-        dist = rc.loc[rc['code'] == dist_code, 'region'].item()
-    except:
-        dist = float('nan')
-    return dist
+    return lookup_district(idnum)
+
 
 def regdate(idnum: Union[str, int]):
+    """Extract registration day (1-31) from KK."""
     idnum = _check_length(idnum)
     rdtm = _check_reg(idnum)
     try:
-        rdate = rdtm.day
-    except:
-        rdate = float('nan')
-    return rdate
+        return rdtm['day']
+    except (TypeError, KeyError):
+        return float('nan')
+
 
 def regmonth(idnum: Union[str, int]):
+    """Extract registration month (1-12) from KK."""
     idnum = _check_length(idnum)
     rdtm = _check_reg(idnum)
     try:
-        rmonth = rdtm.month
-    except:
-        rmonth = float('nan')
-    return rmonth
+        return rdtm['month']
+    except (TypeError, KeyError):
+        return float('nan')
+
 
 def regyear(idnum: Union[str, int]):
+    """Extract registration year from KK."""
     idnum = _check_length(idnum)
     rdtm = _check_reg(idnum)
     try:
-        ryear = rdtm.year
-    except:
-        ryear = float('nan')
-    return ryear
+        return rdtm['year']
+    except (TypeError, KeyError):
+        return float('nan')
 
-def regdtm(idnum: Union[str, int]): # registration day in datetime data type
-    idnum = _check_length(idnum)
-    rdtm = _check_reg(idnum)
-    return rdtm
 
-def regday(idnum: Union[str, int]): # registration day in string data type
+def regdtm(idnum: Union[str, int]):
+    """Extract registration date as datetime object from KK."""
     idnum = _check_length(idnum)
     rdtm = _check_reg(idnum)
     try:
-        rday = rdtm.strftime("%d %B %Y")
-    except:
-        rday = float('nan')
-    return rday
+        from datetime import datetime
+        return datetime(rdtm['year'], rdtm['month'], rdtm['day'])
+    except (TypeError, KeyError, ValueError):
+        return float('nan')
+
+
+def regday(idnum: Union[str, int]):
+    """Extract registration date as formatted string (e.g., '10 January 1964') from KK."""
+    idnum = _check_length(idnum)
+    rdtm = _check_reg(idnum)
+    try:
+        return rdtm['formatted']
+    except (TypeError, KeyError):
+        return float('nan')
+
 
 def nth_pub(idnum: Union[str, int]) -> int:
+    """Extract the KK registration sequence number (digits 14-16)."""
     idnum = _check_length(idnum)
-    nth = int(idnum[13:])
-    return nth
+    return _extract_nth_pub(idnum)
+
 
 def all_info(idnum: Union[str, int]) -> dict:
-    kk_dict = {'NIK': int(idnum), 'province': province(idnum), 'city': city(idnum), 'district': district(idnum),
-            'regist_datetime': regdtm(idnum), 'regist_day': regday(idnum),
-            'regist_code': nth_pub(idnum)}
-
-    return kk_dict
+    """Extract all available information from KK as a dictionary."""
+    idnum = _check_length(idnum)
+    return {
+        'NIK': int(idnum),
+        'province': province(idnum),
+        'city': city(idnum),
+        'district': district(idnum),
+        'regist_datetime': regdtm(idnum),
+        'regist_day': regday(idnum),
+        'regist_code': nth_pub(idnum),
+    }

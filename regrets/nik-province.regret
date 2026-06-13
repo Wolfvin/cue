@@ -1,0 +1,13 @@
+cluster: nik-province
+version: 1
+fingerprint: 3b03c5w
+captured: 2026-06-13T14:19:10.527137+00:00
+watches: [province]
+entry: province
+stack: python
+fingerprintLevel: entry
+module: nomiden.nik
+---
+INPUT  "1101016401640000"
+OUTPUT "ACEH"
+HASH   3b03c5w

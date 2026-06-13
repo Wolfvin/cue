@@ -1,0 +1,188 @@
+{
+  "clusters": [
+    {
+      "id": "nik-validate-length",
+      "entry": "validate_nik_length",
+      "watches": ["validate_nik_length"],
+      "module": "nomiden.nik_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Validate NIK is exactly 16 digits",
+      "inputs": [
+        "1101016401640000",
+        1101016401640000
+      ]
+    },
+    {
+      "id": "nik-extract-gender",
+      "entry": "extract_gender",
+      "watches": ["extract_gender"],
+      "module": "nomiden.nik_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Extract gender from NIK day code (Male 1-31, Female 41-71)",
+      "inputs": [
+        1,
+        31,
+        41,
+        64,
+        71
+      ]
+    },
+    {
+      "id": "nik-parse-birth",
+      "entry": "parse_birth_code",
+      "watches": ["parse_birth_code"],
+      "module": "nomiden.nik_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "multiArgs": true,
+      "description": "Parse 6-digit birth code from NIK into date components with female +40 normalization",
+      "inputs": [
+        ["010164", 2026],
+        ["640164", 2026],
+        ["310199", 2026],
+        ["010100", 2026]
+      ]
+    },
+    {
+      "id": "nik-extract-region-code",
+      "entry": "extract_region_code",
+      "watches": ["extract_region_code"],
+      "module": "nomiden.nik_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Extract province/city/district codes from NIK",
+      "inputs": [
+        "1101016401640000",
+        "3174052503900002"
+      ]
+    },
+    {
+      "id": "nik-extract-nth-person",
+      "entry": "extract_nth_person",
+      "watches": ["extract_nth_person"],
+      "module": "nomiden.nik_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Extract registration sequence number from NIK positions [13:16]",
+      "inputs": [
+        "1101016401640000",
+        "1101010101640001"
+      ]
+    },
+    {
+      "id": "nik-province",
+      "entry": "province",
+      "watches": ["province"],
+      "module": "nomiden.nik",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Look up province name from NIK province code using region CSV",
+      "inputs": [
+        "1101016401640000",
+        "3174052503900002"
+      ]
+    },
+    {
+      "id": "nik-city",
+      "entry": "city",
+      "watches": ["city"],
+      "module": "nomiden.nik",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Look up city name from NIK city code using region CSV",
+      "inputs": [
+        "1101016401640000",
+        "3174052503900002"
+      ]
+    },
+    {
+      "id": "nik-district",
+      "entry": "district",
+      "watches": ["district"],
+      "module": "nomiden.nik",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Look up district name from NIK district code using region CSV",
+      "inputs": [
+        "1101016401640000",
+        "3174052503900002"
+      ]
+    },
+    {
+      "id": "kk-validate-length",
+      "entry": "validate_kk_length",
+      "watches": ["validate_kk_length"],
+      "module": "nomiden.kk_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Validate KK is exactly 16 digits",
+      "inputs": [
+        "1101011001640000",
+        1101011001640000
+      ]
+    },
+    {
+      "id": "kk-parse-reg",
+      "entry": "parse_reg_code",
+      "watches": ["parse_reg_code"],
+      "module": "nomiden.kk_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "multiArgs": true,
+      "description": "Parse 6-digit registration code from KK into date components",
+      "inputs": [
+        ["100164", 2026],
+        ["310199", 2026]
+      ]
+    },
+    {
+      "id": "kk-extract-nth-pub",
+      "entry": "extract_nth_pub",
+      "watches": ["extract_nth_pub"],
+      "module": "nomiden.kk_logic",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Extract registration sequence number from KK positions [13:16]",
+      "inputs": [
+        "1101011001640000"
+      ]
+    },
+    {
+      "id": "kk-province",
+      "entry": "province",
+      "watches": ["province"],
+      "module": "nomiden.kk",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Look up province name from KK province code using region CSV",
+      "inputs": [
+        "1101011001640000"
+      ]
+    },
+    {
+      "id": "kk-district",
+      "entry": "district",
+      "watches": ["district"],
+      "module": "nomiden.kk",
+      "pythonPath": ".",
+      "stack": "python",
+      "fingerprintLevel": "entry",
+      "description": "Look up district name from KK district code using region CSV",
+      "inputs": [
+        "1101011001640000"
+      ]
+    }
+  ]
+}

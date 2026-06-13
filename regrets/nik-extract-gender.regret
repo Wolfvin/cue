@@ -1,0 +1,13 @@
+cluster: nik-extract-gender
+version: 1
+fingerprint: 5rgcuoz
+captured: 2026-06-13T14:19:09.608616+00:00
+watches: [extract_gender]
+entry: extract_gender
+stack: python
+fingerprintLevel: entry
+module: nomiden.nik_logic
+---
+INPUT  1
+OUTPUT "Male"
+HASH   5rgcuoz
