@@ -25,6 +25,39 @@ import "@cue/css/cue.css";
 
 ---
 
+## Quick Start (for AI Agents)
+
+```bash
+# Clone dan install
+git clone https://github.com/Wolfvin/cue
+cd cue && pnpm install
+
+# Build semua packages
+pnpm run build
+
+# Jalankan contoh end-to-end
+cd examples/e2e && pnpm start
+# → Generates demo.html, open di browser
+```
+
+### Pakai sebagai MCP Tool di Claude
+
+```json
+// claude_desktop_config.json
+{
+  "mcpServers": {
+    "cue": {
+      "command": "npx",
+      "args": ["@cue/mcp"]
+    }
+  }
+}
+```
+
+Claude sekarang bisa panggil: `cue_generate`, `cue_export_html`, `cue_validate`, `cue_get_stats`
+
+---
+
 ## Packages
 
 ### `@cue/core` — Framework-agnostic engine
@@ -93,6 +126,7 @@ Zero JS dependency. Single file: `cue.css`.
 
 | Example | Description |
 |---------|-------------|
+| `examples/e2e` | End-to-end: generate → validate → export HTML (no build step) |
 | `examples/auto-demo` | Auto-playing demo with scripted pointer + DemoTheater |
 | `examples/interactive` | Interactive demo with FilePickerOverlay |
 | `examples/primitives` | Showcase of all hooks and CSS primitives |
@@ -113,6 +147,7 @@ cue/
 │   ├── react/       # React components & hooks
 │   └── css/         # Pure CSS animation primitives
 ├── examples/
+│   ├── e2e/         # End-to-end: generate → validate → export HTML
 │   ├── auto-demo/   # Auto-playing scripted demo
 │   ├── interactive/ # Interactive file picker demo
 │   └── primitives/  # Hook & CSS primitive showcase

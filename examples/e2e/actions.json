@@ -1,0 +1,30 @@
+{
+  "session": "taskflow-recording",
+  "actions": [
+    {
+      "type": "click",
+      "target": "#new-task-button",
+      "label": "Create Task",
+      "timestamp": 0
+    },
+    {
+      "type": "drag",
+      "target": "#task-item",
+      "to": "#team-member-avatar",
+      "label": "Assign Team Member",
+      "timestamp": 3200
+    },
+    {
+      "type": "navigate",
+      "target": "#progress-tab",
+      "label": "Track Progress",
+      "timestamp": 7400
+    },
+    {
+      "type": "input",
+      "target": "#email-input",
+      "label": "Get Started",
+      "timestamp": 12000
+    }
+  ]
+}

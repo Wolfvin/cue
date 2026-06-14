@@ -1,0 +1,13 @@
+{
+  "name": "@cue/example-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx run.ts"
+  },
+  "dependencies": {
+    "@cue/core": "workspace:*",
+    "@cue/player": "workspace:*",
+    "tsx": "^4"
+  }
+}
