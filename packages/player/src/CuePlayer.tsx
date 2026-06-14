@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { DemoScript, DemoStep, DemoHotspot, DemoAnnotation, PointerState } from "@cue/core";
-import { ScreenSlide } from "@cue/react";
-import { ScriptedPointer } from "@cue/react";
-import { HotspotOverlay } from "@cue/react";
-import { AnnotationLayer } from "@cue/react";
-import { StepProgress } from "@cue/react";
-import { ChapterNav } from "@cue/react";
-import type { Annotation } from "@cue/react";
+import type { DemoScript, DemoStep, DemoHotspot, DemoAnnotation, PointerState } from "@cue-vin/core";
+import { ScreenSlide } from "@cue-vin/react";
+import { ScriptedPointer } from "@cue-vin/react";
+import { HotspotOverlay } from "@cue-vin/react";
+import { AnnotationLayer } from "@cue-vin/react";
+import { StepProgress } from "@cue-vin/react";
+import { ChapterNav } from "@cue-vin/react";
+import type { Annotation } from "@cue-vin/react";
 
 /** Props for the CuePlayer component. */
 export interface CuePlayerProps {
