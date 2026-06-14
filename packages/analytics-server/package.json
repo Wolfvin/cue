@@ -1,0 +1,24 @@
+{
+  "name": "@cue/analytics-server",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Self-hostable analytics endpoint for cue Demo Theater SDK",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "cue-analytics": "./dist/server.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server.js",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.7.0"
+  },
+  "license": "MIT"
+}
