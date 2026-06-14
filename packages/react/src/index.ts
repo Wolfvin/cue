@@ -24,3 +24,9 @@ export type { UseStaggerOptions } from "./hooks/useStagger";
 
 export { useScrollReveal } from "./hooks/useScrollReveal";
 export type { UseScrollRevealOptions } from "./hooks/useScrollReveal";
+
+export { HotspotOverlay } from "./components/HotspotOverlay";
+export type { HotspotOverlayProps, Hotspot } from "./components/HotspotOverlay";
+
+export { AnnotationLayer } from "./components/AnnotationLayer";
+export type { AnnotationLayerProps, Annotation, AnnotationArrow, AnnotationBox, AnnotationText } from "./components/AnnotationLayer";
