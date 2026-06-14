@@ -5,8 +5,8 @@
  * Run:  cd examples/e2e && pnpm start
  */
 
-import { generate, validateDemoScript } from "@cue/core";
-// Import directly from source — the @cue/player barrel export includes
+import { generate, validateDemoScript } from "@cue-vin/core";
+// Import directly from source — the @cue-vin/player barrel export includes
 // browser-only code (HTMLElement) that crashes in Node.js. The export.ts
 // module is a pure string builder and works in any environment.
 import { exportToHtml } from "../../packages/player/src/export";
