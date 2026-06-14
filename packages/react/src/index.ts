@@ -30,3 +30,6 @@ export type { HotspotOverlayProps, Hotspot } from "./components/HotspotOverlay";
 
 export { AnnotationLayer } from "./components/AnnotationLayer";
 export type { AnnotationLayerProps, Annotation, AnnotationArrow, AnnotationBox, AnnotationText } from "./components/AnnotationLayer";
+
+export { ScreenSlide } from "./components/ScreenSlide";
+export type { ScreenSlideProps } from "./components/ScreenSlide";
