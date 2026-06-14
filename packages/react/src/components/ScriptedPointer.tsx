@@ -1,4 +1,4 @@
-import type { PointerState } from "@cue/core";
+import type { PointerState } from "@cue-vin/core";
 
 /** Props for the ScriptedPointer component. */
 export interface ScriptedPointerProps {
