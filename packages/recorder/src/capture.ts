@@ -1,4 +1,4 @@
-import type { DemoHotspot, DemoPointer } from "@cue/core";
+import type { DemoHotspot, DemoPointer } from "@cue-vin/core";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
