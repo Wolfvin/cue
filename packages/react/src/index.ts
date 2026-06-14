@@ -45,4 +45,4 @@ export type { ChapterNavProps } from "./components/ChapterNav";
 
 export { CtaOverlay } from "./components/CtaOverlay";
 export type { CtaOverlayProps } from "./components/CtaOverlay";
-export type { DemoCta } from "@cue/core";
+export type { DemoCta } from "@cue-vin/core";
