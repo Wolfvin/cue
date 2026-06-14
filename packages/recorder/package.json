@@ -2,19 +2,24 @@
   "name": "@cue/recorder",
   "version": "0.1.0",
   "description": "Playwright-based capture tool that produces DemoScript JSON for cue SDK",
-  "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "bin": {
     "cue-record": "./dist/cli.js"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "clean": "rm -rf dist *.tsbuildinfo",
+    "build": "tsup src/index.ts src/cli.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts src/cli.ts --format cjs,esm --dts --watch",
+    "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
