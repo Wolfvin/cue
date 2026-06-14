@@ -3,22 +3,22 @@
  * HTML file.
  *
  * We implement the HTML template directly rather than importing from
- * @cue/player because the player's CJS bundle contains browser-specific code
+ * @cue-vin/player because the player's CJS bundle contains browser-specific code
  * (React, customElements, HTMLElement) that cannot run in Node.js. The MCP
  * server runs as a Node.js CLI process, so we need a Node-compatible version
  * of the export logic.
  *
- * The HTML output is functionally identical to @cue/player's exportToHtml()
+ * The HTML output is functionally identical to @cue-vin/player's exportToHtml()
  * with playerJsInline=false (CDN mode).
  */
 
 import { z } from "zod";
-import type { DemoScript } from "@cue/core";
+import type { DemoScript } from "@cue-vin/core";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 /** Default CDN URL for the IIFE bundle. */
 const DEFAULT_CDN_URL =
-  "https://unpkg.com/@cue/player/dist/cue-player.iife.js";
+  "https://unpkg.com/@cue-vin/player/dist/cue-player.iife.js";
 
 /** Zod schema for the cue_export_html tool input. */
 export const exportHtmlToolSchema = {
@@ -48,7 +48,7 @@ function escapeHtml(str: string): string {
 
 /**
  * Generate a self-contained HTML string from a DemoScript.
- * This is the Node.js-compatible equivalent of @cue/player's exportToHtml().
+ * This is the Node.js-compatible equivalent of @cue-vin/player's exportToHtml().
  */
 function generateHtml(
   script: DemoScript,
