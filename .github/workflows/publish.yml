@@ -33,7 +33,7 @@ jobs:
           for pkg in packages/core packages/react packages/css packages/player packages/recorder packages/analytics-server packages/mcp; do
             echo "Publishing $pkg..."
             cd $pkg
-            npm publish --access public || true
+            pnpm publish --no-git-checks --access public || true
             cd ../..
           done
         env:
