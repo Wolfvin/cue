@@ -9,7 +9,8 @@
   "files": ["src", "README.md"],
   "scripts": {
     "build": "echo 'No build step required — cue.css is ready as-is'",
-    "clean": "echo 'Nothing to clean'"
+    "clean": "echo 'Nothing to clean'",
+    "typecheck": "echo 'No TypeScript files — skipping typecheck'"
   },
   "license": "MIT"
 }
