@@ -42,3 +42,7 @@ export type { StepProgressProps } from "./components/StepProgress";
 
 export { ChapterNav } from "./components/ChapterNav";
 export type { ChapterNavProps } from "./components/ChapterNav";
+
+export { CtaOverlay } from "./components/CtaOverlay";
+export type { CtaOverlayProps } from "./components/CtaOverlay";
+export type { DemoCta } from "@cue/core";

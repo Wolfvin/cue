@@ -30,6 +30,22 @@ export interface DemoPointer {
   clicking?: boolean;
 }
 
+/** Call-to-action overlay for a demo step. */
+export interface DemoCta {
+  /** CTA variant. */
+  type: "button" | "email_capture" | "link";
+  /** Label text for the button or CTA element. */
+  label: string;
+  /** URL for `type: "link"`, or navigation target for `type: "button"`. */
+  href?: string;
+  /** Placeholder text for `type: "email_capture"`. Default: "Enter your email". */
+  placeholder?: string;
+  /** Submit button label for `type: "email_capture"`. Default: "Get started". */
+  submitLabel?: string;
+  /** Message shown after email submission. Default: "Thanks! We'll be in touch.". */
+  successMessage?: string;
+}
+
 /** Theme configuration for a demo script. */
 export interface DemoTheme {
   /** Accent color used for highlights and interactive elements. Default: "#C91C1C". */
@@ -56,6 +72,8 @@ export interface DemoStep {
   annotations?: DemoAnnotation[];
   /** Caption text displayed below the slide. */
   caption?: string;
+  /** Call-to-action overlay. When present, renders a CTA on top of this step. */
+  cta?: DemoCta;
 }
 
 /** JSON-driven demo configuration that an AI agent generates and cue renders. */
