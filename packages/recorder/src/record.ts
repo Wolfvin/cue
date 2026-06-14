@@ -1,4 +1,4 @@
-import type { DemoScript, DemoStep } from "@cue/core";
+import type { DemoScript, DemoStep } from "@cue-vin/core";
 import { captureScreenshot } from "./capture.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
