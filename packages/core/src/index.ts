@@ -19,3 +19,14 @@ export type {
   DemoTheme,
 } from "./DemoScript";
 export { validateDemoScript, getDemoStep } from "./DemoScript";
+
+export type {
+  CueEventType,
+  CueEvent,
+  CueAnalyticsConfig,
+  CueSummary,
+} from "./Analytics";
+export { CueAnalytics } from "./Analytics";
+
+export { screenshotToStep, fileToDataUrl, interpolatePointer } from "./ScreenCapture";
+export type { ScreenshotToStepOptions } from "./ScreenCapture";
