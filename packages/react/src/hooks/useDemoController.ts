@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { StateMachine } from "@cue/core";
+import { StateMachine } from "@cue-vin/core";
 
 export interface UseDemoControllerOptions {
   steps: number;
