@@ -1,0 +1,17 @@
+{
+  "name": "cue-monorepo",
+  "private": true,
+  "description": "Motion Primitives & Demo Theater SDK for AI agents",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "clean": "turbo run clean",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

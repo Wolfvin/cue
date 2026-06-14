@@ -1,0 +1,111 @@
+/* ========================================================================
+   @cue/css — Motion Primitives for Demo Theater
+   Pure CSS animation primitives. Zero JS dependency.
+   ======================================================================== */
+
+/* ── Custom Properties ─────────────────────────────────────────────────── */
+
+:root {
+  --cue-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cue-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cue-ease-in-out: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --cue-duration-fast: 150ms;
+  --cue-duration-normal: 300ms;
+  --cue-duration-slow: 500ms;
+
+  --cue-color-accent: #3b82f6;
+  --cue-color-glow: rgba(59, 130, 246, 0.4);
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+
+@keyframes cue-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cue-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cue-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cue-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cue-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--cue-color-glow);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px var(--cue-color-glow);
+  }
+}
+
+/* ── Enter Utility ─────────────────────────────────────────────────────── */
+
+.cue-enter {
+  animation: cue-slide-up var(--cue-duration-normal) var(--cue-ease-out) both;
+}
+
+.cue-enter-fade {
+  animation: cue-fade-in var(--cue-duration-normal) var(--cue-ease-out) both;
+}
+
+.cue-enter-scale {
+  animation: cue-scale-in var(--cue-duration-slow) var(--cue-ease-spring) both;
+}
+
+/* ── Hover Utilities ───────────────────────────────────────────────────── */
+
+.cue-hover-lift {
+  transition: transform var(--cue-duration-fast) var(--cue-ease-spring),
+              box-shadow var(--cue-duration-fast) var(--cue-ease-out);
+}
+
+.cue-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Stagger Utilities ─────────────────────────────────────────────────── */
+
+.cue-stagger-1 { animation-delay: 50ms; }
+.cue-stagger-2 { animation-delay: 100ms; }
+.cue-stagger-3 { animation-delay: 150ms; }
+.cue-stagger-4 { animation-delay: 200ms; }
+.cue-stagger-5 { animation-delay: 250ms; }
+.cue-stagger-6 { animation-delay: 300ms; }
+.cue-stagger-7 { animation-delay: 350ms; }
+.cue-stagger-8 { animation-delay: 400ms; }
+
+/* ── Spinner ───────────────────────────────────────────────────────────── */
+
+.cue-spinner {
+  animation: cue-spin 0.8s linear infinite;
+}
+
+/* ── Glow Pulse ────────────────────────────────────────────────────────── */
+
+.cue-glow {
+  animation: cue-glow-pulse 2s ease-in-out infinite;
+}

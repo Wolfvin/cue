@@ -1,0 +1,12 @@
+{
+  "name": "@cue/css",
+  "version": "0.1.0",
+  "description": "Pure CSS animation primitives for cue SDK — zero JS dependency",
+  "main": "src/cue.css",
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — cue.css is ready as-is'",
+    "clean": "echo 'Nothing to clean'"
+  },
+  "license": "MIT"
+}
