@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * @cue/mcp — MCP server that exposes cue capabilities as tools for AI agents.
+ * @cue-vin/mcp — MCP server that exposes cue capabilities as tools for AI agents.
  *
  * Runs on stdio (standard MCP transport) so it can be used directly by
  * Claude Desktop, Cursor, and any other MCP-compatible AI client.
@@ -26,7 +26,7 @@ import { statsToolSchema, handleGetStats } from "./tools/stats.js";
  */
 export function createServer(): McpServer {
   const server = new McpServer({
-    name: "@cue/mcp",
+    name: "@cue-vin/mcp",
     version: "0.1.0",
   });
 
@@ -85,6 +85,6 @@ export async function startMcpServer(): Promise<void> {
 
 // When executed directly (not imported), start the server
 startMcpServer().catch((error: unknown) => {
-  console.error("Fatal error starting @cue/mcp server:", error);
+  console.error("Fatal error starting @cue-vin/mcp server:", error);
   process.exit(1);
 });
