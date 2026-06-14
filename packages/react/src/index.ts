@@ -24,3 +24,6 @@ export type { UseStaggerOptions } from "./hooks/useStagger";
 
 export { useScrollReveal } from "./hooks/useScrollReveal";
 export type { UseScrollRevealOptions } from "./hooks/useScrollReveal";
+
+export { ScreenSlide } from "./components/ScreenSlide";
+export type { ScreenSlideProps } from "./components/ScreenSlide";

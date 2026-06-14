@@ -9,3 +9,13 @@ export type { Scene, TransitionEvent, StateMachineOptions } from "./StateMachine
 
 export { ScrollTrigger } from "./ScrollTrigger";
 export type { ScrollTriggerOptions } from "./ScrollTrigger";
+
+export type {
+  DemoScript,
+  DemoStep,
+  DemoHotspot,
+  DemoAnnotation,
+  DemoPointer,
+  DemoTheme,
+} from "./DemoScript";
+export { validateDemoScript, getDemoStep } from "./DemoScript";
