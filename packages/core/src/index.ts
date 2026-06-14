@@ -16,6 +16,7 @@ export type {
   DemoHotspot,
   DemoAnnotation,
   DemoPointer,
+  DemoCta,
   DemoTheme,
 } from "./DemoScript";
 export { validateDemoScript, getDemoStep } from "./DemoScript";
