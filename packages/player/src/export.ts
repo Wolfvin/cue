@@ -6,7 +6,7 @@
  * When false, the script is loaded from a CDN URL (works in browser/edge).
  */
 
-import type { DemoScript } from "@cue/core";
+import type { DemoScript } from "@cue-vin/core";
 
 /** Options for the HTML export function. */
 export interface ExportOptions {
@@ -26,7 +26,7 @@ export interface ExportOptions {
 
 /** Default CDN URL for the IIFE bundle. */
 const DEFAULT_CDN_URL =
-  "https://unpkg.com/@cue/player/dist/cue-player.iife.js";
+  "https://unpkg.com/@cue-vin/player/dist/cue-player.iife.js";
 
 /**
  * Generate a self-contained HTML string from a DemoScript.
