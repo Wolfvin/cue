@@ -6,6 +6,8 @@ export interface UseScrollRevealOptions {
   threshold?: number;
   /** Whether to trigger only once. Default: true. */
   once?: boolean;
+  /** Root margin string for the observer. Default: "0px". */
+  rootMargin?: string;
 }
 
 /** Hook that returns a ref and a boolean indicating if the element is in the viewport. */
@@ -13,7 +15,7 @@ export function useScrollReveal(options: UseScrollRevealOptions = {}): [
   React.RefObject<HTMLDivElement | null>,
   boolean,
 ] {
-  const { threshold = 0.1, once = true } = options;
+  const { threshold = 0.1, once = true, rootMargin = "0px" } = options;
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const playedRef = useRef(false);
@@ -34,12 +36,12 @@ export function useScrollReveal(options: UseScrollRevealOptions = {}): [
           }
         }
       },
-      { threshold }
+      { threshold, rootMargin }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold, once]);
+  }, [threshold, once, rootMargin]);
 
   return [ref, isVisible];
 }

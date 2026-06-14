@@ -49,9 +49,19 @@ export class StateMachine {
     return this.scenes.map((s) => s.id);
   }
 
+  /** Total number of registered scenes. */
+  get sceneCount(): number {
+    return this.scenes.length;
+  }
+
   /** Whether the machine has reached the last scene. */
   get isFinished(): boolean {
-    return this.currentIndex === this.scenes.length - 1;
+    return this.scenes.length > 0 && this.currentIndex === this.scenes.length - 1;
+  }
+
+  /** Whether the machine has been started (any scene is active). */
+  get isStarted(): boolean {
+    return this.currentIndex >= 0;
   }
 
   /** Add a scene to the end of the sequence. */
@@ -64,7 +74,7 @@ export class StateMachine {
     scenes.forEach((s) => this.addScene(s));
   }
 
-  /** Transition to the first scene (id: "idle" if not customized). */
+  /** Transition to the first scene. */
   start(): void {
     if (this.scenes.length === 0) return;
     this.currentIndex = 0;
@@ -74,7 +84,7 @@ export class StateMachine {
     scene.onEnter?.();
   }
 
-  /** Transition to the next scene in sequence. */
+  /** Transition to the next scene in sequence. Loops if configured. */
   next(): void {
     if (this.currentIndex < 0) {
       this.start();
@@ -95,12 +105,23 @@ export class StateMachine {
     scene.onEnter?.();
   }
 
-  /** Jump to a specific scene by id. */
+  /** Jump to a specific scene by id. No-op if id not found. */
   goTo(id: string): void {
     const index = this.scenes.findIndex((s) => s.id === id);
     if (index < 0) return;
     const from = this.currentIndex >= 0 ? this.scenes[this.currentIndex].id : null;
     this.currentIndex = index;
+    const scene = this.scenes[this.currentIndex];
+    const event: TransitionEvent = { from, to: scene.id };
+    this.onTransition?.(event);
+    scene.onEnter?.();
+  }
+
+  /** Go back to the previous scene. No-op if at the first scene. */
+  prev(): void {
+    if (this.currentIndex <= 0) return;
+    const from = this.scenes[this.currentIndex].id;
+    this.currentIndex--;
     const scene = this.scenes[this.currentIndex];
     const event: TransitionEvent = { from, to: scene.id };
     this.onTransition?.(event);

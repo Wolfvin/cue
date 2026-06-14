@@ -14,7 +14,7 @@ export interface ScrollTriggerOptions {
   once?: boolean;
 }
 
-/** IntersectionObserver wrapper with threshold and played-guard. */
+/** IntersectionObserver wrapper with threshold, rootMargin, and played-guard. */
 export class ScrollTrigger {
   private observer: IntersectionObserver | null = null;
   private played = false;
@@ -33,6 +33,11 @@ export class ScrollTrigger {
     };
   }
 
+  /** Whether the trigger has already fired (when once=true). */
+  get hasPlayed(): boolean {
+    return this.played;
+  }
+
   /** Start observing the target element. */
   observe(): void {
     if (this.observer) return;
@@ -48,7 +53,7 @@ export class ScrollTrigger {
             this.played = true;
             this.options.onEnter();
           } else {
-            this.options.onLeave();
+            this.options.onLeave?.();
           }
         }
       },
@@ -68,6 +73,12 @@ export class ScrollTrigger {
 
   /** Reset the played guard so the trigger can fire again. */
   reset(): void {
+    this.played = false;
+  }
+
+  /** Disconnect and reset — fully clean up. */
+  dispose(): void {
+    this.disconnect();
     this.played = false;
   }
 }

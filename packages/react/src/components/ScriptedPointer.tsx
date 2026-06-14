@@ -1,6 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from "react";
 import type { PointerState } from "@cue/core";
-import { Pointer } from "@cue/core";
 
 /** Props for the ScriptedPointer component. */
 export interface ScriptedPointerProps {
@@ -21,7 +19,6 @@ export function ScriptedPointer({
   color = "#1a1a1a",
   className,
 }: ScriptedPointerProps) {
-  const half = size / 2;
   return (
     <div
       className={className}
@@ -29,10 +26,13 @@ export function ScriptedPointer({
         position: "absolute",
         left: state.x,
         top: state.y,
-        transition: `left ${state.transition} ease-out, top ${state.transition} ease-out`,
+        transitionProperty: "left, top",
+        transitionDuration: state.transition,
+        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
         pointerEvents: "none",
         zIndex: 9999,
         transform: "translate(-2px, -2px)",
+        willChange: "left, top",
       }}
     >
       <svg

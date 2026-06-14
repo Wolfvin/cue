@@ -6,7 +6,7 @@ export interface PointerState {
   y: number;
   /** Whether the pointer is in clicking state. */
   clicking: boolean;
-  /** CSS transition duration string, e.g. "0.4s". */
+  /** CSS transition duration string, e.g. "400ms". */
   transition: string;
 }
 
@@ -36,7 +36,7 @@ export interface PointerOptions {
   onChange?: (state: PointerState) => void;
 }
 
-/** Scripted pointer that drives cursor position and click state. */
+/** Scripted pointer that drives cursor position and click state via callbacks. */
 export class Pointer {
   private state: PointerState;
   private defaultDuration: number;
@@ -74,49 +74,57 @@ export class Pointer {
     this.emit();
   }
 
-  /** Simulate a click at the current position. */
+  /** Simulate a click at the current position for a given hold duration. */
   click(duration = 150): void {
     this.state.clicking = true;
     this.emit();
     const timer = setTimeout(() => {
+      if (!this._isRunning && this.timers.length === 0) return; // Guard if disposed
       this.state.clicking = false;
       this.emit();
     }, duration);
     this.timers.push(timer);
   }
 
-  /** Play a sequence of keyframes. */
+  /** Play a sequence of keyframes sequentially. No-op if already running. */
   play(keyframes: PointerKeyframe[]): void {
     if (this._isRunning) return;
     this._isRunning = true;
+
     let cumulative = 0;
     for (const kf of keyframes) {
       cumulative += kf.delay ?? 0;
       const moveAfter = cumulative;
       const moveTimer = setTimeout(() => {
+        if (!this._isRunning) return; // Guard if stopped mid-play
         this.moveTo(kf.x, kf.y, kf.duration);
         if (kf.click) {
-          const clickTimer = setTimeout(() => this.click(), (kf.duration ?? this.defaultDuration));
+          const clickDelay = (kf.duration ?? this.defaultDuration) * 0.7;
+          const clickTimer = setTimeout(() => {
+            if (!this._isRunning) return;
+            this.click();
+          }, clickDelay);
           this.timers.push(clickTimer);
         }
       }, moveAfter);
       this.timers.push(moveTimer);
       cumulative += kf.duration ?? this.defaultDuration;
     }
+
     const endTimer = setTimeout(() => {
       this._isRunning = false;
     }, cumulative + 50);
     this.timers.push(endTimer);
   }
 
-  /** Stop all pending pointer movements. */
+  /** Stop all pending pointer movements and clear timers. */
   stop(): void {
     this._isRunning = false;
     this.timers.forEach(clearTimeout);
     this.timers = [];
   }
 
-  /** Reset pointer to initial position and clear state. */
+  /** Reset pointer to a given position and clear all state. */
   reset(x = 0, y = 0): void {
     this.stop();
     this.state = { x, y, clicking: false, transition: `${this.defaultDuration}ms` };

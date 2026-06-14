@@ -41,6 +41,11 @@ export class Timeline {
     return this._isPlaying;
   }
 
+  /** Number of entries in the timeline. */
+  get length(): number {
+    return this.entries.length;
+  }
+
   /** Add a callback to be executed after a specified delay. */
   add(delay: number, callback: () => void): string {
     const id = `cue-tl-${this.counter++}`;
@@ -48,12 +53,14 @@ export class Timeline {
     return id;
   }
 
-  /** Remove an entry by its id. */
-  remove(id: string): void {
+  /** Remove an entry by its id. Returns true if found and removed. */
+  remove(id: string): boolean {
+    const len = this.entries.length;
     this.entries = this.entries.filter((e) => e.id !== id);
+    return this.entries.length < len;
   }
 
-  /** Start executing all entries in sequence. */
+  /** Start executing all entries in sequence. No-op if already playing. */
   play(): void {
     if (this._isPlaying) return;
     this._isPlaying = true;
@@ -73,7 +80,7 @@ export class Timeline {
     this.entries.forEach((e) => (e.played = false));
   }
 
-  /** Clean up all timers — call on unmount. */
+  /** Clean up all timers and entries — call on unmount. */
   dispose(): void {
     this.stop();
     this.entries = [];
@@ -85,6 +92,8 @@ export class Timeline {
       if (entry.played) continue;
       cumulative += entry.delay;
       const timer = setTimeout(() => {
+        // Guard: skip if timeline was stopped or entry already played
+        if (!this._isPlaying || entry.played) return;
         entry.callback();
         entry.played = true;
         this.checkCompletion();
@@ -100,6 +109,7 @@ export class Timeline {
     if (this.loop) {
       this.entries.forEach((e) => (e.played = false));
       const timer = setTimeout(() => {
+        if (!this._isPlaying) return; // Guard against stop during loopDelay
         this.timers = [];
         this.scheduleEntries();
       }, this.loopDelay);

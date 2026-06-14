@@ -10,11 +10,13 @@ export interface UseCountUpOptions {
   enabled?: boolean;
   /** Number of decimal places. Default: 0. */
   decimals?: number;
+  /** Easing function. Default: "ease-out-cubic". */
+  easing?: "linear" | "ease-out-cubic" | "ease-out-expo";
 }
 
-/** Hook that animates a number counting up from 0 to a target value. */
+/** Hook that animates a number counting up from 0 to a target value using requestAnimationFrame. */
 export function useCountUp(options: UseCountUpOptions): number {
-  const { target, duration = 1200, enabled = true, decimals = 0 } = options;
+  const { target, duration = 1200, enabled = true, decimals = 0, easing = "ease-out-cubic" } = options;
   const [value, setValue] = useState(enabled ? 0 : target);
   const rafRef = useRef<number>(0);
 
@@ -25,11 +27,24 @@ export function useCountUp(options: UseCountUpOptions): number {
     }
 
     const startTime = performance.now();
+
+    const ease = (t: number): number => {
+      switch (easing) {
+        case "linear":
+          return t;
+        case "ease-out-expo":
+          return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        case "ease-out-cubic":
+        default:
+          return 1 - Math.pow(1 - t, 3);
+      }
+    };
+
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(parseFloat((eased * target).toFixed(decimals)));
+      const easedProgress = ease(progress);
+      setValue(parseFloat((easedProgress * target).toFixed(decimals)));
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(animate);
       }
@@ -37,7 +52,7 @@ export function useCountUp(options: UseCountUpOptions): number {
 
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [target, duration, enabled, decimals]);
+  }, [target, duration, enabled, decimals, easing]);
 
   return value;
 }

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, type ReactNode } from "react";
+import { useRef, useEffect, useCallback, useState, type ReactNode } from "react";
 
 /** Props for the DemoTheater component. */
 export interface DemoTheaterProps {
@@ -23,25 +23,30 @@ export function DemoTheater({
   className,
 }: DemoTheaterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const artboardRef = useRef<HTMLDivElement>(null);
+
+  const updateScale = useCallback(() => {
+    const container = containerRef.current;
+    const artboard = artboardRef.current;
+    if (!container || !artboard) return;
+
+    const rect = container.getBoundingClientRect();
+    const scaleX = rect.width / width;
+    const scaleY = rect.height / height;
+    const scale = Math.min(scaleX, scaleY, 1);
+    artboard.style.transform = `scale(${scale})`;
+  }, [width, height]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
-    const updateScale = () => {
-      const rect = container.getBoundingClientRect();
-      const scaleX = rect.width / width;
-      const scaleY = rect.height / height;
-      setScale(Math.min(scaleX, scaleY, 1));
-    };
 
     const observer = new ResizeObserver(updateScale);
     observer.observe(container);
     updateScale();
 
     return () => observer.disconnect();
-  }, [width, height]);
+  }, [updateScale]);
 
   return (
     <div
@@ -58,16 +63,17 @@ export function DemoTheater({
       }}
     >
       <div
+        ref={artboardRef}
         style={{
           width,
           height,
           background,
-          transform: `scale(${scale})`,
           transformOrigin: "center center",
           position: "relative",
           overflow: "hidden",
           borderRadius: 8,
           boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+          flexShrink: 0,
         }}
       >
         {children}
