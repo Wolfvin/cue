@@ -1,11 +1,11 @@
 /**
  * Tool handler for cue_validate — validate a DemoScript JSON object.
- * Delegates to @cue/core's validateDemoScript() function.
+ * Delegates to @cue-vin/core's validateDemoScript() function.
  */
 
 import { z } from "zod";
-import { validateDemoScript } from "@cue/core";
-import type { DemoScript } from "@cue/core";
+import { validateDemoScript } from "@cue-vin/core";
+import type { DemoScript } from "@cue-vin/core";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 /** Zod schema for the cue_validate tool input. */
