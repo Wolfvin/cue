@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { createRoot, Root } from "react-dom/client";
-import type { DemoScript } from "@cue/core";
-import { validateDemoScript } from "@cue/core";
+import type { DemoScript } from "@cue-vin/core";
+import { validateDemoScript } from "@cue-vin/core";
 import { CuePlayer } from "./CuePlayer";
 
 /** Custom Element that renders a CuePlayer inside a shadow DOM. */
