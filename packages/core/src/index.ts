@@ -31,3 +31,6 @@ export { CueAnalytics } from "./Analytics";
 
 export { screenshotToStep, fileToDataUrl, interpolatePointer } from "./ScreenCapture";
 export type { ScreenshotToStepOptions } from "./ScreenCapture";
+
+export { generate } from "./generate";
+export type { GenerateOptions } from "./generate";
