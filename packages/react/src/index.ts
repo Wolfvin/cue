@@ -33,3 +33,12 @@ export type { AnnotationLayerProps, Annotation, AnnotationArrow, AnnotationBox, 
 
 export { ScreenSlide } from "./components/ScreenSlide";
 export type { ScreenSlideProps } from "./components/ScreenSlide";
+
+export { useDemoController } from "./hooks/useDemoController";
+export type { UseDemoControllerOptions, DemoController } from "./hooks/useDemoController";
+
+export { StepProgress } from "./components/StepProgress";
+export type { StepProgressProps } from "./components/StepProgress";
+
+export { ChapterNav } from "./components/ChapterNav";
+export type { ChapterNavProps } from "./components/ChapterNav";
