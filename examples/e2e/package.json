@@ -6,8 +6,8 @@
     "start": "tsx run.ts"
   },
   "dependencies": {
-    "@cue/core": "workspace:*",
-    "@cue/player": "workspace:*",
+    "@cue-vin/core": "workspace:*",
+    "@cue-vin/player": "workspace:*",
     "tsx": "^4"
   }
 }
