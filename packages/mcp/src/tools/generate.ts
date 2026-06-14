@@ -1,11 +1,11 @@
 /**
  * Tool handler for cue_generate — generate a DemoScript JSON from a list of
- * features. Delegates to @cue/core's generate() function.
+ * features. Delegates to @cue-vin/core's generate() function.
  */
 
 import { z } from "zod";
-import { generate } from "@cue/core";
-import type { GenerateOptions } from "@cue/core";
+import { generate } from "@cue-vin/core";
+import type { GenerateOptions } from "@cue-vin/core";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 /** Zod schema for a single feature input. */
@@ -35,7 +35,7 @@ export const generateToolSchema = {
 
 /**
  * Handle the cue_generate tool call.
- * Calls generate() from @cue/core and returns the DemoScript as a JSON string.
+ * Calls generate() from @cue-vin/core and returns the DemoScript as a JSON string.
  */
 export async function handleGenerate(
   args: Record<string, unknown>
