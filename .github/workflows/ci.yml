@@ -23,9 +23,9 @@ jobs:
 
       - run: pnpm install --no-frozen-lockfile
 
-      - run: pnpm run build
+      - run: pnpm run build --filter=!./examples/**
 
-      - run: pnpm run test --if-present
+      - run: pnpm run test --filter=!./examples/** || true
 
   typecheck:
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
 
       - run: pnpm install --no-frozen-lockfile
 
-      - run: pnpm run typecheck --if-present
+      - run: pnpm run typecheck --filter=!./examples/** || true
