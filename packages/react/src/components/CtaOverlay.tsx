@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, type FormEvent, type KeyboardEvent } from "react";
-import type { DemoCta } from "@cue/core";
+import type { DemoCta } from "@cue-vin/core";
 
 /** Props for the CtaOverlay component. */
 export interface CtaOverlayProps {
