@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cue demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    #error {
+      color: #ef4444;
+      font-size: 14px;
+      text-align: center;
+      padding: 24px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <cue-embed id="player"></cue-embed>
+  <div id="error"></div>
+
+  <!-- Load the IIFE bundle (exposes window.Cue) -->
+  <script src="./cue-player.iife.js"></script>
+
+  <script>
+    (function () {
+      var player = document.getElementById('player');
+      var errorEl = document.getElementById('error');
+
+      function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        player.style.display = 'none';
+      }
+
+      // Register the <cue-embed> custom element
+      if (window.Cue && typeof window.Cue.initCue === 'function') {
+        window.Cue.initCue();
+      }
+
+      // Parse query string
+      var params = new URLSearchParams(window.location.search);
+      var src = params.get('src');
+      var data = params.get('data');
+
+      // Pass through width/height/autoplay/loop if provided
+      if (params.has('width')) player.setAttribute('width', params.get('width'));
+      if (params.has('height')) player.setAttribute('height', params.get('height'));
+      if (params.has('autoplay')) player.setAttribute('autoplay', '');
+      if (params.has('loop')) player.setAttribute('loop', '');
+
+      if (src) {
+        // Mode 1: fetch DemoScript from URL
+        player.setAttribute('src', src);
+      } else if (data) {
+        // Mode 2: base64-encoded DemoScript JSON
+        try {
+          var jsonStr = decodeURIComponent(escape(atob(data)));
+          player.setAttribute('data', jsonStr);
+        } catch (e) {
+          showError('Failed to decode base64 data parameter');
+        }
+      } else {
+        showError('No demo source provided. Use ?src=./demo.json or ?data=<base64>');
+      }
+    })();
+  </script>
+</body>
+</html>
