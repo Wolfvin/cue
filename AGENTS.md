@@ -25,6 +25,9 @@ User minta apa?
 ├─ "Punya screenshot file?" → Recipe 4 (Screenshot-Based Demo) — gunakan fileToDataUrl + screenshotToStep
 ├─ "Mau embed di HTML / landing page?" → Recipe 5 (Embeddable Player) — gunakan initCue + <cue-embed>
 ├─ "Perlu track analytics?" → Recipe 6 (Analytics Tracking) — gunakan CueAnalytics
+├─ "Capture app nyata jadi DemoScript?" → Recipe 7 (Record Browser Session) — gunakan cue-record CLI
+├─ "Generate demo dari deskripsi fitur?" → Recipe 8 (Generate DemoScript) — gunakan generate()
+├─ "Self-hosted analytics server?" → Recipe 9 (Analytics Server) — gunakan cue-analytics
 └─ "Gabungan" → Combine sesuai kebutuhan
 ```
 
@@ -1109,7 +1112,347 @@ const handleStepChange = (stepIndex: number) => {
 
 ---
 
-## Quick Reference — All Exports (Phase 1 + 2 + 3)
+## Recipe 7: Record Browser Session → DemoScript (cue-record CLI)
+
+**Gunakan ketika:** Agent punya URL app yang bisa dibuka Playwright dan ingin capture real browser session menjadi DemoScript JSON dengan screenshot nyata. Cocok untuk "record app live → jadi demo".
+
+**Prinsip:** `cue-record` CLI membaca file `actions.json` berisi array `CaptureAction`, menjalankan tiap action di Playwright headless browser, capture screenshot + pointer position + hotspot positions, lalu menghasilkan DemoScript JSON siap pakai.
+
+### Step 1 — Buat actions.json
+
+```json
+[
+  {
+    "type": "navigate",
+    "url": "https://my-app.example.com/dashboard",
+    "caption": "Welcome to the dashboard"
+  },
+  {
+    "type": "wait",
+    "duration": 1500
+  },
+  {
+    "type": "screenshot",
+    "caption": "Dashboard overview — see your key metrics at a glance",
+    "hotspots": [
+      { "label": "Revenue chart", "selector": "#revenue-card", "alwaysShow": true },
+      { "label": "User activity", "selector": "#activity-feed" }
+    ]
+  },
+  {
+    "type": "click",
+    "selector": "button.upload-btn",
+    "caption": "Click Upload to start adding your data files"
+  },
+  {
+    "type": "screenshot",
+    "caption": "Upload area — drag and drop or browse your files",
+    "hotspots": [
+      { "label": "Drop zone", "selector": ".drop-zone", "alwaysShow": true }
+    ]
+  },
+  {
+    "type": "type",
+    "selector": "input.search-input",
+    "text": "Q4 revenue report.xlsx",
+    "caption": "Search and select your file"
+  },
+  {
+    "type": "click",
+    "selector": "button.analyze-btn",
+    "caption": "Hit Analyze to process your data"
+  },
+  {
+    "type": "screenshot",
+    "caption": "Analysis results with interactive charts and insights",
+    "duration": 6000,
+    "hotspots": [
+      { "label": "Key insight", "selector": ".insight-card", "alwaysShow": true }
+    ]
+  }
+]
+```
+
+### Step 2 — Jalankan recorder
+
+```bash
+# Install Playwright browser (hanya sekali)
+npx playwright install chromium
+
+# Run recorder
+npx cue-record --script actions.json --output demo.json --screenshots ./shots
+
+# Dengan custom viewport
+npx cue-record --script actions.json --output demo.json --screenshots ./shots --width 1440 --height 900
+```
+
+### Step 3 — Output
+
+File `demo.json` berisi DemoScript yang valid dan bisa langsung di-feed ke CuePlayer:
+
+```json
+{
+  "id": "demo-1700000000000",
+  "title": "Recorded Demo",
+  "steps": [
+    {
+      "id": "step-0",
+      "screen": "shots/step-000.png",
+      "pointer": { "x": 0.5, "y": 0.5, "clicking": false },
+      "caption": "Welcome to the dashboard"
+    },
+    {
+      "id": "step-1",
+      "screen": "shots/step-001.png",
+      "pointer": { "x": 0.5, "y": 0.5, "clicking": false },
+      "caption": "Dashboard overview — see your key metrics at a glance",
+      "hotspots": [
+        { "id": "h-1-0", "x": 0.25, "y": 0.30, "label": "Revenue chart", "alwaysShow": true },
+        { "id": "h-1-1", "x": 0.70, "y": 0.40, "label": "User activity" }
+      ]
+    },
+    {
+      "id": "step-2",
+      "screen": "shots/step-002.png",
+      "pointer": { "x": 0.45, "y": 0.55, "clicking": true },
+      "caption": "Click Upload to start adding your data files"
+    }
+  ],
+  "loop": false
+}
+```
+
+**Kapan pakai:** Saat punya URL app yang bisa dibuka Playwright dan ingin demo dengan screenshot real — bukan mock UI. Output DemoScript bisa langsung dipakai Recipe 4 (Screenshot-Based Demo) atau Recipe 5 (Embeddable Player).
+
+---
+
+## Recipe 8: Generate DemoScript dari Deskripsi Fitur (generate())
+
+**Gunakan ketika:** Agent ingin membuat demo dari deskripsi fitur tanpa screenshot real. Cocok untuk "describe fitur → auto-generate DemoScript siap pakai". Tidak memanggil LLM — pure heuristic/template based.
+
+**Prinsip:** Fungsi `generate()` dari `@cue/core` menerima structured input (id, title, array of features) dan menghasilkan valid DemoScript. Setiap feature jadi satu DemoStep. Steps dengan CTA tidak auto-advance (duration undefined), step tanpa CTA menggunakan `defaultDuration`.
+
+```ts
+// generate-demo.ts — Generate DemoScript from feature descriptions
+import { generate, validateDemoScript } from "@cue/core";
+import { writeFileSync } from "node:fs";
+
+const script = generate({
+  id: "my-saas-demo",
+  title: "My SaaS Product Demo",
+  features: [
+    {
+      name: "Dashboard Overview",
+      description: "See all your key metrics at a glance with real-time data.",
+      screenshotPath: "/screenshots/dashboard.png",
+      hotspots: [
+        { label: "Revenue chart", x: 0.25, y: 0.3 },
+        { label: "User activity", x: 0.7, y: 0.4 },
+      ],
+    },
+    {
+      name: "Upload Data",
+      description: "Drag and drop your files to start analysis.",
+      screenshotPath: "/screenshots/upload.png",
+      hotspots: [
+        { label: "Upload area", x: 0.5, y: 0.5 },
+      ],
+      cta: {
+        type: "button",
+        label: "Try Upload",
+      },
+    },
+    {
+      name: "View Results",
+      description: "View analysis results with interactive charts and insights.",
+      screenshotPath: "/screenshots/results.png",
+      hotspots: [
+        { label: "Key insight", x: 0.6, y: 0.35 },
+      ],
+    },
+    {
+      name: "Get Started",
+      description: "Ready to transform your workflow?",
+      cta: {
+        type: "email_capture",
+        label: "Start Free Trial",
+      },
+    },
+  ],
+  defaultDuration: 5000,
+  theme: { accent: "#3b82f6", bg: "#0a0a0a" },
+});
+
+// Validate before saving
+if (!validateDemoScript(script)) {
+  throw new Error("Generated DemoScript is invalid");
+}
+
+// Save to file
+writeFileSync("demo.json", JSON.stringify(script, null, 2), "utf-8");
+console.log(`Generated demo: ${script.id} with ${script.steps.length} steps`);
+```
+
+### Output DemoScript (snippet)
+
+```json
+{
+  "id": "my-saas-demo",
+  "title": "My SaaS Product Demo",
+  "steps": [
+    {
+      "id": "dashboard-overview",
+      "caption": "See all your key metrics at a glance with real-time data.",
+      "screen": "/screenshots/dashboard.png",
+      "hotspots": [
+        { "id": "dashboard-overview-hotspot-0", "x": 0.25, "y": 0.3, "label": "Revenue chart" },
+        { "id": "dashboard-overview-hotspot-1", "x": 0.7, "y": 0.4, "label": "User activity" }
+      ],
+      "duration": 5000
+    },
+    {
+      "id": "upload-data",
+      "caption": "Drag and drop your files to start analysis.\n[Try Upload]",
+      "screen": "/screenshots/upload.png",
+      "hotspots": [
+        { "id": "upload-data-hotspot-0", "x": 0.5, "y": 0.5, "label": "Upload area" }
+      ],
+      "duration": undefined
+    }
+  ],
+  "loop": false,
+  "theme": { "accent": "#3b82f6", "bg": "#0a0a0a" }
+}
+```
+
+### Helper: slugify()
+
+Fungsi `slugify()` diexport bersama `generate()` — berguna jika agent perlu generate step id sendiri:
+
+```ts
+import { slugify } from "@cue/core";
+
+slugify("Upload File");       // "upload-file"
+slugify("API Integration");   // "api-integration"
+slugify("2FA Login!");        // "2fa-login"
+```
+
+**Kapan pakai:** Saat tidak punya screenshot real atau URL app — generate demo sintetis dari deskripsi fitur. Bisa di-combine dengan Recipe 7 (Record) jika sebagian fitur punya screenshot dan sebagian tidak. Output DemoScript bisa langsung dipakai Recipe 4 atau Recipe 5.
+
+---
+
+## Recipe 9: Analytics Server — Track + Query (cue-analytics)
+
+**Gunakan ketika:** Agent ingin tahu siapa nonton demo, sampai mana viewer melihat, dan hotspot mana yang diklik. Self-hosted analytics server — zero external dependencies, data disimpan lokal di NDJSON.
+
+**Prinsip:** `cue-analytics` server menyediakan 3 endpoint: `POST /event` untuk menerima events dari CuePlayer, `GET /stats/:demoId` untuk query aggregate stats, dan `GET /health` untuk health check. Data disimpan append-only di NDJSON file.
+
+### Start server
+
+```bash
+# Start dengan default port 3001
+npx cue-analytics
+
+# Custom port
+npx cue-analytics --port 3001
+
+# Custom data directory (default: ./data)
+npx cue-analytics --port 3001 --data ./my-analytics-data
+```
+
+### POST events dari CuePlayer
+
+CuePlayer sudah otomatis mengirim analytics events jika `analyticsEndpoint` di-set di player config. Jika tidak menggunakan CuePlayer, kirim event manual via curl:
+
+```bash
+# Demo start event
+curl -X POST http://localhost:3001/event \
+  -H "Content-Type: application/json" \
+  -d '{
+    "demoId": "my-saas-demo",
+    "sessionId": "sess-abc123",
+    "event": "start",
+    "step": 0,
+    "totalSteps": 4,
+    "ts": 1700000000000
+  }'
+
+# Step enter event
+curl -X POST http://localhost:3001/event \
+  -H "Content-Type: application/json" \
+  -d '{
+    "demoId": "my-saas-demo",
+    "sessionId": "sess-abc123",
+    "event": "step_enter",
+    "step": 1,
+    "totalSteps": 4,
+    "ts": 1700000005000
+  }'
+
+# Hotspot click event
+curl -X POST http://localhost:3001/event \
+  -H "Content-Type: application/json" \
+  -d '{
+    "demoId": "my-saas-demo",
+    "sessionId": "sess-abc123",
+    "event": "hotspot_click",
+    "step": 1,
+    "totalSteps": 4,
+    "hotspotId": "upload-data-hotspot-0",
+    "ts": 1700000007000
+  }'
+
+# Demo complete event
+curl -X POST http://localhost:3001/event \
+  -H "Content-Type: application/json" \
+  -d '{
+    "demoId": "my-saas-demo",
+    "sessionId": "sess-abc123",
+    "event": "complete",
+    "step": 3,
+    "totalSteps": 4,
+    "ts": 1700000015000
+  }'
+```
+
+### Query stats
+
+```bash
+# Get aggregate stats for a demo
+curl http://localhost:3001/stats/my-saas-demo
+
+# Health check
+curl http://localhost:3001/health
+```
+
+### Response JSON + interpretasi
+
+```json
+{
+  "demoId": "my-saas-demo",
+  "totalViews": 42,
+  "completionRate": 0.71,
+  "avgStepsReached": 3.2,
+  "stepDropoff": [42, 38, 35, 30],
+  "hotspotClicks": {
+    "upload-data-hotspot-0": 18,
+    "dashboard-overview-hotspot-0": 12
+  }
+}
+```
+
+**Interpretasi untuk agent:**
+- `totalViews: 42` → 42 unique sessions menonton demo ini
+- `completionRate: 0.71` → 71% viewers menyelesaikan sampai akhir (event "complete")
+- `avgStepsReached: 3.2` → rata-rata viewer sampai step 3 dari 4 total
+- `stepDropoff: [42, 38, 35, 30]` → 42 viewers di step 0, 38 di step 1, 35 di step 2, 30 di step 3 — dropoff terbesar di step 0→1, mungkin perlu perbaikan caption atau CTA
+- `hotspotClicks` → hotspot "upload-data-hotspot-0" diklik 18 kali, paling populer — area ini menarik perhatian viewer
+
+**Kapan pakai:** Selalu — analytics gratis dan self-hosted. Setelah demo di-deploy, jalankan `cue-analytics` dan set `analyticsEndpoint` di CuePlayer. Review stats secara berkala untuk optimasi demo (caption, CTA placement, step ordering).
+
+---
+
+## Quick Reference — All Exports (Phase 1 + 2 + 3 + 4)
 
 ### @cue/core
 
@@ -1144,6 +1487,9 @@ const handleStepChange = (stepIndex: number) => {
 | `screenshotToStep` | Fn | 3 | Build DemoStep from screenshot params |
 | `fileToDataUrl` | Fn | 3 | Convert File to data URL (browser) |
 | `interpolatePointer` | Fn | 3 | Linear interpolation between two pointer positions |
+| `generate` | Fn | 4 | Generate DemoScript from structured feature descriptions |
+| `slugify` | Fn | 4 | Slugify text into kebab-case identifier |
+| `GenerateOptions` | Type | 4 | Options for generate() function |
 
 ### @cue/react
 
