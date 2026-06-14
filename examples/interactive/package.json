@@ -7,8 +7,8 @@
     "build": "next build"
   },
   "dependencies": {
-    "@cue/core": "workspace:*",
-    "@cue/react": "workspace:*",
+    "@cue-vin/core": "workspace:*",
+    "@cue-vin/react": "workspace:*",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "next": "^14.2.0"
