@@ -6,30 +6,1356 @@
   <title>Taskly — Project Management Demo</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-soft: rgba(99, 102, 241, 0.08);
+      --bg: #0f172a;
+      --bg-card: #1e1b4b;
+      --bg-surface: #1e293b;
+      --bg-input: #1e2a40;
+      --border: #312e81;
+      --border-light: #3730a3;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --success: #22c55e;
+      --success-glow: rgba(34, 197, 94, 0.12);
+      --info: #38bdf8;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 9px;
+      --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
     html, body { width: 100%; height: 100%; overflow: hidden; }
     body {
-      background: #0f172a;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Theater ─────────────────────────────────────────────────── */
+    .theater {
+      position: relative;
+      width: 880px;
+      height: 560px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(99, 102, 241, 0.07), 0 25px 50px rgba(0,0,0,0.6);
+    }
+
+    /* ── Slides ──────────────────────────────────────────────────── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      opacity: 0;
+      transform: translateX(28px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
+    .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+    .slide.exit-left { opacity: 0; transform: translateX(-28px); }
+
+    /* ── Sidebar ─────────────────────────────────────────────────── */
+    .sidebar {
+      width: 196px;
+      background: rgba(15, 23, 42, 0.7);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-logo {
+      padding: 0 18px 18px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--accent-light);
+      letter-spacing: -0.5px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .sidebar-logo span { color: var(--text); }
+    .sidebar-item {
+      padding: 9px 18px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: default;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      transition: all 0.2s;
+    }
+    .sidebar-item.active {
+      background: var(--accent-soft);
+      color: var(--accent-light);
+      font-weight: 600;
+      border-right: 3px solid var(--accent);
+    }
+    .sidebar-section {
+      padding: 14px 18px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .sidebar-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: &#39;Inter&#39;, &#39;Segoe UI&#39;, system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .sidebar-name { font-size: 12px; font-weight: 600; }
+    .sidebar-role { font-size: 10px; color: var(--text-dim); }
+
+    /* ── Main Content ────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .main-header {
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: rgba(15,23,42,0.4);
+    }
+    .main-title { font-size: 15px; font-weight: 700; }
+    .main-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .main-body {
+      flex: 1;
+      padding: 18px 22px;
+      overflow: hidden;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn-primary {
+      padding: 9px 20px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: default;
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+    .btn-outline {
+      padding: 7px 14px;
+      background: transparent;
+      color: var(--accent-light);
+      border: 1px solid var(--border-light);
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--font);
+      cursor: default;
+    }
+    .btn-ghost {
+      padding: 7px 14px;
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 12px;
+      font-family: var(--font);
+      cursor: default;
+    }
+
+    /* ── Form inputs ─────────────────────────────────────────────── */
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font);
+      outline: none;
+    }
+    .form-input.focused { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    /* ════════════════════════════════════════════════════════════════
+       STEP 1 — Create Project
+    ════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 14, 30, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+      z-index: 5;
+    }
+    .modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 28px;
+      width: 440px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.1);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 17px; font-weight: 700; }
+    .modal-close {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: default;
+    }
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .template-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: default;
+      transition: border-color 0.2s;
+    }
+    .template-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .template-card .icon { font-size: 22px; margin-bottom: 6px; }
+    .template-card .name { font-size: 11px; font-weight: 600; }
+    .template-card .desc { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       STEP 2 — Invite Team
+    ════════════════════════════════════════════════════════════════ */
+    .invite-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    .invite-form .form-group { flex: 1; }
+    .invite-form .role-group { width: 130px; }
+    .member-list { display: flex; flex-direction: column; gap: 8px; }
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+    }
+    .member-avatar {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .member-name { font-size: 13px; font-weight: 600; }
+    .member-email { font-size: 11px; color: var(--text-dim); }
+    .member-role {
+      margin-left: auto;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .role-owner { background: rgba(99,102,241,0.15); color: var(--accent-light); }
+    .role-editor { background: rgba(34,197,94,0.12); color: var(--success); }
+    .role-viewer { background: rgba(100,116,139,0.15); color: var(--text-muted); }
+
+    /* ════════════════════════════════════════════════════════════════
+       STEP 3 — Kanban Board
+    ════════════════════════════════════════════════════════════════ */
+    .kanban-board { display: flex; gap: 14px; height: 100%; }
+    .kanban-col {
+      flex: 1;
+      background: rgba(15,23,42,0.5);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .kanban-col-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .kanban-col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .col-count {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+    }
+    .task-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: default;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .task-card.dragging { border-color: var(--accent); transform: rotate(2deg); box-shadow: 0 8px 20px rgba(0,0,0,0.4); opacity: 0.9; }
+    .task-card.highlight { border-color: var(--accent); background: var(--accent-soft); }
+    .task-card-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    .task-card-meta { display: flex; align-items: center; gap: 8px; }
+    .task-tag {
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .tag-design { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .tag-dev { background: rgba(56,189,248,0.15); color: var(--info); }
+    .tag-qa { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .tag-done { background: rgba(34,197,94,0.12); color: var(--success); }
+    .task-assignee {
+      margin-left: auto;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+    }
+    .task-priority {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+    .kanban-drop-zone {
+      border: 2px dashed var(--accent);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--accent-light);
+      background: var(--accent-soft);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       STEP 4 — Set Deadline (Task Detail)
+    ════════════════════════════════════════════════════════════════ */
+    .task-detail { display: flex; gap: 18px; height: 100%; }
+    .task-detail-main { flex: 1; }
+    .task-detail-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+    .task-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .task-detail-sidebar { width: 200px; display: flex; flex-direction: column; gap: 14px; }
+    .detail-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .calendar-widget {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .cal-month { font-size: 13px; font-weight: 700; }
+    .cal-nav { font-size: 12px; color: var(--accent-light); cursor: default; }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+    .cal-day-head {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-align: center;
+      padding: 3px 0;
+      text-transform: uppercase;
+    }
+    .cal-day {
+      font-size: 11px;
+      text-align: center;
+      padding: 5px 2px;
+      border-radius: 5px;
+      color: var(--text-muted);
+      cursor: default;
+    }
+    .cal-day.today { background: var(--bg-surface); color: var(--text); font-weight: 600; }
+    .cal-day.selected { background: var(--accent); color: #fff; font-weight: 700; }
+    .cal-day.in-range { background: var(--accent-soft); color: var(--accent-light); }
+    .cal-day.other-month { opacity: 0.35; }
+    .reminder-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .toggle-label { font-size: 12px; font-weight: 500; }
+    .toggle-switch {
+      width: 34px; height: 18px;
+      border-radius: 20px;
+      background: var(--accent);
+      position: relative;
+      cursor: default;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      top: 2px; right: 2px;
+      transition: transform 0.2s;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 12px;
+      cursor: default;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ════════════════════════════════════════════════════════════════
+       STEP 5 — Dashboard Overview
+    ════════════════════════════════════════════════════════════════ */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+    .dash-card {
+      background: rgba(15,23,42,0.6);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .dash-card.wide { grid-column: span 2; }
+    .dash-stat-label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .dash-stat-value { font-size: 26px; font-weight: 800; }
+    .dash-stat-change { font-size: 11px; margin-top: 3px; }
+    .dash-stat-change.up { color: var(--success); }
+    .dash-stat-change.down { color: var(--danger); }
+    .burndown-chart { display: flex; align-items: flex-end; gap: 5px; height: 80px; margin-top: 10px; }
+    .burndown-bar { flex: 1; border-radius: 4px 4px 0 0; }
+    .velocity-label { font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+    .velocity-bar-track { height: 8px; background: var(--border); border-radius: 4px; margin-bottom: 6px; overflow: hidden; }
+    .velocity-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+    .velocity-member { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .velocity-name { font-size: 11px; width: 60px; color: var(--text-muted); flex-shrink: 0; }
+
+    /* ════════════════════════════════════════════════════════════════
+       STEP 6 — CTA
+    ════════════════════════════════════════════════════════════════ */
+    .cta-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 22px;
+      padding: 28px;
+    }
+    .cta-logo { font-size: 32px; font-weight: 800; color: var(--accent-light); letter-spacing: -1px; }
+    .cta-logo span { color: var(--text); }
+    .cta-headline { font-size: 26px; font-weight: 800; line-height: 1.2; max-width: 500px; }
+    .cta-sub { font-size: 14px; color: var(--text-muted); max-width: 400px; line-height: 1.6; }
+    .cta-benefits { display: flex; gap: 14px; }
+    .cta-benefit {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 14px;
+      text-align: center;
+      width: 140px;
+    }
+    .cta-benefit .icon { font-size: 26px; margin-bottom: 7px; }
+    .cta-benefit .title { font-size: 12px; font-weight: 700; }
+    .cta-benefit .desc { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+    .cta-btn-row { display: flex; gap: 10px; align-items: center; }
+    .btn-cta {
+      padding: 13px 30px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: default;
+      box-shadow: 0 4px 28px var(--accent-glow), 0 0 0 1px rgba(99,102,241,0.3);
+    }
+    .btn-cta-secondary {
+      padding: 13px 22px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: var(--font);
+      cursor: default;
+    }
+    .cta-trust { font-size: 12px; color: var(--text-dim); }
+    .cta-trust strong { color: var(--text-muted); }
+
+    /* ── Hotspots ─────────────────────────────────────────────────── */
+    .hotspot {
+      position: absolute;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      z-index: 10;
+    }
+    .slide.active .hotspot { opacity: 0.8; transform: scale(1); }
+    .hotspot::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      animation: hPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes hPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0; transform: scale(1.9); }
+    }
+    .hotspot-label {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg);
+      color: var(--accent-light);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      border: 1px solid var(--border-light);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .hotspot.always-show .hotspot-label,
+    .hotspot:hover .hotspot-label { opacity: 1; }
+
+    /* ── Pointer ──────────────────────────────────────────────────── */
+    .pointer-cursor {
+      position: absolute;
+      width: 22px; height: 22px;
+      z-index: 100;
+      pointer-events: none;
+      transition:
+        left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        top 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .pointer-cursor svg { width: 22px; height: 22px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6)); }
+    .pointer-glow {
+      position: absolute;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.5), transparent);
+      top: -4px; left: -4px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .pointer-cursor.clicking .pointer-glow { opacity: 1; }
+    .pointer-cursor.clicking svg { transform: scale(0.85); transition: transform 0.1s; }
+
+    /* ── Caption Bar ──────────────────────────────────────────────── */
+    .caption-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 11px 22px;
+      background: linear-gradient(to top, rgba(15,23,42,0.97), rgba(15,23,42,0.78));
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      z-index: 20;
+    }
+    .caption-text { font-size: 13px; color: var(--text); max-width: 560px; line-height: 1.5; }
+    .caption-nav { display: flex; align-items: center; gap: 7px; }
+    .nav-btn {
+      width: 32px; height: 32px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s;
+    }
+    .nav-btn:hover { border-color: var(--accent); color: var(--accent-light); background: var(--accent-soft); }
+    .step-indicator { display: flex; gap: 4px; align-items: center; }
+    .step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); transition: all 0.3s; cursor: pointer; }
+    .step-dot.active { background: var(--accent); width: 20px; border-radius: 4px; }
+
+    /* ── Progress Bar ─────────────────────────────────────────────── */
+    .progress-bar {
+      position: absolute; top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      z-index: 30;
+      transition: width 0.3s ease;
+      border-radius: 0 2px 2px 0;
+    }
+
+    @media (max-width: 920px) {
+      .theater { width: 96vw; height: 72vh; }
+      .sidebar { width: 160px; }
     }
   </style>
 </head>
 <body>
-  <cue-embed id="player" width="840" height="520"></cue-embed>
 
-  <script>window.__CUE_SCRIPT__ = {"id":"taskly-saas-demo","title":"Taskly — Project Management, Simplified","steps":[{"id":"create-project","caption":"Start a new project workspace in seconds — name it, pick a template, and go.","hotspots":[{"id":"create-project-hotspot-0","x":0.15,"y":0.22,"label":"New Project button"},{"id":"create-project-hotspot-1","x":0.55,"y":0.45,"label":"Template gallery"}],"duration":5000},{"id":"invite-team","caption":"Add collaborators by email — they get instant access to the project board.\n[Send Invite]","hotspots":[{"id":"invite-team-hotspot-0","x":0.42,"y":0.3,"label":"Invite field"},{"id":"invite-team-hotspot-1","x":0.72,"y":0.3,"label":"Role selector"}]},{"id":"assign-task","caption":"Drag a task card onto a team member's column to assign it instantly.","hotspots":[{"id":"assign-task-hotspot-0","x":0.3,"y":0.5,"label":"Task card"},{"id":"assign-task-hotspot-1","x":0.7,"y":0.5,"label":"Assignee avatar"}],"duration":5000},{"id":"set-deadline","caption":"Click the calendar icon on any task to set a due date and get automated reminders.","hotspots":[{"id":"set-deadline-hotspot-0","x":0.5,"y":0.35,"label":"Calendar picker"},{"id":"set-deadline-hotspot-1","x":0.5,"y":0.65,"label":"Reminder toggle"}],"duration":5000},{"id":"dashboard-overview","caption":"See burndown charts, task completion rates, and team velocity at a glance.","hotspots":[{"id":"dashboard-overview-hotspot-0","x":0.35,"y":0.4,"label":"Burndown chart"},{"id":"dashboard-overview-hotspot-1","x":0.65,"y":0.4,"label":"Completion rate"},{"id":"dashboard-overview-hotspot-2","x":0.5,"y":0.7,"label":"Team velocity"}],"duration":5000},{"id":"get-started","caption":"Join 50,000+ teams managing projects with Taskly\n[Start free trial] ✉️"}],"loop":false,"theme":{"accent":"#6366f1","bg":"#0f172a","font":"'Inter', 'Segoe UI', system-ui, sans-serif"}};</script>
-  <script src="https://unpkg.com/@cue-vin/player@0.1.2/dist/cue-player.iife.js"></script>
+<div class="theater" id="theater">
+  <div class="progress-bar" id="progressBar"></div>
 
-  <script>
-    if (window.Cue && typeof window.Cue.initCue === 'function') {
-      window.Cue.initCue();
-    }
-    var player = document.getElementById('player');
-    if (player && window.__CUE_SCRIPT__) {
-      player.setAttribute('data', JSON.stringify(window.__CUE_SCRIPT__));
-    }
-  </script>
+  <!-- ══════════════════════════════════════════════════════════════
+       SLIDE 1 — Create Project
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-0">
+    <div class="sidebar">
+      <div class="sidebar-logo">Task<span>ly</span></div>
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-item active">🏠 Home</div>
+      <div class="sidebar-item">📋 My Tasks</div>
+      <div class="sidebar-item">📁 Projects</div>
+      <div class="sidebar-item">📊 Reports</div>
+      <div class="sidebar-section">Projects</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--text-dim)">+ New Project</div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-avatar">AJ</div>
+        <div><div class="sidebar-name">Alex Johnson</div><div class="sidebar-role">Admin</div></div>
+      </div>
+    </div>
+    <div class="main" style="position:relative;">
+      <div class="main-header">
+        <div><div class="main-title">Projects</div><div class="main-subtitle">Manage all your team projects</div></div>
+        <button class="btn-primary">+ New Project</button>
+      </div>
+      <div class="main-body" style="display:flex;gap:14px;flex-wrap:wrap;align-content:flex-start;">
+        <div style="width:100%;display:flex;gap:10px;margin-bottom:4px;">
+          <input class="form-input" style="width:220px;" type="text" value="Search projects..." readonly>
+          <button class="btn-ghost">All Status ▾</button>
+          <button class="btn-ghost">All Teams ▾</button>
+        </div>
+        <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;width:47%;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Q3 Marketing Campaign</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;">Due Sep 30 · 8 members</div>
+          <div style="background:var(--border);border-radius:4px;height:5px;overflow:hidden;"><div style="width:67%;height:100%;background:var(--accent);border-radius:4px;"></div></div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">67% complete</div>
+        </div>
+        <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;width:47%;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Product Redesign v2</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;">Due Oct 15 · 5 members</div>
+          <div style="background:var(--border);border-radius:4px;height:5px;overflow:hidden;"><div style="width:32%;height:100%;background:var(--accent);border-radius:4px;"></div></div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">32% complete</div>
+        </div>
+      </div>
+      <!-- Modal overlay -->
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title">✨ New Project</div>
+            <div class="modal-close">✕</div>
+          </div>
+          <div>
+            <label class="form-label">Project Name</label>
+            <input class="form-input focused" type="text" value="Mobile App Launch 🚀" readonly>
+          </div>
+          <div style="margin-top:14px;">
+            <label class="form-label" style="margin-bottom:8px">Choose a Template</label>
+            <div class="template-grid">
+              <div class="template-card">
+                <div class="icon">📋</div>
+                <div class="name">Blank</div>
+                <div class="desc">Start fresh</div>
+              </div>
+              <div class="template-card selected">
+                <div class="icon">🚀</div>
+                <div class="name">Product Launch</div>
+                <div class="desc">Pre-built milestones</div>
+              </div>
+              <div class="template-card">
+                <div class="icon">🎨</div>
+                <div class="name">Design Sprint</div>
+                <div class="desc">5-day framework</div>
+              </div>
+              <div class="template-card">
+                <div class="icon">🔄</div>
+                <div class="name">Agile Sprint</div>
+                <div class="desc">2-week cycles</div>
+              </div>
+              <div class="template-card">
+                <div class="icon">📣</div>
+                <div class="name">Marketing</div>
+                <div class="desc">Campaign tracker</div>
+              </div>
+              <div class="template-card">
+                <div class="icon">🔧</div>
+                <div class="name">Bug Tracker</div>
+                <div class="desc">Dev workflow</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-ghost">Cancel</button>
+            <button class="btn-primary">Create Project →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="right:22px;top:30px;" data-label="New Project"></div>
+    <div class="hotspot" style="left:58%;top:28%;" data-label="Product Launch template"></div>
+    <div class="hotspot" style="left:75%;top:83%;" data-label="Create Project"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SLIDE 2 — Invite Team
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-1">
+    <div class="sidebar">
+      <div class="sidebar-logo">Task<span>ly</span></div>
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-item">🏠 Home</div>
+      <div class="sidebar-item">📋 My Tasks</div>
+      <div class="sidebar-item active">📁 Projects</div>
+      <div class="sidebar-item">📊 Reports</div>
+      <div class="sidebar-section">Projects</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--accent-light);">🚀 Mobile App Launch</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--text-dim);">📣 Q3 Marketing</div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-avatar">AJ</div>
+        <div><div class="sidebar-name">Alex Johnson</div><div class="sidebar-role">Admin</div></div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="main-header">
+        <div><div class="main-title">Mobile App Launch — Members</div><div class="main-subtitle">Invite collaborators to your project</div></div>
+      </div>
+      <div class="main-body">
+        <div class="invite-form">
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <input class="form-input focused" type="email" value="sarah.kim@company.com" readonly>
+          </div>
+          <div class="role-group">
+            <label class="form-label">Role</label>
+            <input class="form-input" type="text" value="Editor ▾" readonly>
+          </div>
+          <button class="btn-primary" style="flex-shrink:0;margin-top:4px;">Send Invite</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">4 members · 1 pending invite</div>
+        <div class="member-list">
+          <div class="member-item">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#6366f1,#7c3aed)">AJ</div>
+            <div><div class="member-name">Alex Johnson</div><div class="member-email">alex@company.com</div></div>
+            <div class="member-role role-owner">Owner</div>
+          </div>
+          <div class="member-item">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">MR</div>
+            <div><div class="member-name">Maya Rodriguez</div><div class="member-email">maya@company.com</div></div>
+            <div class="member-role role-editor">Editor</div>
+          </div>
+          <div class="member-item">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#22c55e,#15803d)">TW</div>
+            <div><div class="member-name">Tom Walsh</div><div class="member-email">tom@company.com</div></div>
+            <div class="member-role role-editor">Editor</div>
+          </div>
+          <div class="member-item" style="opacity:0.6;border-style:dashed;">
+            <div class="member-avatar" style="background:var(--bg-card);border:1px dashed var(--border)">?</div>
+            <div><div class="member-name" style="color:var(--text-muted)">sarah.kim@company.com</div><div class="member-email">Invite pending…</div></div>
+            <div class="member-role role-viewer">Viewer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:44%;top:26%;" data-label="Email field"></div>
+    <div class="hotspot" style="left:64%;top:26%;" data-label="Role selector"></div>
+    <div class="hotspot" style="left:78%;top:26%;" data-label="Send Invite"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SLIDE 3 — Assign Task (Kanban)
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-2">
+    <div class="sidebar">
+      <div class="sidebar-logo">Task<span>ly</span></div>
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-item">🏠 Home</div>
+      <div class="sidebar-item active">📋 My Tasks</div>
+      <div class="sidebar-item">📁 Projects</div>
+      <div class="sidebar-item">📊 Reports</div>
+      <div class="sidebar-section">Mobile App Launch</div>
+      <div class="sidebar-item" style="font-size:11px;">📋 Board</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--text-dim);">📅 Timeline</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--text-dim);">✅ List</div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-avatar">AJ</div>
+        <div><div class="sidebar-name">Alex Johnson</div><div class="sidebar-role">Admin</div></div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="main-header">
+        <div><div class="main-title">Board — Mobile App Launch</div><div class="main-subtitle">Drag tasks to assign and update status</div></div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-ghost" style="font-size:11px;">👤 Assignee</button>
+          <button class="btn-ghost" style="font-size:11px;">🏷️ Label</button>
+        </div>
+      </div>
+      <div class="main-body" style="padding-bottom:60px;">
+        <div class="kanban-board">
+          <!-- Todo col -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <div class="kanban-col-title" style="color:var(--text-muted)">📋 Todo</div>
+              <div class="col-count">4</div>
+            </div>
+            <div class="task-card dragging">
+              <div class="task-card-title">Design onboarding screens</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-design">Design</div>
+                <div class="task-priority">High</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#6366f1,#7c3aed)">AJ</div>
+              </div>
+            </div>
+            <div class="task-card">
+              <div class="task-card-title">Write API documentation</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-dev">Dev</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#22c55e,#15803d)">TW</div>
+              </div>
+            </div>
+            <div class="task-card">
+              <div class="task-card-title">Set up analytics events</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-dev">Dev</div>
+                <div class="task-assignee" style="background:var(--bg-surface);border:1px dashed var(--border);color:var(--text-dim)">+</div>
+              </div>
+            </div>
+          </div>
+          <!-- In Progress col -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <div class="kanban-col-title" style="color:var(--warning)">⚡ In Progress</div>
+              <div class="col-count">3</div>
+            </div>
+            <div class="task-card highlight">
+              <div class="task-card-title">Build auth flow</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-dev">Dev</div>
+                <div class="task-priority">Critical</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">MR</div>
+              </div>
+            </div>
+            <div class="kanban-drop-zone">⟵ Drop card to assign</div>
+            <div class="task-card">
+              <div class="task-card-title">UI component library</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-design">Design</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#6366f1,#7c3aed)">AJ</div>
+              </div>
+            </div>
+          </div>
+          <!-- Done col -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <div class="kanban-col-title" style="color:var(--success)">✅ Done</div>
+              <div class="col-count">6</div>
+            </div>
+            <div class="task-card" style="opacity:0.7">
+              <div class="task-card-title">Project kickoff meeting</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-done">Done</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#6366f1,#7c3aed)">AJ</div>
+              </div>
+            </div>
+            <div class="task-card" style="opacity:0.7">
+              <div class="task-card-title">Define tech stack</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-done">Done</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">MR</div>
+              </div>
+            </div>
+            <div class="task-card" style="opacity:0.7">
+              <div class="task-card-title">Wireframes approved</div>
+              <div class="task-card-meta">
+                <div class="task-tag tag-done">Done</div>
+                <div class="task-assignee" style="background:linear-gradient(135deg,#22c55e,#15803d)">TW</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:27%;top:36%;" data-label="Drag task card"></div>
+    <div class="hotspot" style="left:50%;top:46%;" data-label="Drop zone — In Progress"></div>
+    <div class="hotspot" style="left:50%;top:34%;" data-label="MR assigned here"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SLIDE 4 — Set Deadline
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-3">
+    <div class="sidebar">
+      <div class="sidebar-logo">Task<span>ly</span></div>
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-item">🏠 Home</div>
+      <div class="sidebar-item active">📋 My Tasks</div>
+      <div class="sidebar-item">📁 Projects</div>
+      <div class="sidebar-item">📊 Reports</div>
+      <div class="sidebar-section">Mobile App Launch</div>
+      <div class="sidebar-item" style="font-size:11px;">📋 Board</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--text-dim);">📅 Timeline</div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-avatar">AJ</div>
+        <div><div class="sidebar-name">Alex Johnson</div><div class="sidebar-role">Admin</div></div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="main-header">
+        <div><div class="main-title">Task Detail</div><div class="main-subtitle">Build auth flow · Mobile App Launch</div></div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-ghost" style="font-size:11px;">⋯ More</button>
+          <button class="btn-ghost" style="font-size:11px;">✕</button>
+        </div>
+      </div>
+      <div class="main-body">
+        <div class="task-detail">
+          <div class="task-detail-main">
+            <div class="task-detail-title">Build auth flow</div>
+            <div class="task-desc">Implement OAuth 2.0 authentication with Google and Apple sign-in. Include JWT token management, refresh logic, and secure storage on device.</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+              <div class="status-pill"><div class="status-dot" style="background:var(--warning)"></div>In Progress</div>
+              <div class="status-pill"><div class="status-dot" style="background:#c084fc"></div>Dev</div>
+              <div class="status-pill">👤 Maya Rodriguez</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:9px;padding:14px;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Checklist</div>
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--success)">✓</span> Google OAuth integration</div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--success)">✓</span> Apple Sign-in flow</div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--border-light)">○</span><span style="color:var(--text-muted)">JWT refresh token logic</span></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--border-light)">○</span><span style="color:var(--text-muted)">Write unit tests</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="task-detail-sidebar">
+            <div>
+              <div class="detail-section-title">Due Date</div>
+              <div class="calendar-widget">
+                <div class="cal-header">
+                  <div class="cal-month">June 2026</div>
+                  <div class="cal-nav">◀ ▶</div>
+                </div>
+                <div class="cal-grid">
+                  <div class="cal-day-head">Su</div>
+                  <div class="cal-day-head">Mo</div>
+                  <div class="cal-day-head">Tu</div>
+                  <div class="cal-day-head">We</div>
+                  <div class="cal-day-head">Th</div>
+                  <div class="cal-day-head">Fr</div>
+                  <div class="cal-day-head">Sa</div>
+                  <div class="cal-day other-month">25</div>
+                  <div class="cal-day other-month">26</div>
+                  <div class="cal-day other-month">27</div>
+                  <div class="cal-day other-month">28</div>
+                  <div class="cal-day other-month">29</div>
+                  <div class="cal-day other-month">30</div>
+                  <div class="cal-day">1</div>
+                  <div class="cal-day">2</div>
+                  <div class="cal-day">3</div>
+                  <div class="cal-day">4</div>
+                  <div class="cal-day">5</div>
+                  <div class="cal-day">6</div>
+                  <div class="cal-day">7</div>
+                  <div class="cal-day">8</div>
+                  <div class="cal-day">9</div>
+                  <div class="cal-day">10</div>
+                  <div class="cal-day">11</div>
+                  <div class="cal-day">12</div>
+                  <div class="cal-day">13</div>
+                  <div class="cal-day">14</div>
+                  <div class="cal-day today">15</div>
+                  <div class="cal-day in-range">16</div>
+                  <div class="cal-day in-range">17</div>
+                  <div class="cal-day in-range">18</div>
+                  <div class="cal-day in-range">19</div>
+                  <div class="cal-day in-range">20</div>
+                  <div class="cal-day selected">21</div>
+                  <div class="cal-day">22</div>
+                  <div class="cal-day">23</div>
+                  <div class="cal-day">24</div>
+                  <div class="cal-day">25</div>
+                  <div class="cal-day">26</div>
+                  <div class="cal-day">27</div>
+                  <div class="cal-day">28</div>
+                  <div class="cal-day">29</div>
+                  <div class="cal-day">30</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="detail-section-title">Reminders</div>
+              <div class="reminder-toggle">
+                <span class="toggle-label">📅 Due date reminder</span>
+                <div class="toggle-switch"></div>
+              </div>
+              <div class="reminder-toggle" style="margin-top:6px;">
+                <span class="toggle-label">⏰ 1 day before</span>
+                <div class="toggle-switch" style="background:var(--border);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="right:155px;top:42%;" data-label="Calendar picker"></div>
+    <div class="hotspot" style="right:155px;top:70%;" data-label="Reminder toggle"></div>
+    <div class="hotspot" style="left:30%;top:50%;" data-label="Task checklist"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SLIDE 5 — Dashboard Overview
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-4">
+    <div class="sidebar">
+      <div class="sidebar-logo">Task<span>ly</span></div>
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-item">🏠 Home</div>
+      <div class="sidebar-item">📋 My Tasks</div>
+      <div class="sidebar-item">📁 Projects</div>
+      <div class="sidebar-item active">📊 Reports</div>
+      <div class="sidebar-section">Projects</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--accent-light);">🚀 Mobile App Launch</div>
+      <div class="sidebar-item" style="font-size:11px;color:var(--text-dim);">📣 Q3 Marketing</div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-avatar">AJ</div>
+        <div><div class="sidebar-name">Alex Johnson</div><div class="sidebar-role">Admin</div></div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="main-header">
+        <div><div class="main-title">Project Reports</div><div class="main-subtitle">Mobile App Launch · Sprint 3</div></div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span style="font-size:11px;color:var(--text-dim)">June 2026</span>
+          <button class="btn-ghost" style="font-size:11px;">↓ Export</button>
+        </div>
+      </div>
+      <div class="main-body" style="padding-bottom:52px;">
+        <div class="dashboard-grid">
+          <div class="dash-card">
+            <div class="dash-stat-label">Tasks Completed</div>
+            <div class="dash-stat-value" style="color:var(--success)">24</div>
+            <div class="dash-stat-change up">↑ 6 from last sprint</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-stat-label">Completion Rate</div>
+            <div class="dash-stat-value" style="color:var(--accent-light)">78%</div>
+            <div class="dash-stat-change up">↑ 12% vs target</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-stat-label">Overdue Tasks</div>
+            <div class="dash-stat-value" style="color:var(--danger)">3</div>
+            <div class="dash-stat-change down">↓ 2 from last sprint</div>
+          </div>
+          <div class="dash-card wide">
+            <div class="dash-stat-label">Burndown Chart — Sprint 3</div>
+            <div class="burndown-chart">
+              <div class="burndown-bar" style="height:95%;background:linear-gradient(to top,var(--border-light),var(--border));"></div>
+              <div class="burndown-bar" style="height:88%;background:linear-gradient(to top,var(--border-light),var(--border));"></div>
+              <div class="burndown-bar" style="height:82%;background:linear-gradient(to top,var(--border-light),var(--border));"></div>
+              <div class="burndown-bar" style="height:74%;background:linear-gradient(to top,var(--border-light),var(--border));"></div>
+              <div class="burndown-bar" style="height:65%;background:linear-gradient(to top,var(--accent),#7c3aed);"></div>
+              <div class="burndown-bar" style="height:55%;background:linear-gradient(to top,var(--accent),#7c3aed);"></div>
+              <div class="burndown-bar" style="height:44%;background:linear-gradient(to top,var(--accent),#7c3aed);"></div>
+              <div class="burndown-bar" style="height:36%;background:linear-gradient(to top,var(--accent),#7c3aed);"></div>
+              <div class="burndown-bar" style="height:28%;background:linear-gradient(to top,var(--accent),#7c3aed);"></div>
+              <div class="burndown-bar" style="height:22%;background:linear-gradient(to top,var(--accent),#7c3aed);"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-top:4px;">
+              <span>Day 1</span><span>Day 5</span><span>Day 10</span>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="velocity-label">Team Velocity</div>
+            <div class="velocity-member">
+              <div class="velocity-name">Maya R.</div>
+              <div style="flex:1;">
+                <div class="velocity-bar-track"><div class="velocity-bar-fill" style="width:88%"></div></div>
+              </div>
+              <div style="font-size:10px;color:var(--text-muted);width:28px;text-align:right;">88%</div>
+            </div>
+            <div class="velocity-member">
+              <div class="velocity-name">Tom W.</div>
+              <div style="flex:1;">
+                <div class="velocity-bar-track"><div class="velocity-bar-fill" style="width:72%"></div></div>
+              </div>
+              <div style="font-size:10px;color:var(--text-muted);width:28px;text-align:right;">72%</div>
+            </div>
+            <div class="velocity-member">
+              <div class="velocity-name">Alex J.</div>
+              <div style="flex:1;">
+                <div class="velocity-bar-track"><div class="velocity-bar-fill" style="width:65%"></div></div>
+              </div>
+              <div style="font-size:10px;color:var(--text-muted);width:28px;text-align:right;">65%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:50%;top:52%;" data-label="Burndown chart"></div>
+    <div class="hotspot" style="left:60%;top:31%;" data-label="Completion rate 78%"></div>
+    <div class="hotspot" style="left:75%;top:72%;" data-label="Team velocity"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SLIDE 6 — CTA
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-5">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%, rgba(99,102,241,0.15), transparent 70%);"></div>
+    <div class="main">
+      <div class="cta-layout">
+        <div class="cta-logo">Task<span>ly</span></div>
+        <div class="cta-headline">Project management for<br>high-velocity teams</div>
+        <div class="cta-sub">Kanban boards, burndown charts, smart deadlines, and team velocity — all in one place. Loved by 50,000+ teams worldwide.</div>
+        <div class="cta-benefits">
+          <div class="cta-benefit">
+            <div class="icon">⚡</div>
+            <div class="title">Up in 2 min</div>
+            <div class="desc">No setup needed</div>
+          </div>
+          <div class="cta-benefit">
+            <div class="icon">🔗</div>
+            <div class="title">100+ Integrations</div>
+            <div class="desc">Slack, GitHub, Jira</div>
+          </div>
+          <div class="cta-benefit">
+            <div class="icon">🔒</div>
+            <div class="title">SOC 2 Certified</div>
+            <div class="desc">Enterprise-grade security</div>
+          </div>
+          <div class="cta-benefit">
+            <div class="icon">🆓</div>
+            <div class="title">Free Forever</div>
+            <div class="desc">Up to 10 members</div>
+          </div>
+        </div>
+        <div class="cta-btn-row">
+          <button class="btn-cta">Start Free Trial →</button>
+          <button class="btn-cta-secondary">Watch a demo</button>
+        </div>
+        <div class="cta-trust"><strong>No credit card required</strong> · Free for teams up to 10 · Cancel anytime</div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:36%;top:66%;" data-label="Start Free Trial"></div>
+    <div class="hotspot" style="left:56%;top:66%;" data-label="Watch demo"></div>
+  </div>
+
+  <!-- ── Pointer ──────────────────────────────────────────────────── -->
+  <div class="pointer-cursor" id="pointer">
+    <div class="pointer-glow"></div>
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 3l14 8-6 2-2 6z" fill="white" stroke="#1e1b4b" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- ── Caption Bar ──────────────────────────────────────────────── -->
+  <div class="caption-bar">
+    <div class="caption-text" id="captionText"></div>
+    <div class="caption-nav">
+      <div class="step-indicator" id="stepIndicator"></div>
+      <button class="nav-btn" id="prevBtn" title="Previous">◀</button>
+      <button class="nav-btn" id="nextBtn" title="Next">▶</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@cue-vin/player@0.1.8/dist/cue-utils.iife.js"></script>
+<script>
+// ── DemoScript ────────────────────────────────────────────────────
+const DEMO_SCRIPT = {
+  id: "taskly-saas-demo",
+  title: "Taskly — Project Management, Simplified",
+  steps: [
+    { id: "create-project",    duration: 5000, pointer: { x: 0.56, y: 0.48 }, caption: "Start a new project workspace in seconds — name it, pick a template, and go." },
+    { id: "invite-team",       duration: 5000, pointer: { x: 0.44, y: 0.27 }, caption: "Add collaborators by email and set their role — they get instant access to the project board." },
+    { id: "assign-task",       duration: 5000, pointer: { x: 0.45, y: 0.42 }, caption: "Drag a task card onto a team member's column to assign it — updates sync for everyone in real time." },
+    { id: "set-deadline",      duration: 5000, pointer: { x: 0.79, y: 0.42 }, caption: "Click the calendar icon to pick a due date and toggle automated reminders for the team." },
+    { id: "dashboard-overview",duration: 5000, pointer: { x: 0.48, y: 0.54 }, caption: "See burndown charts, task completion rates, and team velocity at a glance — Sprint 3 on track." },
+    { id: "get-started",       duration: null, pointer: { x: 0.36, y: 0.66 }, caption: "Join 50,000+ teams managing projects with Taskly — free forever for teams up to 10 members." }
+  ],
+  loop: true,
+  theme: { accent: "#6366f1", bg: "#0f172a" }
+};
+
+// ── State ─────────────────────────────────────────────────────────
+let currentStep = 0;
+let autoTimer = null;
+const totalSteps = DEMO_SCRIPT.steps.length;
+
+// ── DOM ───────────────────────────────────────────────────────────
+const slides        = document.querySelectorAll('.slide');
+const captionEl     = document.getElementById('captionText');
+const stepIndicatorEl = document.getElementById('stepIndicator');
+const progressBar   = document.getElementById('progressBar');
+const pointerEl     = document.getElementById('pointer');
+const prevBtn       = document.getElementById('prevBtn');
+const nextBtn       = document.getElementById('nextBtn');
+const theater       = document.getElementById('theater');
+
+// ── Build dots ────────────────────────────────────────────────────
+for (let i = 0; i < totalSteps; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => goToStep(i));
+  stepIndicatorEl.appendChild(dot);
+}
+
+// ── Pointer ───────────────────────────────────────────────────────
+function movePointer(step) {
+  if (!step.pointer) return;
+  const r = theater.getBoundingClientRect();
+  pointerEl.style.left = (step.pointer.x * r.width - 11) + 'px';
+  pointerEl.style.top  = (step.pointer.y * r.height - 11) + 'px';
+}
+function simulateClick() {
+  pointerEl.classList.add('clicking');
+  setTimeout(() => pointerEl.classList.remove('clicking'), 200);
+}
+
+// ── Go To Step ────────────────────────────────────────────────────
+function goToStep(index) {
+  if (index < 0) index = DEMO_SCRIPT.loop ? totalSteps - 1 : 0;
+  if (index >= totalSteps) index = DEMO_SCRIPT.loop ? 0 : totalSteps - 1;
+
+  const prev = currentStep;
+  currentStep = index;
+  const step = DEMO_SCRIPT.steps[currentStep];
+
+  // Slides
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'exit-left');
+    if (i === prev && i !== currentStep) s.classList.add('exit-left');
+  });
+  requestAnimationFrame(() => slides[currentStep].classList.add('active'));
+
+  // Caption
+  captionEl.textContent = step.caption || '';
+
+  // Dots
+  stepIndicatorEl.querySelectorAll('.step-dot').forEach((d, i) =>
+    d.classList.toggle('active', i === currentStep)
+  );
+
+  // Progress bar
+  progressBar.style.width = ((currentStep + 1) / totalSteps * 100) + '%';
+
+  // Pointer
+  movePointer(step);
+  setTimeout(simulateClick, 580);
+
+  // Auto-advance (null = no auto-advance, e.g. CTA)
+  clearTimeout(autoTimer);
+  if (step.duration) {
+    autoTimer = setTimeout(() => goToStep(currentStep + 1), step.duration);
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────
+prevBtn.addEventListener('click', () => { clearTimeout(autoTimer); goToStep(currentStep - 1); });
+nextBtn.addEventListener('click', () => { clearTimeout(autoTimer); goToStep(currentStep + 1); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { clearTimeout(autoTimer); goToStep(currentStep + 1); e.preventDefault(); }
+  if (e.key === 'ArrowLeft')                    { clearTimeout(autoTimer); goToStep(currentStep - 1); e.preventDefault(); }
+});
+
+// ── Init ──────────────────────────────────────────────────────────
+goToStep(0);
+</script>
 </body>
 </html>
