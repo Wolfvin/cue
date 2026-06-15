@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cue — The Demo Theater SDK for AI Agents</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0a0a;
+      --card:     #111111;
+      --border:   #1a1a1a;
+      --text:     #e4e4e7;
+      --muted:    #71717a;
+      --accent:   #4F8EF7;
+      --green:    #00FF94;
+      --radius:   8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, pre, .mono {
+      font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", "Cascadia Code", "Menlo", "Consolas", monospace;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Container ─────────────────────────────────────────────── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Nav ────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    nav .logo span { color: var(--accent); }
+
+    nav .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 0.875rem;
+    }
+
+    nav .nav-links a {
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    nav .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    .hero {
+      padding: 120px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(79,142,247,0.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(79,142,247,0.10);
+      border: 1px solid rgba(79,142,247,0.20);
+      border-radius: 100px;
+      padding: 4px 14px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--accent), #7CB3FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero .sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    /* ── Copy Button ────────────────────────────────────────────── */
+    .install-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-size: 0.875rem;
+    }
+
+    .install-row .prompt {
+      padding: 12px 14px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid var(--border);
+      user-select: none;
+    }
+
+    .install-row code {
+      padding: 12px 16px;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .install-row .copy-btn {
+      padding: 12px 14px;
+      background: none;
+      border: none;
+      border-left: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: inherit;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .install-row .copy-btn:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .install-row .copy-btn.copied {
+      color: var(--green);
+    }
+
+    /* ── Section ────────────────────────────────────────────────── */
+    .section {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 40px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── Live Showcase ──────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 8px 18px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--text);
+      border-color: #333;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .iframe-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 840px;
+      margin: 0 auto;
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 840 / 520;
+    }
+
+    .iframe-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .iframe-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,10,10,0.6);
+      opacity: 1;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .iframe-overlay.loaded { opacity: 0; }
+
+    .iframe-overlay span {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── Quick Start ────────────────────────────────────────────── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 720px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(79,142,247,0.12);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .step-body { flex: 1; }
+
+    .step-body .step-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .step-body .step-desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    pre.code-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: #c4c4c8;
+    }
+
+    pre.code-block .kw   { color: #C678DD; }
+    pre.code-block .fn   { color: #61AFEF; }
+    pre.code-block .str  { color: #98C379; }
+    pre.code-block .cm   { color: #5C6370; font-style: italic; }
+    pre.code-block .obj  { color: #E5C07B; }
+    pre.code-block .prop { color: #E06C75; }
+    pre.code-block .op   { color: #56B6C2; }
+    pre.code-block .punc { color: #ABB2BF; }
+
+    /* ── Packages ───────────────────────────────────────────────── */
+    .pkg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .pkg-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .pkg-card:hover {
+      border-color: #333;
+      transform: translateY(-2px);
+    }
+
+    .pkg-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--green);
+    }
+
+    .pkg-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .pkg-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(0,255,148,0.08);
+      color: var(--green);
+      border: 1px solid rgba(0,255,148,0.15);
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    footer .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero { padding: 80px 0 48px; }
+      .hero h1 { font-size: 2rem; }
+      .pkg-grid { grid-template-columns: 1fr 1fr; }
+      .iframe-wrap { aspect-ratio: 4 / 3; }
+    }
+
+    @media (max-width: 480px) {
+      .pkg-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ Nav ═══════════════════ -->
+<nav>
+  <div class="container">
+    <div class="logo"><span>cue</span> SDK</div>
+    <div class="nav-links">
+      <a href="#showcase">Showcase</a>
+      <a href="#quickstart">Quick Start</a>
+      <a href="#packages">Packages</a>
+      <a href="https://github.com/Wolfvin/cue" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════ Hero ═══════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="badge">Open Source &middot; MIT License</div>
+    <h1>
+      The Demo Theater SDK<br>
+      for <span class="highlight">AI Agents</span>
+    </h1>
+    <p class="sub">
+      Build interactive product demos in JSON. Ship in minutes.<br>
+      No browser recorder needed — your agents generate demos from code.
+    </p>
+    <div class="install-row">
+      <span class="prompt mono">$</span>
+      <code>npm install @cue-vin/core</code>
+      <button class="copy-btn" id="copyBtn" onclick="copyInstall()">Copy</button>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════ Live Showcase ═══════════════════ -->
+<section class="section" id="showcase">
+  <div class="container">
+    <h2 class="section-title">See it in action</h2>
+    <p class="section-sub">Six live demos — switch tabs to preview each showcase in the embedded player.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-target="../../showcase/devtool/index.html">DevTool</button>
+      <button class="tab" data-target="../../showcase/saas/index.html">SaaS</button>
+      <button class="tab" data-target="../../showcase/fintech/index.html">Fintech</button>
+      <button class="tab" data-target="../../showcase/ecommerce/index.html">E-Commerce</button>
+      <button class="tab" data-target="../../showcase/devops/index.html">DevOps</button>
+      <button class="tab" data-target="../../showcase/mobile/index.html">Mobile</button>
+    </div>
+
+    <div class="iframe-wrap" id="iframeWrap">
+      <iframe id="showcaseFrame" src="../../showcase/devtool/index.html" title="Live showcase"></iframe>
+      <div class="iframe-overlay" id="iframeOverlay"><span>Loading showcase&hellip;</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════ Quick Start ═══════════════════ -->
+<section class="section" id="quickstart">
+  <div class="container">
+    <h2 class="section-title">Quick Start</h2>
+    <p class="section-sub">From zero to a running demo in three steps.</p>
+
+    <div class="steps">
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-label">Install the core package</div>
+          <div class="step-desc">Add the cue SDK to your project. Zero external dependencies.</div>
+<pre class="code-block"><span class="cm"># npm</span>
+npm install @cue-vin/core
+
+<span class="cm"># or pnpm</span>
+pnpm add @cue-vin/core</pre>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-label">Generate a DemoScript</div>
+          <div class="step-desc">Describe your features in structured JSON and call <code>generate()</code>. No LLM call required — the heuristic engine converts features into a playable demo script automatically.</div>
+<pre class="code-block"><span class="kw">import</span> <span class="punc">{</span> <span class="fn">generate</span> <span class="punc">}</span> <span class="kw">from</span> <span class="str">"@cue-vin/core"</span><span class="punc">;</span>
+
+<span class="kw">const</span> <span class="obj">script</span> <span class="op">=</span> <span class="fn">generate</span><span class="punc">({</span>
+  <span class="prop">id</span><span class="punc">:</span> <span class="str">"my-demo"</span><span class="punc">,</span>
+  <span class="prop">title</span><span class="punc">:</span> <span class="str">"My Product Demo"</span><span class="punc">,</span>
+  <span class="prop">features</span><span class="punc">:</span> <span class="punc">[</span>
+    <span class="punc">{</span>
+      <span class="prop">name</span><span class="punc">:</span> <span class="str">"Dashboard"</span><span class="punc">,</span>
+      <span class="prop">description</span><span class="punc">:</span> <span class="str">"See key metrics at a glance"</span><span class="punc">,</span>
+      <span class="prop">hotspots</span><span class="punc">:</span> <span class="punc">[{</span> <span class="prop">label</span><span class="punc">:</span> <span class="str">"Revenue"</span><span class="punc">,</span> <span class="prop">x</span><span class="punc">:</span> <span class="str">0.25</span><span class="punc">,</span> <span class="prop">y</span><span class="punc">:</span> <span class="str">0.3</span> <span class="punc">}]</span>
+    <span class="punc">}</span><span class="punc">,</span>
+    <span class="punc">{</span>
+      <span class="prop">name</span><span class="punc">:</span> <span class="str">"Get Started"</span><span class="punc">,</span>
+      <span class="prop">description</span><span class="punc">:</span> <span class="str">"Join 10k+ users"</span><span class="punc">,</span>
+      <span class="prop">cta</span><span class="punc">:</span> <span class="punc">{</span> <span class="prop">type</span><span class="punc">:</span> <span class="str">"email_capture"</span><span class="punc">,</span> <span class="prop">label</span><span class="punc">:</span> <span class="str">"Start trial"</span> <span class="punc">}</span>
+    <span class="punc">}</span>
+  <span class="punc">]</span>
+<span class="punc">}</span><span class="punc">);</span></pre>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-label">Connect to Claude via MCP</div>
+          <div class="step-desc">Let AI agents generate demos on the fly. Add the MCP server to your Claude Desktop config — your agent can then call <code>generate</code>, <code>validate</code>, and <code>export</code> as tools.</div>
+<pre class="code-block"><span class="cm">// claude_desktop_config.json</span>
+<span class="punc">{</span>
+  <span class="prop">"mcpServers"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"cue"</span><span class="punc">:</span> <span class="punc">{</span>
+      <span class="prop">"command"</span><span class="punc">:</span> <span class="str">"npx"</span><span class="punc">,</span>
+      <span class="prop">"args"</span><span class="punc">:</span> <span class="punc">[</span> <span class="str">"@cue-vin/mcp"</span> <span class="punc">]</span>
+    <span class="punc">}</span>
+  <span class="punc">}</span>
+<span class="punc">}</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════ Packages ═══════════════════ -->
+<section class="section" id="packages">
+  <div class="container">
+    <h2 class="section-title">Packages</h2>
+    <p class="section-sub">Five packages, one cohesive SDK. Use them individually or together.</p>
+
+    <div class="pkg-grid">
+      <div class="pkg-card">
+        <div class="pkg-name">@cue-vin/core</div>
+        <div class="pkg-desc">DemoScript engine &mdash; generate, validate, and compose demo scripts from structured data.</div>
+        <span class="pkg-badge">npm</span>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-name">@cue-vin/player</div>
+        <div class="pkg-desc">Standalone embeddable player &mdash; export demos as self-contained HTML files.</div>
+        <span class="pkg-badge">npm</span>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-name">@cue-vin/react</div>
+        <div class="pkg-desc">React components &mdash; DemoTheater, HotspotOverlay, CtaOverlay, and more.</div>
+        <span class="pkg-badge">npm</span>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-name">@cue-vin/css</div>
+        <div class="pkg-desc">Motion CSS primitives &mdash; animations, transitions, and layout utilities.</div>
+        <span class="pkg-badge">npm</span>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-name">@cue-vin/mcp</div>
+        <div class="pkg-desc">MCP server for Claude &mdash; let AI agents generate and export demos as tools.</div>
+        <span class="pkg-badge">npm</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════ Footer ═══════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-links">
+      <a href="https://github.com/Wolfvin/cue" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.npmjs.com/org/cue-vin" target="_blank" rel="noopener">npm</a>
+    </div>
+    <div>&copy; 2025 cue SDK &middot; MIT License</div>
+  </div>
+</footer>
+
+<!-- ═══════════════════ Scripts ═══════════════════ -->
+<script>
+  // ── Tab switching ─────────────────────────────────────────
+  (function () {
+    var tabs = document.querySelectorAll('.tab');
+    var frame = document.getElementById('showcaseFrame');
+    var overlay = document.getElementById('iframeOverlay');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        // Update active tab
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+
+        // Show loading overlay
+        overlay.classList.remove('loaded');
+
+        // Switch iframe src
+        var target = tab.getAttribute('data-target');
+        frame.src = target;
+      });
+    });
+
+    // Hide overlay when iframe loads
+    frame.addEventListener('load', function () {
+      overlay.classList.add('loaded');
+    });
+  })();
+
+  // ── Copy install command ──────────────────────────────────
+  function copyInstall() {
+    var btn = document.getElementById('copyBtn');
+    var text = 'npm install @cue-vin/core';
+
+    navigator.clipboard.writeText(text).then(function () {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function () {
+      // Fallback for non-HTTPS
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
