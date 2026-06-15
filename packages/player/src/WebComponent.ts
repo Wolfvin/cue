@@ -36,11 +36,14 @@ export class CueEmbed extends HTMLElement {
   }
 
   attributeChangedCallback(
-    _name: string,
+    name: string,
     oldValue: string | null,
-    _newValue: string | null
+    newValue: string | null
   ): void {
-    if (oldValue !== null && this.mounted) {
+    // Re-render when the value actually changes (skip identical updates).
+    // We must also handle the first set (oldValue === null → newValue !== null)
+    // because connectedCallback may have fired before the attribute was set.
+    if (oldValue !== newValue && this.mounted) {
       this.loadAndRender();
     }
   }

@@ -110,23 +110,35 @@ function escapeHtml(str: string): string {
 /**
  * Read the IIFE bundle from dist/ for inlining.
  * Node.js only — uses dynamic require of fs/path.
+ * Returns an empty string when running in the browser so that
+ * exportToHtml({ playerJsInline: true }) fails gracefully instead
+ * of throwing on the missing `fs` module.
  */
 function readPlayerBundle(): string {
-  // @ts-expect-error — Node.js only; not available in browser
-  const fs: typeof import("fs") = require("fs");
-  // @ts-expect-error — Node.js only
-  const path: typeof import("path") = require("path");
-
-  // Resolve relative to the current file's directory.
-  // import.meta.url is available in ESM; fall back to __dirname for CJS.
-  let dir: string;
   try {
-    dir = path.dirname(new URL(import.meta.url).pathname);
-  } catch {
-    // @ts-expect-error — __dirname for CJS contexts
-    dir = __dirname;
-  }
+    // @ts-expect-error — Node.js only; not available in browser
+    const fs: typeof import("fs") = require("fs");
+    // @ts-expect-error — Node.js only
+    const path: typeof import("path") = require("path");
 
-  const distPath = path.resolve(dir, "cue-player.iife.js");
-  return fs.readFileSync(distPath, "utf-8");
+    // Resolve relative to the current file's directory.
+    // import.meta.url is available in ESM; fall back to __dirname for CJS.
+    let dir: string;
+    try {
+      dir = path.dirname(new URL(import.meta.url).pathname);
+    } catch {
+      // @ts-expect-error — __dirname for CJS contexts
+      dir = __dirname;
+    }
+
+    const distPath = path.resolve(dir, "cue-player.iife.js");
+    return fs.readFileSync(distPath, "utf-8");
+  } catch {
+    // Browser or edge environment where fs/path are unavailable.
+    console.warn(
+      "[cue] playerJsInline requires a Node.js environment. " +
+        "Use cdnUrl instead for browser builds."
+    );
+    return "";
+  }
 }
