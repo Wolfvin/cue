@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaketKu — Lacak Paket Kiriman</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --accent:#4F46E5;--accent-light:#6366F1;--accent-glow:rgba(79,70,229,.25);
+  --bg:#0B0F1A;--bg-card:#111827;--bg-input:#1E293B;--border:#1E293B;
+  --text:#F1F5F9;--text-muted:#94A3B8;--text-dim:#64748B;
+  --success:#22C55E;--warning:#F59E0B;--danger:#EF4444;
+  --radius:12px;
+  --font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --phone-w:360;--phone-h:640;
+}
+html,body{width:100%;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* ── Canvas (landscape 840x520) ─────────────────────────────────── */
+.canvas{
+  position:relative;width:840px;height:520px;
+  background:radial-gradient(ellipse at 50% 40%,rgba(79,70,229,.08) 0%,transparent 60%),var(--bg);
+  border-radius:16px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── Smartphone Frame ────────────────────────────────────────────── */
+.phone-frame{
+  position:relative;
+  width:272px;height:560px;
+  background:#1a1a2e;
+  border-radius:36px;
+  border:3px solid #2a2a4a;
+  box-shadow:0 0 0 2px #0d0d1a,0 0 60px rgba(79,70,229,.15),0 30px 60px rgba(0,0,0,.6);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.phone-frame::before{
+  content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  width:80px;height:24px;background:#0d0d1a;border-radius:0 0 14px 14px;z-index:50;
+}
+.phone-frame::after{
+  content:'';position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:8px;height:8px;background:#1a1a2e;border-radius:50%;z-index:51;
+  box-shadow:inset 0 0 2px rgba(79,70,229,.5);
+}
+
+/* ── Phone Screen ────────────────────────────────────────────────── */
+.phone-screen{
+  position:relative;flex:1;margin:6px 4px 4px;border-radius:28px;overflow:hidden;
+  background:#0f172a;
+}
+
+/* ── Slides ──────────────────────────────────────────────────────── */
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;
+  opacity:0;transform:translateX(30px);
+  transition:opacity .5s var(--ease),transform .5s var(--ease);pointer-events:none}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}
+
+/* ── Step 1: Splash + Login ──────────────────────────────────────── */
+.splash-screen{align-items:center;justify-content:center;padding:24px;text-align:center;
+  background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%)}
+.splash-logo{width:72px;height:72px;border-radius:18px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;color:#fff;font-weight:800;
+  box-shadow:0 8px 24px var(--accent-glow);
+  margin-bottom:12px;
+  animation:logoPulse 2s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{box-shadow:0 8px 24px var(--accent-glow)}50%{box-shadow:0 8px 40px rgba(79,70,229,.45)}}
+.splash-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+.splash-subtitle{font-size:11px;color:var(--text-muted);margin-bottom:24px}
+.login-form{width:100%;max-width:280px}
+.login-label{font-size:10px;color:var(--text-muted);margin-bottom:4px;display:block;text-align:left}
+.login-input{width:100%;padding:10px 12px;background:var(--bg-input);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;
+  margin-bottom:12px;transition:border-color .3s}
+.login-input:focus{border-color:var(--accent)}
+.login-input::placeholder{color:var(--text-dim)}
+.login-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:default;
+  transition:transform .2s,box-shadow .3s}
+.login-btn:hover{transform:scale(1.02);box-shadow:0 4px 16px var(--accent-glow)}
+
+/* ── Step 2: Home — Paket List ───────────────────────────────────── */
+.home-screen{background:#0f172a;padding:0}
+.home-header{padding:36px 16px 12px;
+  background:linear-gradient(135deg,var(--accent),#4338ca);color:#fff}
+.home-greeting{font-size:11px;opacity:.8}
+.home-name{font-size:16px;font-weight:700}
+.home-search{margin:10px 16px;padding:8px 12px;background:rgba(255,255,255,.12);
+  border-radius:8px;font-size:11px;color:rgba(255,255,255,.5)}
+.paket-list{flex:1;overflow:hidden;padding:8px 12px}
+.paket-card{background:var(--bg-card);border-radius:10px;padding:10px 12px;margin-bottom:8px;
+  border:1px solid var(--border);display:flex;align-items:center;gap:10px;
+  transition:transform .3s var(--ease),border-color .3s}
+.paket-card.highlight{border-color:var(--accent);transform:scale(1.02)}
+.paket-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0}
+.paket-icon.otp{background:rgba(79,70,229,.15);color:var(--accent-light)}
+.paket-icon.transit{background:rgba(245,158,11,.15);color:var(--warning)}
+.paket-icon.delivered{background:rgba(34,197,94,.15);color:var(--success)}
+.paket-info{flex:1;min-width:0}
+.paket-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.paket-desc{font-size:10px;color:var(--text-muted);margin-top:2px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;
+  white-space:nowrap;flex-shrink:0}
+.badge.otp{background:rgba(79,70,229,.15);color:var(--accent-light)}
+.badge.transit{background:rgba(245,158,11,.15);color:var(--warning)}
+.badge.delivered{background:rgba(34,197,94,.15);color:var(--success)}
+
+/* ── Step 3: Detail Paket — Timeline ─────────────────────────────── */
+.detail-screen{background:#0f172a;padding:0}
+.detail-header{padding:36px 16px 14px;
+  background:linear-gradient(135deg,var(--accent),#4338ca);color:#fff}
+.detail-back{font-size:12px;margin-bottom:6px;opacity:.7}
+.detail-title{font-size:16px;font-weight:700}
+.detail-subtitle{font-size:10px;opacity:.7;margin-top:2px}
+.detail-body{padding:16px;flex:1}
+.detail-card{background:var(--bg-card);border-radius:10px;padding:14px;margin-bottom:10px;
+  border:1px solid var(--border)}
+.detail-card-label{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.detail-card-value{font-size:14px;font-weight:700;color:var(--text);margin-top:2px}
+.timeline{padding-left:20px;border-left:2px solid var(--border);margin-top:4px}
+.timeline-step{position:relative;padding:0 0 16px 16px}
+.timeline-step:last-child{padding-bottom:0}
+.timeline-dot{position:absolute;left:-27px;top:2px;width:12px;height:12px;border-radius:50%;
+  background:var(--border);border:2px solid var(--bg-card)}
+.timeline-step.active .timeline-dot{background:var(--accent);border-color:var(--accent);
+  box-shadow:0 0 12px var(--accent-glow)}
+.timeline-step.done .timeline-dot{background:var(--success);border-color:var(--success)}
+.timeline-step-title{font-size:11px;font-weight:600;color:var(--text)}
+.timeline-step.active .timeline-step-title{color:var(--accent-light)}
+.timeline-step.done .timeline-step-title{color:var(--success)}
+.timeline-step-time{font-size:9px;color:var(--text-dim);margin-top:1px}
+.timeline-step.active .timeline-step-time{color:var(--accent-light);opacity:.7}
+
+/* ── Step 4: Notifikasi ──────────────────────────────────────────── */
+.notif-screen{background:#0f172a;padding:0;position:relative}
+.notif-home{flex:1;padding:36px 16px 12px;opacity:.5}
+.notif-overlay{position:absolute;inset:0;z-index:10;pointer-events:none}
+.push-notif{
+  position:absolute;top:8px;left:10px;right:10px;
+  background:rgba(30,27,75,.95);backdrop-filter:blur(12px);
+  border:1px solid rgba(79,70,229,.3);border-radius:14px;
+  padding:12px 14px;display:flex;gap:10px;align-items:flex-start;
+  transform:translateY(-120%);opacity:0;
+  transition:transform .5s var(--ease),opacity .5s var(--ease);
+  box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.push-notif.show{transform:translateY(0);opacity:1}
+.notif-icon{width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-body{flex:1}
+.notif-app{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.notif-title{font-size:12px;font-weight:600;color:var(--text);margin-top:1px}
+.notif-text{font-size:10px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+.notif-time{font-size:9px;color:var(--text-dim);flex-shrink:0;margin-top:1px}
+
+/* ── Step 5: CTA ─────────────────────────────────────────────────── */
+.cta-screen{align-items:center;justify-content:center;padding:24px;text-align:center;
+  background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%)}
+.cta-logo{width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:#fff;font-weight:800;
+  box-shadow:0 8px 24px var(--accent-glow);margin-bottom:14px}
+.cta-heading{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.cta-sub{font-size:11px;color:var(--text-muted);margin-bottom:20px;line-height:1.5}
+.store-btn{display:flex;align-items:center;gap:8px;width:100%;
+  padding:10px 14px;border-radius:10px;margin-bottom:10px;
+  cursor:default;border:none;font-family:var(--font);text-align:left;
+  transition:transform .2s,box-shadow .3s}
+.store-btn:hover{transform:scale(1.02)}
+.store-btn.appstore{background:#fff;color:#000}
+.store-btn.playstore{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.store-icon{font-size:20px;flex-shrink:0}
+.store-label{font-size:9px;opacity:.7;display:block}
+.store-name{font-size:13px;font-weight:600;display:block}
+
+/* ── Caption Bar ─────────────────────────────────────────────────── */
+.caption-bar{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:10px 20px;
+  background:linear-gradient(180deg,transparent,rgba(11,15,26,.9));
+  text-align:center;z-index:20
+}
+.caption-text{font-size:13px;color:var(--text-muted);font-style:italic;min-height:18px;
+  transition:opacity .3s}
+
+/* ── Step Progress ───────────────────────────────────────────────── */
+.progress-bar{
+  position:absolute;top:16px;right:16px;
+  display:flex;gap:6px;align-items:center;z-index:20
+}
+.progress-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);
+  transition:all .4s var(--ease)}
+.progress-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent-glow);transform:scale(1.3)}
+.progress-dot.done{background:var(--success)}
+
+/* ── Pointer ─────────────────────────────────────────────────────── */
+.pointer{
+  position:absolute;z-index:30;
+  width:16px;height:16px;
+  transition:left .6s var(--ease),top .6s var(--ease);
+  pointer-events:none
+}
+.pointer-dot{width:16px;height:16px;border-radius:50%;
+  background:var(--accent);opacity:.3;
+  animation:pointerPulse 1.5s ease-in-out infinite}
+.pointer-dot::after{content:'';position:absolute;top:4px;left:4px;
+  width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.pointer.clicking .pointer-dot{opacity:.6;transform:scale(.85);
+  transition:transform .15s}
+@keyframes pointerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4);opacity:.15}}
+
+/* ── Hotspot ─────────────────────────────────────────────────────── */
+.hotspot{
+  position:absolute;z-index:25;
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--accent);
+  transform:translate(-50%,-50%);
+  animation:hotspotPulse 2s ease-in-out infinite;
+  pointer-events:none
+}
+.hotspot-label{
+  position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  margin-top:4px;white-space:nowrap;
+  font-size:9px;font-weight:600;color:var(--accent-light);
+  background:rgba(79,70,229,.15);padding:2px 6px;border-radius:4px
+}
+@keyframes hotspotPulse{0%,100%{box-shadow:0 0 0 0 var(--accent-glow)}50%{box-shadow:0 0 0 8px transparent}}
+
+/* ── Phone Home Indicator ────────────────────────────────────────── */
+.home-indicator{
+  width:100px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;
+  margin:6px auto 8px;flex-shrink:0
+}
+
+/* ── Nav Hint ────────────────────────────────────────────────────── */
+.nav-hint{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  font-size:10px;color:var(--text-dim);white-space:nowrap
+}
+.nav-hint kbd{background:var(--bg-input);padding:1px 6px;border-radius:3px;font-size:9px;
+  border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div class="canvas">
+  <!-- Step Progress -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Smartphone Frame -->
+  <div class="phone-frame">
+    <div class="phone-screen" id="phoneScreen">
+
+      <!-- Step 1: Splash + Login -->
+      <div class="slide splash-screen active" id="slide-0">
+        <div class="splash-logo">PK</div>
+        <div class="splash-title">PaketKu</div>
+        <div class="splash-subtitle">Lacak paket kirimanmu dengan mudah</div>
+        <div class="login-form">
+          <label class="login-label">Nomor HP</label>
+          <input class="login-input" placeholder="0812-3456-7890" id="phoneInput">
+          <button class="login-btn" id="loginBtn">Masuk</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Home — List Paket -->
+      <div class="slide home-screen" id="slide-1">
+        <div class="home-header">
+          <div class="home-greeting">Selamat pagi,</div>
+          <div class="home-name">Andi Pratama</div>
+          <div class="home-search">Cari resi atau paket...</div>
+        </div>
+        <div class="paket-list" id="paketList">
+          <div class="paket-card" id="card-0">
+            <div class="paket-icon otp">📦</div>
+            <div class="paket-info">
+              <div class="paket-name">Laptop Asus ROG</div>
+              <div class="paket-desc">JNE - RESI: JNE1234567890</div>
+            </div>
+            <span class="badge otp">Menunggu Pickup</span>
+          </div>
+          <div class="paket-card" id="card-1">
+            <div class="paket-icon transit">🚚</div>
+            <div class="paket-info">
+              <div class="paket-name">Headphone Sony</div>
+              <div class="paket-desc">SiCeppt - RESI: SIQ987654321</div>
+            </div>
+            <span class="badge transit">Dalam Perjalanan</span>
+          </div>
+          <div class="paket-card" id="card-2">
+            <div class="paket-icon delivered">✅</div>
+            <div class="paket-info">
+              <div class="paket-name">Buku Clean Code</div>
+              <div class="paket-desc">J&T - RESI: JTQ555666777</div>
+            </div>
+            <span class="badge delivered">Terkirim</span>
+          </div>
+          <div class="paket-card" id="card-3">
+            <div class="paket-icon transit">🚚</div>
+            <div class="paket-info">
+              <div class="paket-name">Keyboard Mechanical</div>
+              <div class="paket-desc">AnterAja - RESI: AAQ111222333</div>
+            </div>
+            <span class="badge transit">Dalam Perjalanan</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Detail Paket — Timeline -->
+      <div class="slide detail-screen" id="slide-2">
+        <div class="detail-header">
+          <div class="detail-back">← Kembali</div>
+          <div class="detail-title">Headphone Sony</div>
+          <div class="detail-subtitle">SiCeppt — RESI: SIQ987654321</div>
+        </div>
+        <div class="detail-body">
+          <div class="detail-card">
+            <div class="detail-card-label">Estimasi Tiba</div>
+            <div class="detail-card-value" style="color:var(--warning)">Hari ini, 14:00 - 16:00</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-label">Status Pengiriman</div>
+            <div class="timeline" id="timeline">
+              <div class="timeline-step done">
+                <div class="timeline-dot"></div>
+                <div class="timeline-step-title">Pesanan Dibuat</div>
+                <div class="timeline-step-time">12 Jun, 09:15</div>
+              </div>
+              <div class="timeline-step done">
+                <div class="timeline-dot"></div>
+                <div class="timeline-step-title">Paket Diambil Kurir</div>
+                <div class="timeline-step-time">12 Jun, 14:30</div>
+              </div>
+              <div class="timeline-step done">
+                <div class="timeline-dot"></div>
+                <div class="timeline-step-title">Masuk Hub Jakarta</div>
+                <div class="timeline-step-time">13 Jun, 02:10</div>
+              </div>
+              <div class="timeline-step active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-step-title">Dalam Pengantaran</div>
+                <div class="timeline-step-time">15 Jun, 08:45</div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-dot"></div>
+                <div class="timeline-step-title">Tiba di Tujuan</div>
+                <div class="timeline-step-time">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Notifikasi -->
+      <div class="slide notif-screen" id="slide-3">
+        <div class="notif-home">
+          <div class="home-header" style="border-radius:0">
+            <div class="home-greeting">Selamat pagi,</div>
+            <div class="home-name">Andi Pratama</div>
+          </div>
+          <div class="paket-list" style="opacity:.4">
+            <div class="paket-card">
+              <div class="paket-icon transit">🚚</div>
+              <div class="paket-info">
+                <div class="paket-name">Headphone Sony</div>
+                <div class="paket-desc">SiCeppt - RESI: SIQ987654321</div>
+              </div>
+              <span class="badge transit">Dalam Perjalanan</span>
+            </div>
+            <div class="paket-card">
+              <div class="paket-icon delivered">✅</div>
+              <div class="paket-info">
+                <div class="paket-name">Buku Clean Code</div>
+                <div class="paket-desc">J&T - RESI: JTQ555666777</div>
+              </div>
+              <span class="badge delivered">Terkirim</span>
+            </div>
+          </div>
+        </div>
+        <div class="notif-overlay" id="notifOverlay">
+          <div class="push-notif" id="pushNotif">
+            <div class="notif-icon">📦</div>
+            <div class="notif-body">
+              <div class="notif-app">PaketKu</div>
+              <div class="notif-title">Paket sedang diantar!</div>
+              <div class="notif-text">Headphone Sony — kurir sudah dekat lokasi Anda</div>
+            </div>
+            <div class="notif-time">now</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: CTA -->
+      <div class="slide cta-screen" id="slide-4">
+        <div class="cta-logo">PK</div>
+        <div class="cta-heading">Download PaketKu</div>
+        <div class="cta-sub">Lacak semua paket kirimanmu dalam satu aplikasi. Gratis!</div>
+        <button class="store-btn appstore">
+          <span class="store-icon">🍎</span>
+          <div>
+            <span class="store-label">Download on the</span>
+            <span class="store-name">App Store</span>
+          </div>
+        </button>
+        <button class="store-btn playstore">
+          <span class="store-icon">▶️</span>
+          <div>
+            <span class="store-label">GET IT ON</span>
+            <span class="store-name">Google Play</span>
+          </div>
+        </button>
+      </div>
+
+    </div><!-- /phone-screen -->
+    <div class="home-indicator"></div>
+  </div><!-- /phone-frame -->
+
+  <!-- Caption Bar -->
+  <div class="caption-bar">
+    <div class="caption-text" id="captionText"></div>
+  </div>
+
+  <!-- Pointer -->
+  <div class="pointer" id="pointer">
+    <div class="pointer-dot"></div>
+  </div>
+
+  <!-- Nav Hint -->
+  <div class="nav-hint"><kbd>→</kbd> next &nbsp; <kbd>←</kbd> prev &nbsp; <kbd>Space</kbd> pause/play</div>
+</div>
+
+<script>
+// ── DemoScript Data ────────────────────────────────────────────────
+const SCRIPT = {
+  id: "paketku-mobile-demo",
+  title: "PaketKu — Lacak Paket Kiriman",
+  steps: [
+    {
+      id: "splash-login",
+      duration: 7000,
+      caption: "Masuk dengan nomor HP — tanpa password, langsung OTP.",
+      pointer: { x: 0.50, y: 0.62 },
+      hotspots: [
+        { id: "h-phone-input", x: 0.50, y: 0.56, label: "Input nomor HP", alwaysShow: true },
+        { id: "h-login-btn", x: 0.50, y: 0.70, label: "Masuk", alwaysShow: true }
+      ]
+    },
+    {
+      id: "home-list",
+      duration: 6000,
+      caption: "Semua paket aktif ditampilkan — status real-time dengan badge warna.",
+      pointer: { x: 0.50, y: 0.50 },
+      hotspots: [
+        { id: "h-paket-otp", x: 0.50, y: 0.38, label: "Menunggu Pickup" },
+        { id: "h-paket-transit", x: 0.50, y: 0.50, label: "Dalam Perjalanan", alwaysShow: true },
+        { id: "h-paket-done", x: 0.50, y: 0.62, label: "Terkirim" }
+      ]
+    },
+    {
+      id: "detail-timeline",
+      duration: 7000,
+      caption: "Timeline pengiriman detail — langkah aktif di-highlight dengan warna indigo.",
+      pointer: { x: 0.50, y: 0.55 },
+      hotspots: [
+        { id: "h-tl-eta", x: 0.50, y: 0.28, label: "Estimasi tiba", alwaysShow: true },
+        { id: "h-tl-active", x: 0.50, y: 0.62, label: "Step aktif", alwaysShow: true }
+      ]
+    },
+    {
+      id: "notification",
+      duration: 6000,
+      caption: "Push notification real-time — ketahui posisi paket tanpa buka app.",
+      pointer: { x: 0.50, y: 0.18 },
+      hotspots: [
+        { id: "h-notif-push", x: 0.50, y: 0.15, label: "Push notification", alwaysShow: true }
+      ]
+    },
+    {
+      id: "cta-download",
+      duration: 5000,
+      caption: "Download PaketKu gratis — tersedia di App Store dan Google Play.",
+      pointer: { x: 0.50, y: 0.70 },
+      hotspots: [
+        { id: "h-cta-ios", x: 0.50, y: 0.62, label: "App Store", alwaysShow: true },
+        { id: "h-cta-android", x: 0.50, y: 0.76, label: "Google Play", alwaysShow: true }
+      ],
+      cta: {
+        type: "button",
+        label: "Download PaketKu",
+        href: "#download"
+      }
+    }
+  ],
+  loop: true,
+  theme: {
+    accent: "#4F46E5",
+    bg: "#0B0F1A",
+    font: "'Inter','Segoe UI',system-ui,-apple-system,sans-serif"
+  }
+};
+
+// ── State ──────────────────────────────────────────────────────────
+let cur = 0;
+let playing = true;
+let autoTimer = null;
+let timers = [];
+
+// ── DOM Helpers ────────────────────────────────────────────────────
+const $ = s => document.getElementById(s);
+const phoneScreen = $('phoneScreen');
+const captionEl = $('captionText');
+const pointerEl = $('pointer');
+
+// ── Build Progress Dots ────────────────────────────────────────────
+function buildProgress() {
+  const bar = $('progressBar');
+  bar.innerHTML = '';
+  SCRIPT.steps.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'progress-dot';
+    d.id = 'pdot' + i;
+    bar.appendChild(d);
+  });
+}
+
+function updateProgress() {
+  SCRIPT.steps.forEach((_, i) => {
+    const d = $('pdot' + i);
+    d.className = 'progress-dot' + (i === cur ? ' active' : i < cur ? ' done' : '');
+  });
+}
+
+// ── Slide Management ───────────────────────────────────────────────
+function showSlide(idx) {
+  SCRIPT.steps.forEach((_, i) => {
+    const slide = $('slide-' + i);
+    if (slide) slide.classList.toggle('active', i === idx);
+  });
+}
+
+// ── Pointer Positioning ────────────────────────────────────────────
+// Pointer coordinates in DemoScript are fractional (0-1) relative to
+// the *landscape canvas* (840x520). We remap them to the phone screen
+// position within the canvas layout.
+function movePointer(step) {
+  if (!step.pointer) { pointerEl.style.opacity = '0'; return; }
+  pointerEl.style.opacity = '1';
+
+  // The phone screen is centered in the canvas.
+  // Canvas: 840x520, Phone screen area: ~272x560, offset ~ (284, ~-20) visual center
+  // But pointer is positioned relative to .canvas
+  // We map pointer coords relative to the phone screen's position within the canvas.
+  const canvas = document.querySelector('.canvas');
+  const screen = phoneScreen;
+  const cRect = canvas.getBoundingClientRect();
+  const sRect = screen.getBoundingClientRect();
+
+  // Phone screen offset within canvas
+  const offsetX = sRect.left - cRect.left;
+  const offsetY = sRect.top - cRect.top;
+  const screenW = sRect.width;
+  const screenH = sRect.height;
+
+  // Map fractional coords to phone screen position within canvas
+  const px = offsetX + step.pointer.x * screenW;
+  const py = offsetY + step.pointer.y * screenH;
+
+  pointerEl.style.left = px + 'px';
+  pointerEl.style.top = py + 'px';
+
+  if (step.pointer.clicking) {
+    pointerEl.classList.add('clicking');
+  } else {
+    pointerEl.classList.remove('clicking');
+  }
+}
+
+// ── Hotspots ───────────────────────────────────────────────────────
+function clearHotspots() {
+  document.querySelectorAll('.hotspot').forEach(el => el.remove());
+}
+
+function showHotspots(step) {
+  clearHotspots();
+  if (!step.hotspots) return;
+
+  const canvas = document.querySelector('.canvas');
+  const screen = phoneScreen;
+  const cRect = canvas.getBoundingClientRect();
+  const sRect = screen.getBoundingClientRect();
+
+  const offsetX = sRect.left - cRect.left;
+  const offsetY = sRect.top - cRect.top;
+  const screenW = sRect.width;
+  const screenH = sRect.height;
+
+  step.hotspots.forEach(h => {
+    const el = document.createElement('div');
+    el.className = 'hotspot';
+    if (h.alwaysShow) el.style.opacity = '1';
+
+    const px = offsetX + h.x * screenW;
+    const py = offsetY + h.y * screenH;
+    el.style.left = px + 'px';
+    el.style.top = py + 'px';
+
+    if (h.alwaysShow && h.label) {
+      const lbl = document.createElement('div');
+      lbl.className = 'hotspot-label';
+      lbl.textContent = h.label;
+      el.appendChild(lbl);
+    }
+
+    canvas.appendChild(el);
+  });
+}
+
+// ── Step-Specific Animations ───────────────────────────────────────
+function animateStep(idx) {
+  clearTimers();
+
+  if (idx === 0) {
+    // Splash: type into phone input
+    const input = $('phoneInput');
+    input.value = '';
+    const num = '0812-3456-7890';
+    let ci = 0;
+    const typeChar = () => {
+      if (ci < num.length && cur === idx) {
+        input.value += num[ci];
+        ci++;
+        timers.push(setTimeout(typeChar, 80));
+      }
+    };
+    timers.push(setTimeout(typeChar, 1200));
+  }
+
+  if (idx === 1) {
+    // Highlight cards sequentially
+    const cards = [0, 1, 2, 3];
+    cards.forEach((c, i) => {
+      timers.push(setTimeout(() => {
+        if (cur !== idx) return;
+        document.querySelectorAll('.paket-card').forEach(el => el.classList.remove('highlight'));
+        const card = $('card-' + c);
+        if (card) card.classList.add('highlight');
+      }, 800 + i * 800));
+    });
+  }
+
+  if (idx === 3) {
+    // Push notification slide-in
+    const notif = $('pushNotif');
+    notif.classList.remove('show');
+    timers.push(setTimeout(() => {
+      notif.classList.add('show');
+    }, 1000));
+    // Auto-dismiss
+    timers.push(setTimeout(() => {
+      notif.classList.remove('show');
+    }, 3500));
+  }
+}
+
+// ── Run Step ───────────────────────────────────────────────────────
+function runStep(idx) {
+  if (idx < 0 || idx >= SCRIPT.steps.length) return;
+  const step = SCRIPT.steps[idx];
+
+  showSlide(idx);
+  updateProgress();
+  captionEl.style.opacity = '0';
+  setTimeout(() => {
+    captionEl.textContent = step.caption || '';
+    captionEl.style.opacity = '1';
+  }, 300);
+
+  // Wait for layout before positioning pointer/hotspots
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      movePointer(step);
+      showHotspots(step);
+    });
+  });
+
+  animateStep(idx);
+  scheduleNext(step.duration || 6000);
+}
+
+// ── Auto-advance ───────────────────────────────────────────────────
+function scheduleNext(ms) {
+  clearTimeout(autoTimer);
+  if (!playing) return;
+  autoTimer = setTimeout(() => {
+    if (!playing) return;
+    const next = (cur + 1) % SCRIPT.steps.length;
+    if (next === 0 && !SCRIPT.loop) return;
+    cur = next;
+    runStep(cur);
+  }, ms);
+}
+
+function clearTimeouts() {
+  timers.forEach(clearTimeout);
+  timers = [];
+}
+
+// ── Navigation ─────────────────────────────────────────────────────
+function next() {
+  cur = (cur + 1) % SCRIPT.steps.length;
+  runStep(cur);
+}
+function prev() {
+  cur = (cur - 1 + SCRIPT.steps.length) % SCRIPT.steps.length;
+  runStep(cur);
+}
+function togglePause() {
+  playing = !playing;
+  if (playing) {
+    const step = SCRIPT.steps[cur];
+    scheduleNext(step.duration ? step.duration / 2 : 3000);
+  } else {
+    clearTimeout(autoTimer);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  else if (e.key === ' ') { e.preventDefault(); togglePause(); }
+});
+
+// ── Init ───────────────────────────────────────────────────────────
+buildProgress();
+runStep(0);
+</script>
+</body>
+</html>
