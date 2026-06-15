@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BankFlow — Modern Banking, Simplified</title>
   <style>
-    /* ── Reset & Base ────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --accent: #2563EB;
       --accent-light: #3b82f6;
-      --accent-glow: rgba(37, 99, 235, 0.25);
+      --accent-glow: rgba(37, 99, 235, 0.2);
       --bg: #0a0f1a;
       --bg-card: #111827;
-      --bg-input: #1e293b;
       --border: #1e293b;
       --text: #f1f5f9;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
       --success: #22c55e;
-      --success-glow: rgba(34, 197, 94, 0.15);
-      --danger: #ef4444;
       --radius: 12px;
       --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
@@ -29,580 +25,184 @@
       background: var(--bg);
       color: var(--text);
       font-family: var(--font);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    /* ── Theater Container ───────────────────────────────────────── */
+    /* ── Theater ──────────────────────────────────────────────────── */
     .theater {
       position: relative;
-      width: 880px;
-      height: 560px;
+      width: 880px; height: 560px;
       background: var(--bg-card);
       border-radius: 16px;
       border: 1px solid var(--border);
       overflow: hidden;
-      box-shadow: 0 0 80px rgba(37, 99, 235, 0.08), 0 25px 50px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 80px rgba(37,99,235,0.06), 0 25px 50px rgba(0,0,0,0.5);
     }
 
-    /* ── Step Slides ─────────────────────────────────────────────── */
+    /* ── Slides ───────────────────────────────────────────────────── */
     .slide {
+      position: absolute; inset: 0;
+      opacity: 0; transform: translateX(30px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      overflow-y: auto;
+    }
+    .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+    .slide.exit-left { opacity: 0; transform: translateX(-30px); }
+
+    /* Template container */
+    .slide-content {
+      width: 100%; height: 100%;
+      padding: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Override template styles to fit theater */
+    .slide-content .cue-template { width: 100%; height: 100%; }
+
+    /* ── Annotation Overlays ──────────────────────────────────────── */
+    .annotation-layer {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .ann-box {
       position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      opacity: 0; transform: scale(0.95);
+      transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+    }
+    .ann-box-label {
+      position: absolute; top: -22px; left: 12px;
+      background: var(--accent); color: white;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .slide.active .ann-box { opacity: 0.5; transform: scale(1); }
+    .ann-arrow {
+      position: absolute;
+      height: 2px;
+      background: var(--accent);
+      transform-origin: left center;
       opacity: 0;
-      transform: translateX(40px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      transition: opacity 0.5s ease 0.3s;
+    }
+    .ann-arrow::after {
+      content: '';
+      position: absolute; right: -6px; top: -4px;
+      border-left: 8px solid var(--accent);
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+    .ann-arrow-label {
+      position: absolute; top: -20px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg); color: var(--accent-light);
+      font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 4px;
+      border: 1px solid var(--accent);
+      white-space: nowrap;
+    }
+    .slide.active .ann-arrow { opacity: 0.7; }
+    .ann-text {
+      position: absolute;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.5s ease 0.1s;
       pointer-events: none;
     }
-    .slide.active {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
-    }
-    .slide.exit-left {
-      opacity: 0;
-      transform: translateX(-40px);
-    }
+    .slide.active .ann-text { opacity: 1; }
 
-    /* ── Top Bar ─────────────────────────────────────────────────── */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .topbar-logo {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -0.5px;
-    }
-    .topbar-logo span { color: var(--text); }
-    .topbar-nav {
-      display: flex;
-      gap: 6px;
-    }
-    .topbar-nav-item {
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: var(--text-muted);
-      transition: all 0.25s ease;
-      cursor: default;
-    }
-    .topbar-nav-item.active {
-      background: var(--accent-glow);
-      color: var(--accent-light);
-      font-weight: 600;
-    }
-    .topbar-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #7c3aed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    /* ── Slide Content Area ──────────────────────────────────────── */
-    .slide-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 40px;
-      gap: 20px;
-      position: relative;
-    }
-
-    /* ── Login Slide ─────────────────────────────────────────────── */
-    .login-card {
-      width: 380px;
-      background: var(--bg-input);
-      border-radius: var(--radius);
-      padding: 32px;
-      border: 1px solid var(--border);
-    }
-    .login-card h2 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
-      text-align: center;
-    }
-    .login-card p {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .form-group { margin-bottom: 16px; }
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 10px 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: var(--font);
-      outline: none;
-      transition: border-color 0.25s;
-    }
-    .form-input:focus { border-color: var(--accent); }
-    .btn-primary {
-      width: 100%;
-      padding: 12px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .btn-primary:hover { background: var(--accent-light); }
-
-    /* ── Balance Slide ───────────────────────────────────────────── */
-    .balance-total {
-      text-align: center;
-    }
-    .balance-total .label {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-    .balance-total .amount {
-      font-size: 36px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      background: linear-gradient(135deg, var(--text), var(--accent-light));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .balance-total .change {
-      font-size: 13px;
-      color: var(--success);
-      margin-top: 4px;
-    }
-    .account-cards {
-      display: flex;
-      gap: 16px;
-      width: 100%;
-      max-width: 700px;
-    }
-    .account-card {
-      flex: 1;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .account-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .account-card .icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
-    .account-card .name {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .account-card .value {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    /* ── Transfer Slide ──────────────────────────────────────────── */
-    .transfer-form {
-      width: 440px;
-      background: var(--bg-input);
-      border-radius: var(--radius);
-      padding: 28px;
-      border: 1px solid var(--border);
-    }
-    .transfer-form h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-    .transfer-amount-display {
-      text-align: center;
-      padding: 16px;
-      background: var(--bg);
-      border-radius: 10px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border);
-    }
-    .transfer-amount-display .currency {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-    .transfer-amount-display .value {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--accent-light);
-    }
-    .transfer-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .transfer-row .form-group { flex: 1; margin-bottom: 0; }
-
-    /* ── Confirm Slide ───────────────────────────────────────────── */
-    .confirm-card {
-      width: 440px;
-      background: var(--bg-input);
-      border-radius: var(--radius);
-      padding: 28px;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 30px var(--accent-glow);
-    }
-    .confirm-card h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .confirm-detail {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-    }
-    .confirm-detail .label { color: var(--text-muted); }
-    .confirm-detail .value { font-weight: 600; }
-    .confirm-detail:last-of-type { border-bottom: none; }
-    .confirm-fee {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      margin: 16px 0;
-      padding: 10px;
-      background: var(--success-glow);
-      border-radius: 8px;
-      color: var(--success);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .btn-confirm {
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all 0.25s;
-      margin-top: 8px;
-    }
-    .btn-confirm:hover { background: var(--accent-light); transform: scale(1.01); }
-
-    /* ── Success Slide ───────────────────────────────────────────── */
-    .success-content {
-      text-align: center;
-    }
-    .success-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: var(--success-glow);
-      border: 2px solid var(--success);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 32px;
-      animation: pulseSuccess 2s ease-in-out infinite;
-    }
-    @keyframes pulseSuccess {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3); }
-      50% { box-shadow: 0 0 0 16px rgba(34, 197, 94, 0); }
-    }
-    .success-content h2 {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--success);
-      margin-bottom: 8px;
-    }
-    .success-content .ref {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .success-content .ref-value {
-      font-size: 14px;
-      font-weight: 600;
-      font-family: 'Courier New', monospace;
-      color: var(--text);
-      background: var(--bg-input);
-      padding: 8px 16px;
-      border-radius: 6px;
-      display: inline-block;
-      margin-bottom: 8px;
-    }
-    .success-content .eta {
-      font-size: 13px;
-      color: var(--success);
-    }
-    .success-details {
-      display: flex;
-      gap: 24px;
-      margin-top: 24px;
-      justify-content: center;
-    }
-    .success-detail-item {
-      text-align: center;
-    }
-    .success-detail-item .val {
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .success-detail-item .lbl {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── CTA Slide ───────────────────────────────────────────────── */
-    .cta-content {
-      text-align: center;
-    }
-    .cta-content h2 {
-      font-size: 26px;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .cta-content .subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-    .cta-benefits {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-    .cta-benefit {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      text-align: center;
-      transition: border-color 0.3s, transform 0.3s;
-    }
-    .cta-benefit:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-    .cta-benefit .icon { font-size: 24px; margin-bottom: 8px; }
-    .cta-benefit .title { font-size: 14px; font-weight: 600; }
-    .cta-benefit .desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-    .btn-cta {
-      padding: 16px 48px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all 0.25s;
-      box-shadow: 0 4px 20px var(--accent-glow);
-    }
-    .btn-cta:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 6px 30px var(--accent-glow); }
-
-    /* ── Hotspot Overlays ────────────────────────────────────────── */
+    /* ── Hotspot Overlays ─────────────────────────────────────────── */
     .hotspot {
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 18px; height: 18px;
       border-radius: 50%;
       background: var(--accent);
-      opacity: 0;
-      transform: scale(0);
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      opacity: 0; transform: scale(0);
+      transition: opacity 0.35s ease, transform 0.35s ease;
       z-index: 10;
-      cursor: default;
     }
-    .slide.active .hotspot {
-      opacity: 0.8;
-      transform: scale(1);
-    }
+    .slide.active .hotspot { opacity: 0.75; transform: scale(1); }
     .hotspot::before {
-      content: '';
-      position: absolute;
-      inset: -6px;
-      border-radius: 50%;
-      border: 2px solid var(--accent);
-      animation: hotspotPulse 2s ease-in-out infinite;
+      content: ''; position: absolute; inset: -6px;
+      border-radius: 50%; border: 2px solid var(--accent);
+      animation: hPulse 2s ease-in-out infinite;
     }
-    @keyframes hotspotPulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
+    @keyframes hPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
       50% { opacity: 0; transform: scale(1.8); }
     }
     .hotspot-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, calc(-50% - 32px));
-      background: var(--bg);
-      color: var(--accent-light);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 6px;
-      white-space: nowrap;
-      border: 1px solid var(--accent);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s;
+      position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg); color: var(--accent-light);
+      font-size: 10px; font-weight: 600;
+      padding: 3px 8px; border-radius: 5px;
+      white-space: nowrap; border: 1px solid var(--accent);
+      pointer-events: none; opacity: 0; transition: opacity 0.2s;
     }
     .hotspot:hover .hotspot-label,
-    .hotspot.always-show .hotspot-label {
-      opacity: 1;
-    }
+    .hotspot.always-show .hotspot-label { opacity: 1; }
 
-    /* ── Scripted Pointer ────────────────────────────────────────── */
+    /* ── Pointer ──────────────────────────────────────────────────── */
     .pointer-cursor {
       position: absolute;
-      width: 20px;
-      height: 20px;
-      z-index: 100;
-      pointer-events: none;
-      transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      width: 20px; height: 20px;
+      z-index: 100; pointer-events: none;
     }
     .pointer-cursor svg {
-      width: 20px;
-      height: 20px;
+      width: 20px; height: 20px;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     }
     .pointer-cursor.clicking svg {
-      transform: scale(0.85);
-      transition: transform 0.1s;
+      transform: scale(0.85); transition: transform 0.1s;
     }
 
-    /* ── Caption Bar ─────────────────────────────────────────────── */
+    /* ── Caption Bar ──────────────────────────────────────────────── */
     .caption-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 14px 24px;
-      background: linear-gradient(to top, rgba(10, 15, 26, 0.95), rgba(10, 15, 26, 0.7));
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 12px 24px;
+      background: linear-gradient(to top, rgba(10,15,26,0.96), rgba(10,15,26,0.75));
       backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       border-top: 1px solid var(--border);
       z-index: 20;
     }
-    .caption-text {
-      font-size: 14px;
-      color: var(--text);
-      max-width: 600px;
-      line-height: 1.5;
-    }
-    .caption-nav {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .caption-text { font-size: 13px; color: var(--text); max-width: 580px; line-height: 1.5; }
+    .caption-nav { display: flex; align-items: center; gap: 8px; }
     .nav-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text-muted);
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 34px; height: 34px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--bg-card);
+      color: var(--text-muted); font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
       transition: all 0.2s;
     }
-    .nav-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent-light);
-      background: var(--accent-glow);
-    }
-    .step-indicator {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-    }
+    .nav-btn:hover { border-color: var(--accent); color: var(--accent-light); }
+    .step-indicator { display: flex; gap: 4px; align-items: center; }
     .step-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--text-dim);
-      transition: all 0.3s;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text-dim); transition: all 0.3s; cursor: pointer;
     }
-    .step-dot.active {
-      background: var(--accent);
-      width: 24px;
-      border-radius: 4px;
-    }
+    .step-dot.active { background: var(--accent); width: 22px; border-radius: 4px; }
+    .step-label { font-size: 11px; color: var(--text-dim); margin-right: 8px; }
 
-    /* ── Progress Bar ────────────────────────────────────────────── */
+    /* ── Progress Bar ─────────────────────────────────────────────── */
     .progress-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: var(--accent);
-      z-index: 30;
-      transition: width 0.3s ease;
+      position: absolute; top: 0; left: 0;
+      height: 3px; background: var(--accent);
+      z-index: 30; transition: width 0.3s ease;
       border-radius: 0 2px 2px 0;
     }
 
-    /* ── Responsive ──────────────────────────────────────────────── */
-    @media (max-width: 920px) {
-      .theater { width: 96vw; height: 70vh; }
-      .account-cards { flex-wrap: wrap; }
-      .login-card, .transfer-form, .confirm-card { width: 90%; }
+    /* ── Badge ────────────────────────────────────────────────────── */
+    .sdk-badge {
+      position: absolute; top: 12px; right: 16px;
+      background: var(--accent-glow); border: 1px solid var(--accent);
+      color: var(--accent-light); font-size: 9px; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      z-index: 25; letter-spacing: 0.5px;
     }
   </style>
 </head>
@@ -610,261 +210,21 @@
 
 <div class="theater" id="theater">
   <div class="progress-bar" id="progressBar"></div>
+  <div class="sdk-badge">cue CueUtils + @cue-vin/templates</div>
 
-  <!-- ── Slide 1: Secure Login ───────────────────────────────────── -->
-  <div class="slide" id="slide-0">
-    <div class="topbar">
-      <div class="topbar-logo">Bank<span>Flow</span></div>
-      <div class="topbar-nav">
-        <div class="topbar-nav-item active">Login</div>
-        <div class="topbar-nav-item">Features</div>
-        <div class="topbar-nav-item">Security</div>
-      </div>
-      <div class="topbar-avatar">AW</div>
-    </div>
-    <div class="slide-body">
-      <div class="login-card">
-        <h2>Welcome Back</h2>
-        <p>Sign in to access your accounts</p>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input class="form-input" type="text" value="aditya.w@email.com" readonly>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input class="form-input" type="password" value="••••••••••" readonly>
-        </div>
-        <button class="btn-primary">Sign In Securely</button>
-      </div>
-    </div>
-    <div class="hotspot" style="left:50%;top:42%" data-label="Email field"></div>
-    <div class="hotspot" style="left:50%;top:54%" data-label="Password field"></div>
-    <div class="hotspot always-show" style="left:50%;top:66%" data-label="Sign In"></div>
-  </div>
+  <!-- Slides built dynamically from DemoScript -->
+  <div id="slidesContainer"></div>
 
-  <!-- ── Slide 2: View Balance ───────────────────────────────────── -->
-  <div class="slide" id="slide-1">
-    <div class="topbar">
-      <div class="topbar-logo">Bank<span>Flow</span></div>
-      <div class="topbar-nav">
-        <div class="topbar-nav-item active">Dashboard</div>
-        <div class="topbar-nav-item">Transfers</div>
-        <div class="topbar-nav-item">Cards</div>
-        <div class="topbar-nav-item">Settings</div>
-      </div>
-      <div class="topbar-avatar">AW</div>
-    </div>
-    <div class="slide-body">
-      <div class="balance-total">
-        <div class="label">Total Balance</div>
-        <div class="amount">Rp 142,750,000</div>
-        <div class="change">+2.4% this month</div>
-      </div>
-      <div class="account-cards">
-        <div class="account-card">
-          <div class="icon" style="background:rgba(37,99,235,0.15);color:#3b82f6;">💰</div>
-          <div class="name">Savings</div>
-          <div class="value">Rp 85,200,000</div>
-        </div>
-        <div class="account-card">
-          <div class="icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">💳</div>
-          <div class="name">Checking</div>
-          <div class="value">Rp 32,550,000</div>
-        </div>
-        <div class="account-card">
-          <div class="icon" style="background:rgba(168,85,247,0.15);color:#a855f7;">📈</div>
-          <div class="name">Investments</div>
-          <div class="value">Rp 25,000,000</div>
-        </div>
-      </div>
-    </div>
-    <div class="hotspot always-show" style="left:35%;top:34%" data-label="Total balance"></div>
-    <div class="hotspot" style="left:25%;top:56%" data-label="Savings account"></div>
-    <div class="hotspot" style="left:55%;top:56%" data-label="Checking account"></div>
-    <div class="hotspot" style="left:75%;top:56%" data-label="Investment portfolio"></div>
-  </div>
-
-  <!-- ── Slide 3: Initiate Transfer ──────────────────────────────── -->
-  <div class="slide" id="slide-2">
-    <div class="topbar">
-      <div class="topbar-logo">Bank<span>Flow</span></div>
-      <div class="topbar-nav">
-        <div class="topbar-nav-item">Dashboard</div>
-        <div class="topbar-nav-item active">Transfers</div>
-        <div class="topbar-nav-item">Cards</div>
-        <div class="topbar-nav-item">Settings</div>
-      </div>
-      <div class="topbar-avatar">AW</div>
-    </div>
-    <div class="slide-body">
-      <div class="transfer-form">
-        <h3>Send Money</h3>
-        <div class="transfer-amount-display">
-          <div class="currency">Transfer Amount</div>
-          <div class="value">Rp 5,000,000</div>
-        </div>
-        <div class="transfer-row">
-          <div class="form-group">
-            <label>Recipient Name</label>
-            <input class="form-input" type="text" value="Siti Rahayu" readonly>
-          </div>
-        </div>
-        <div class="transfer-row">
-          <div class="form-group">
-            <label>Account Number</label>
-            <input class="form-input" type="text" value="8821-4567-8901" readonly>
-          </div>
-        </div>
-        <div class="transfer-row">
-          <div class="form-group">
-            <label>Destination Bank</label>
-            <input class="form-input" type="text" value="BCA" readonly>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Note</label>
-          <input class="form-input" type="text" value="Monthly family support" readonly>
-        </div>
-      </div>
-    </div>
-    <div class="hotspot always-show" style="left:50%;top:40%" data-label="Transfer amount"></div>
-    <div class="hotspot" style="left:50%;top:53%" data-label="Recipient account"></div>
-    <div class="hotspot" style="left:50%;top:63%" data-label="Destination bank"></div>
-    <div class="hotspot" style="left:50%;top:75%" data-label="Transfer note"></div>
-  </div>
-
-  <!-- ── Slide 4: Confirm Transfer ───────────────────────────────── -->
-  <div class="slide" id="slide-3">
-    <div class="topbar">
-      <div class="topbar-logo">Bank<span>Flow</span></div>
-      <div class="topbar-nav">
-        <div class="topbar-nav-item">Dashboard</div>
-        <div class="topbar-nav-item active">Transfers</div>
-        <div class="topbar-nav-item">Cards</div>
-        <div class="topbar-nav-item">Settings</div>
-      </div>
-      <div class="topbar-avatar">AW</div>
-    </div>
-    <div class="slide-body">
-      <div class="confirm-card">
-        <h3>Confirm Transfer</h3>
-        <div class="confirm-detail">
-          <span class="label">Amount</span>
-          <span class="value">Rp 5,000,000</span>
-        </div>
-        <div class="confirm-detail">
-          <span class="label">To</span>
-          <span class="value">Siti Rahayu</span>
-        </div>
-        <div class="confirm-detail">
-          <span class="label">Bank</span>
-          <span class="value">BCA — 8821-4567-8901</span>
-        </div>
-        <div class="confirm-detail">
-          <span class="label">Note</span>
-          <span class="value">Monthly family support</span>
-        </div>
-        <div class="confirm-fee">
-          ✓ Zero transfer fees — free for all users
-        </div>
-        <button class="btn-confirm">Confirm & Send</button>
-      </div>
-    </div>
-    <div class="hotspot" style="left:50%;top:38%" data-label="Transfer details"></div>
-    <div class="hotspot always-show" style="left:50%;top:60%" data-label="No fees"></div>
-    <div class="hotspot always-show" style="left:50%;top:76%" data-label="Confirm & Send"></div>
-  </div>
-
-  <!-- ── Slide 5: Success Notification ───────────────────────────── -->
-  <div class="slide" id="slide-4">
-    <div class="topbar">
-      <div class="topbar-logo">Bank<span>Flow</span></div>
-      <div class="topbar-nav">
-        <div class="topbar-nav-item active">Dashboard</div>
-        <div class="topbar-nav-item">Transfers</div>
-        <div class="topbar-nav-item">Cards</div>
-        <div class="topbar-nav-item">Settings</div>
-      </div>
-      <div class="topbar-avatar">AW</div>
-    </div>
-    <div class="slide-body">
-      <div class="success-content">
-        <div class="success-icon">✓</div>
-        <h2>Transfer Successful!</h2>
-        <div class="ref">Reference Number</div>
-        <div class="ref-value">BF-20260615-84729</div>
-        <div class="eta">⚡ Estimated arrival: Instant</div>
-        <div class="success-details">
-          <div class="success-detail-item">
-            <div class="val" style="color:var(--accent-light)">Rp 5M</div>
-            <div class="lbl">Sent</div>
-          </div>
-          <div class="success-detail-item">
-            <div class="val" style="color:var(--success)">Rp 0</div>
-            <div class="lbl">Fee</div>
-          </div>
-          <div class="success-detail-item">
-            <div class="val" style="color:var(--text)">BCA</div>
-            <div class="lbl">Destination</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="hotspot always-show" style="left:50%;top:32%" data-label="Transfer successful"></div>
-    <div class="hotspot" style="left:50%;top:54%" data-label="Reference number"></div>
-    <div class="hotspot" style="left:50%;top:66%" data-label="Estimated arrival: instant"></div>
-  </div>
-
-  <!-- ── Slide 6: CTA ────────────────────────────────────────────── -->
-  <div class="slide" id="slide-5">
-    <div class="topbar">
-      <div class="topbar-logo">Bank<span>Flow</span></div>
-      <div class="topbar-nav">
-        <div class="topbar-nav-item">Features</div>
-        <div class="topbar-nav-item">Security</div>
-        <div class="topbar-nav-item active">Get Started</div>
-      </div>
-      <div class="topbar-avatar" style="background:var(--text-dim);">?</div>
-    </div>
-    <div class="slide-body">
-      <div class="cta-content">
-        <h2>Bank Smarter Today</h2>
-        <div class="subtitle">Join 2 million+ users who trust BankFlow with their finances</div>
-        <div class="cta-benefits">
-          <div class="cta-benefit">
-            <div class="icon">🏦</div>
-            <div class="title">Zero Fees</div>
-            <div class="desc">No hidden charges, ever</div>
-          </div>
-          <div class="cta-benefit">
-            <div class="icon">📈</div>
-            <div class="title">4.5% APY</div>
-            <div class="desc">On savings accounts</div>
-          </div>
-          <div class="cta-benefit">
-            <div class="icon">🔐</div>
-            <div class="title">Bank-Grade</div>
-            <div class="desc">256-bit encryption</div>
-          </div>
-        </div>
-        <button class="btn-cta">Open Free Account</button>
-      </div>
-    </div>
-    <div class="hotspot" style="left:35%;top:48%" data-label="Zero fees"></div>
-    <div class="hotspot" style="left:60%;top:48%" data-label="4.5% APY savings"></div>
-  </div>
-
-  <!-- ── Scripted Pointer ────────────────────────────────────────── -->
+  <!-- Pointer (moved by CueUtils.Pointer) -->
   <div class="pointer-cursor" id="pointer">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 3l14 8-6 2-2 6z" fill="white" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 3l14 8-6 2-2 6z" fill="white" stroke="#111827" stroke-width="1.5" stroke-linejoin="round"/></svg>
   </div>
 
-  <!-- ── Caption Bar ─────────────────────────────────────────────── -->
+  <!-- Caption Bar -->
   <div class="caption-bar">
     <div class="caption-text" id="captionText"></div>
     <div class="caption-nav">
+      <span class="step-label" id="stepLabel"></span>
       <div class="step-indicator" id="stepIndicator"></div>
       <button class="nav-btn" id="prevBtn" title="Previous">◀</button>
       <button class="nav-btn" id="nextBtn" title="Next">▶</button>
@@ -872,69 +232,295 @@
   </div>
 </div>
 
-<script>
-// ── DemoScript Data (inline, matches script.json schema) ────────────
+<!-- ── CueUtils IIFE: Timeline + Pointer ────────────────────────── -->
+<script src="../../packages/player/dist/cue-utils.iife.js"></script>
+
+<!-- ── @cue-vin/templates ESM ───────────────────────────────────── -->
+<script type="module">
+import { renderTemplate } from "../../packages/templates/dist/index.mjs";
+
+// ── DemoScript (inline, matches script.json) ──────────────────────
 const DEMO_SCRIPT = {
   id: "bankflow-fintech-demo",
   title: "BankFlow — Modern Banking, Simplified",
   steps: [
     {
-      id: "secure-login",
-      duration: 6000,
-      pointer: { x: 0.50, y: 0.58 },
-      caption: "Secure login with 2FA authentication — your money, protected from the first click."
+      id: "secure-login", duration: 6000,
+      template: { type: "login", data: {
+        brand: "BankFlow", title: "Selamat Datang",
+        subtitle: "Masuk ke akun perbankan Anda",
+        fields: [
+          { name: "email", type: "email", label: "Email", placeholder: "aditya@bankflow.id", value: "aditya@bankflow.id" },
+          { name: "password", type: "password", label: "Kata Sandi", placeholder: "••••••••••", value: "••••••••••" }
+        ],
+        submitLabel: "Masuk dengan Aman"
+      }},
+      pointer: { x: 0.50, y: 0.62 },
+      hotspots: [
+        { id: "h-login-brand", x: 0.50, y: 0.18, label: "Brand", alwaysShow: true },
+        { id: "h-login-email", x: 0.50, y: 0.40, label: "Email" },
+        { id: "h-login-pass", x: 0.50, y: 0.52, label: "Kata Sandi" },
+        { id: "h-login-btn", x: 0.50, y: 0.65, label: "Masuk", alwaysShow: true }
+      ],
+      annotations: [
+        { type: "box", x: 0.28, y: 0.12, width: 0.44, height: 0.72, color: "#2563EB", cornerRadius: 12, label: "Secure Login Form" }
+      ],
+      caption: "Login aman dengan autentikasi 2FA — uang Anda terlindungi dari klik pertama."
     },
     {
-      id: "view-balance",
-      duration: 6000,
-      pointer: { x: 0.35, y: 0.30 },
-      caption: "All your accounts at a glance — savings, checking, and investments in one dashboard."
+      id: "view-balance", duration: 6000,
+      template: { type: "dashboard", data: {
+        title: "Dashboard", greeting: "Selamat datang, Aditya!", columns: 3,
+        metrics: [
+          { label: "Total Saldo", value: "Rp 142.750.000", change: "+2.4%", icon: "💰" },
+          { label: "Tabungan", value: "Rp 85.200.000", change: "+1.8%", icon: "🏦" },
+          { label: "Investasi", value: "Rp 25.000.000", change: "+5.2%", icon: "📈" }
+        ]
+      }},
+      pointer: { x: 0.25, y: 0.40 },
+      hotspots: [
+        { id: "h-bal-total", x: 0.25, y: 0.40, label: "Total Saldo", alwaysShow: true },
+        { id: "h-bal-savings", x: 0.55, y: 0.40, label: "Tabungan" },
+        { id: "h-bal-invest", x: 0.80, y: 0.40, label: "Investasi" }
+      ],
+      annotations: [
+        { type: "text", x: 0.50, y: 0.18, text: "Selamat datang, Aditya!", color: "#ffffff", fontSize: 16, align: "center" }
+      ],
+      caption: "Semua akun dalam satu tampilan — tabungan, giro, dan investasi terintegrasi."
     },
     {
-      id: "initiate-transfer",
-      duration: 6000,
-      pointer: { x: 0.50, y: 0.52 },
-      caption: "Transfer funds in seconds — fill the amount, pick a recipient, and you're almost done."
+      id: "initiate-transfer", duration: 6000,
+      template: { type: "form", data: {
+        title: "Transfer Dana",
+        description: "Kirim uang ke rekening manapun dalam hitungan detik",
+        fields: [
+          { name: "amount", label: "Jumlah Transfer", type: "text", value: "Rp 5.000.000" },
+          { name: "recipient", label: "Nama Penerima", type: "text", value: "Siti Rahayu" },
+          { name: "account", label: "Nomor Rekening", type: "text", value: "8821-4567-8901" },
+          { name: "bank", label: "Bank Tujuan", type: "select", value: "BCA", options: ["BCA","BNI","BRI","Mandiri","BSI"] },
+          { name: "note", label: "Catatan", type: "text", value: "Bantuan bulanan keluarga" }
+        ],
+        submitLabel: "Lanjut ke Konfirmasi",
+        layout: "centered"
+      }},
+      pointer: { x: 0.50, y: 0.50 },
+      hotspots: [
+        { id: "h-xfer-amount", x: 0.50, y: 0.35, label: "Jumlah", alwaysShow: true },
+        { id: "h-xfer-recipient", x: 0.50, y: 0.47, label: "Penerima" },
+        { id: "h-xfer-bank", x: 0.50, y: 0.60, label: "Bank Tujuan" },
+        { id: "h-xfer-btn", x: 0.50, y: 0.80, label: "Lanjutkan", alwaysShow: true }
+      ],
+      annotations: [
+        { type: "arrow", x1: 0.15, y1: 0.35, x2: 0.35, y2: 0.35, color: "#2563EB", label: "Isi otomatis" }
+      ],
+      caption: "Transfer dana dalam hitungan detik — isi jumlah, pilih penerima, hampir selesai."
     },
     {
-      id: "confirm-transfer",
-      duration: 5000,
-      pointer: { x: 0.50, y: 0.70 },
-      caption: "Double-check before you send — full transparency on amount, fees, and recipient details."
+      id: "confirm-transfer", duration: 6000,
+      template: { type: "table", data: {
+        title: "Konfirmasi Transfer", showRowNumbers: false,
+        columns: [ { key: "field", label: "Detail" }, { key: "value", label: "Informasi" } ],
+        rows: [
+          { cells: { field: "Jumlah", value: "Rp 5.000.000" } },
+          { cells: { field: "Penerima", value: "Siti Rahayu" } },
+          { cells: { field: "Bank", value: "BCA — 8821-4567-8901" } },
+          { cells: { field: "Catatan", value: "Bantuan bulanan keluarga" } },
+          { cells: { field: "Biaya", value: "GRATIS" }, status: "success" },
+          { cells: { field: "Estimasi", value: "Instan (real-time)" }, status: "success" }
+        ]
+      }},
+      pointer: { x: 0.50, y: 0.75 },
+      hotspots: [
+        { id: "h-confirm-amount", x: 0.60, y: 0.32, label: "Jumlah" },
+        { id: "h-confirm-fee", x: 0.60, y: 0.62, label: "Gratis!", alwaysShow: true },
+        { id: "h-confirm-btn", x: 0.50, y: 0.85, label: "Konfirmasi & Kirim", alwaysShow: true }
+      ],
+      annotations: [
+        { type: "box", x: 0.15, y: 0.10, width: 0.70, height: 0.78, color: "#2563EB", cornerRadius: 12, label: "Review sebelum kirim" }
+      ],
+      caption: "Periksa kembali sebelum mengirim — transparansi penuh atas jumlah, biaya, dan detail penerima."
     },
     {
-      id: "success-notification",
-      duration: 5000,
-      pointer: { x: 0.50, y: 0.30 },
-      caption: "Instant confirmation with reference number — your money arrives in seconds, not hours."
+      id: "success-notification", duration: 6000,
+      template: { type: "terminal", data: {
+        title: "BankFlow Terminal", cwd: "~/transfer", prompt: "$",
+        lines: [
+          { text: "bankflow transfer --to 8821-4567-8901 --amount 5000000", type: "command" },
+          { text: "Verifying recipient... OK", type: "output" },
+          { text: "Checking balance... Sufficient (Rp 142.750.000)", type: "output" },
+          { text: "Processing transfer...", type: "output" },
+          { text: "", type: "output" },
+          { text: "Transfer berhasil!", type: "success" },
+          { text: "  Ref: BF-20260615-84729", type: "output" },
+          { text: "  Jumlah: Rp 5.000.000", type: "output" },
+          { text: "  Biaya: Rp 0 (GRATIS)", type: "success" },
+          { text: "  Estimasi tiba: Instan", type: "success" }
+        ]
+      }},
+      pointer: { x: 0.50, y: 0.55 },
+      hotspots: [
+        { id: "h-success-ref", x: 0.45, y: 0.56, label: "Nomor Referensi", alwaysShow: true },
+        { id: "h-success-free", x: 0.45, y: 0.66, label: "Gratis!" },
+        { id: "h-success-instant", x: 0.45, y: 0.76, label: "Instan" }
+      ],
+      annotations: [
+        { type: "text", x: 0.50, y: 0.08, text: "Transfer Berhasil!", color: "#22c55e", fontSize: 18, align: "center" }
+      ],
+      caption: "Konfirmasi instan dengan nomor referensi — uang Anda sampai dalam hitungan detik."
     },
     {
-      id: "open-account",
-      duration: 5000,
-      pointer: { x: 0.50, y: 0.65 },
-      caption: "Join 2 million+ users banking smarter with BankFlow — open your free account today."
+      id: "open-account", duration: 5000,
+      template: { type: "login", data: {
+        brand: "BankFlow", title: "Buka Akun Gratis",
+        subtitle: "Bergabung dengan 2 juta+ pengguna yang mempercayai BankFlow",
+        fields: [
+          { name: "fullname", type: "text", label: "Nama Lengkap", placeholder: "Nama lengkap Anda" },
+          { name: "email", type: "email", label: "Email", placeholder: "email@andatoko.id" },
+          { name: "phone", type: "tel", label: "Nomor HP", placeholder: "+62 812 3456 7890" }
+        ],
+        submitLabel: "Buka Akun Sekarang",
+        footerLinks: [
+          { label: "Tanpa biaya daftar" },
+          { label: "Proses < 5 menit" },
+          { label: "Deposit awal Rp 0" }
+        ]
+      }},
+      pointer: { x: 0.50, y: 0.72 },
+      hotspots: [
+        { id: "h-cta-benefits", x: 0.50, y: 0.84, label: "Tanpa biaya", alwaysShow: true }
+      ],
+      caption: "Bergabung dengan 2 juta+ pengguna — buka akun gratis hari ini, tanpa biaya tersembunyi.",
+      cta: { type: "email_capture", label: "Buka Akun Gratis", placeholder: "Email Anda", submitLabel: "Daftar Sekarang", successMessage: "Selamat! Akun BankFlow Anda sudah aktif." }
     }
   ],
   loop: true,
-  theme: { accent: "#2563EB", bg: "#0a0f1a" }
+  theme: { accent: "#2563EB", bg: "#0a0f1a", font: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" }
 };
 
-// ── Player State ──────────────────────────────────────────────────
-let currentStep = 0;
-let autoTimer = null;
-const totalSteps = DEMO_SCRIPT.steps.length;
+// ── Verify CueUtils loaded ─────────────────────────────────────────
+if (!window.CueUtils) {
+  document.body.innerHTML = '<div style="color:#ef4444;padding:40px;text-align:center"><h2>CueUtils IIFE not loaded</h2><p>Make sure cue-utils.iife.js is accessible.</p></div>';
+  throw new Error("CueUtils IIFE not loaded");
+}
+const { Timeline, Pointer } = window.CueUtils;
 
-// ── DOM References ────────────────────────────────────────────────
-const slides = document.querySelectorAll('.slide');
+// ── DOM ────────────────────────────────────────────────────────────
+const theater = document.getElementById('theater');
+const slidesContainer = document.getElementById('slidesContainer');
 const captionEl = document.getElementById('captionText');
+const stepLabel = document.getElementById('stepLabel');
 const stepIndicatorEl = document.getElementById('stepIndicator');
 const progressBar = document.getElementById('progressBar');
 const pointerEl = document.getElementById('pointer');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
-const theater = document.getElementById('theater');
+const totalSteps = DEMO_SCRIPT.steps.length;
 
-// ── Build Step Indicator Dots ─────────────────────────────────────
+// ── Theme for templates ────────────────────────────────────────────
+const theme = {
+  accent: DEMO_SCRIPT.theme?.accent || "#2563EB",
+  bg: DEMO_SCRIPT.theme?.bg || "#0a0f1a",
+  bgCard: "#111827",
+  bgInput: "#1e293b",
+  border: "#1e293b",
+  text: "#f1f5f9",
+  textMuted: "#94a3b8",
+  textDim: "#64748b",
+  font: DEMO_SCRIPT.theme?.font || "'Inter','Segoe UI',system-ui,sans-serif",
+  radius: 12,
+};
+
+// ── Build Slides ───────────────────────────────────────────────────
+const slideEls = [];
+DEMO_SCRIPT.steps.forEach((step, i) => {
+  const slide = document.createElement('div');
+  slide.className = 'slide';
+  slide.id = `slide-${i}`;
+
+  // Render template content
+  if (step.template) {
+    const config = { type: step.template.type, ...(step.template.data || {}) };
+    const html = renderTemplate(config, theme);
+    const content = document.createElement('div');
+    content.className = 'slide-content';
+    content.innerHTML = html;
+    slide.appendChild(content);
+  }
+
+  // Render annotations
+  if (step.annotations && step.annotations.length > 0) {
+    const layer = document.createElement('div');
+    layer.className = 'annotation-layer';
+    step.annotations.forEach(ann => {
+      if (ann.type === 'box') {
+        const el = document.createElement('div');
+        el.className = 'ann-box';
+        el.style.left = (ann.x * 100) + '%';
+        el.style.top = (ann.y * 100) + '%';
+        el.style.width = (ann.width * 100) + '%';
+        el.style.height = (ann.height * 100) + '%';
+        if (ann.color) el.style.borderColor = ann.color;
+        if (ann.cornerRadius) el.style.borderRadius = ann.cornerRadius + 'px';
+        if (ann.label) {
+          const lbl = document.createElement('span');
+          lbl.className = 'ann-box-label';
+          lbl.textContent = ann.label;
+          el.appendChild(lbl);
+        }
+        layer.appendChild(el);
+      } else if (ann.type === 'arrow') {
+        const el = document.createElement('div');
+        el.className = 'ann-arrow';
+        el.style.left = (ann.x1 * 100) + '%';
+        el.style.top = (ann.y1 * 100) + '%';
+        const dx = ann.x2 - ann.x1, dy = ann.y2 - ann.y1;
+        const len = Math.sqrt(dx*dx + dy*dy) * 100;
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        el.style.width = len + '%';
+        el.style.transform = `rotate(${angle}deg)`;
+        if (ann.color) el.style.background = ann.color;
+        if (ann.label) {
+          const lbl = document.createElement('span');
+          lbl.className = 'ann-arrow-label';
+          lbl.textContent = ann.label;
+          el.appendChild(lbl);
+        }
+        layer.appendChild(el);
+      } else if (ann.type === 'text') {
+        const el = document.createElement('div');
+        el.className = 'ann-text';
+        el.style.left = (ann.x * 100) + '%';
+        el.style.top = (ann.y * 100) + '%';
+        el.textContent = ann.text;
+        if (ann.color) el.style.color = ann.color;
+        if (ann.fontSize) el.style.fontSize = ann.fontSize + 'px';
+        if (ann.align === 'center') { el.style.transform = 'translateX(-50%)'; el.style.textAlign = 'center'; }
+        layer.appendChild(el);
+      }
+    });
+    slide.appendChild(layer);
+  }
+
+  // Render hotspots
+  if (step.hotspots) {
+    step.hotspots.forEach(h => {
+      const el = document.createElement('div');
+      el.className = 'hotspot' + (h.alwaysShow ? ' always-show' : '');
+      el.style.left = `calc(${h.x * 100}% - 9px)`;
+      el.style.top = `calc(${h.y * 100}% - 9px)`;
+      const lbl = document.createElement('span');
+      lbl.className = 'hotspot-label';
+      lbl.textContent = h.label;
+      el.appendChild(lbl);
+      slide.appendChild(el);
+    });
+  }
+
+  slidesContainer.appendChild(slide);
+  slideEls.push(slide);
+});
+
+// ── Build Dots ─────────────────────────────────────────────────────
 for (let i = 0; i < totalSteps; i++) {
   const dot = document.createElement('div');
   dot.className = 'step-dot' + (i === 0 ? ' active' : '');
@@ -942,89 +528,94 @@ for (let i = 0; i < totalSteps; i++) {
   stepIndicatorEl.appendChild(dot);
 }
 
-// ── Move Pointer ──────────────────────────────────────────────────
-function movePointer(step) {
-  if (!step.pointer) return;
-  const theaterRect = theater.getBoundingClientRect();
-  const px = step.pointer.x * theaterRect.width;
-  const py = step.pointer.y * theaterRect.height;
-  pointerEl.style.left = px + 'px';
-  pointerEl.style.top = py + 'px';
-}
+// ── CueUtils.Pointer ───────────────────────────────────────────────
+const pointer = new Pointer({
+  startX: theater.offsetWidth * 0.5,
+  startY: theater.offsetHeight * 0.58,
+  defaultDuration: 500,
+  onChange: (state) => {
+    pointerEl.style.left = state.x + 'px';
+    pointerEl.style.top = state.y + 'px';
+    pointerEl.style.transitionDuration = state.transition;
+    if (state.clicking) pointerEl.classList.add('clicking');
+    else pointerEl.classList.remove('clicking');
+  },
+});
 
-// ── Simulate Click ────────────────────────────────────────────────
-function simulateClick() {
-  pointerEl.classList.add('clicking');
-  setTimeout(() => pointerEl.classList.remove('clicking'), 150);
-}
+// ── State ──────────────────────────────────────────────────────────
+let currentStep = 0;
+let autoTimeline = null;
 
-// ── Go To Step ────────────────────────────────────────────────────
-function goToStep(index, direction) {
+// ── Go To Step ─────────────────────────────────────────────────────
+function goToStep(index) {
   if (index < 0) index = DEMO_SCRIPT.loop ? totalSteps - 1 : 0;
   if (index >= totalSteps) index = DEMO_SCRIPT.loop ? 0 : totalSteps - 1;
 
-  const prevStep = currentStep;
+  const prev = currentStep;
   currentStep = index;
   const step = DEMO_SCRIPT.steps[currentStep];
 
-  // Update slides
-  slides.forEach((slide, i) => {
-    slide.classList.remove('active', 'exit-left');
-    if (i === prevStep && i !== currentStep) {
-      slide.classList.add('exit-left');
-    }
+  // Slides
+  slideEls.forEach((s, i) => {
+    s.classList.remove('active', 'exit-left');
+    if (i === prev && i !== currentStep) s.classList.add('exit-left');
   });
-  // Small delay to let exit animation start
-  requestAnimationFrame(() => {
-    slides[currentStep].classList.add('active');
-  });
+  requestAnimationFrame(() => slideEls[currentStep].classList.add('active'));
 
-  // Update caption
+  // Caption
   captionEl.textContent = step.caption || '';
 
-  // Update step indicator
-  const dots = stepIndicatorEl.querySelectorAll('.step-dot');
-  dots.forEach((dot, i) => dot.classList.toggle('active', i === currentStep));
+  // Step label
+  stepLabel.textContent = `${currentStep + 1} / ${totalSteps}`;
 
-  // Update progress bar
+  // Dots
+  stepIndicatorEl.querySelectorAll('.step-dot').forEach((d, i) =>
+    d.classList.toggle('active', i === currentStep));
+
+  // Progress
   progressBar.style.width = ((currentStep + 1) / totalSteps * 100) + '%';
 
-  // Move pointer (with click simulation for transition feel)
-  movePointer(step);
-  setTimeout(simulateClick, 600);
+  // Pointer — use CueUtils.Pointer.moveTo()
+  if (step.pointer) {
+    pointer.moveTo(
+      step.pointer.x * theater.offsetWidth,
+      step.pointer.y * theater.offsetHeight,
+      600
+    );
+    // Simulate click after move
+    setTimeout(() => pointer.click(150), 600);
+  }
 
-  // Auto-advance
-  clearTimeout(autoTimer);
+  // Auto-advance — use CueUtils.Timeline
+  if (autoTimeline) { autoTimeline.dispose(); autoTimeline = null; }
   if (step.duration && step.duration > 0) {
-    autoTimer = setTimeout(() => goToStep(currentStep + 1), step.duration);
+    autoTimeline = new Timeline({ loop: false });
+    autoTimeline.add(step.duration, () => goToStep(currentStep + 1));
+    autoTimeline.play();
   }
 }
 
-// ── Navigation ────────────────────────────────────────────────────
+// ── Navigation ─────────────────────────────────────────────────────
 prevBtn.addEventListener('click', () => {
-  clearTimeout(autoTimer);
+  if (autoTimeline) { autoTimeline.dispose(); autoTimeline = null; }
   goToStep(currentStep - 1);
 });
 nextBtn.addEventListener('click', () => {
-  clearTimeout(autoTimer);
+  if (autoTimeline) { autoTimeline.dispose(); autoTimeline = null; }
   goToStep(currentStep + 1);
 });
-
-// ── Keyboard Navigation ───────────────────────────────────────────
 document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === ' ') {
-    clearTimeout(autoTimer);
-    goToStep(currentStep + 1);
-    e.preventDefault();
+    if (autoTimeline) { autoTimeline.dispose(); autoTimeline = null; }
+    goToStep(currentStep + 1); e.preventDefault();
   }
   if (e.key === 'ArrowLeft') {
-    clearTimeout(autoTimer);
-    goToStep(currentStep - 1);
-    e.preventDefault();
+    if (autoTimeline) { autoTimeline.dispose(); autoTimeline = null; }
+    goToStep(currentStep - 1); e.preventDefault();
   }
 });
 
-// ── Initialize ────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────────
 goToStep(0);
 </script>
 </body>

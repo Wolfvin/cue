@@ -1,155 +1,184 @@
 # showcase/fintech — BankFlow Demo
 
-> Standalone HTML demo for a fictional Fintech/Banking product **BankFlow**, built by hand-rendering a `DemoScript` JSON with pure vanilla JS and CSS transitions. No npm, no React, no server required.
+> Standalone HTML demo untuk produk Fintech/Banking fiktif **BankFlow**. Demo ini menggunakan **fitur terbaru** dari cue SDK: `CueUtils` IIFE (Timeline + Pointer), `@cue-vin/templates` (5 template UI), `DemoStep.template` schema, dan annotation types terbaru (discriminated union).
 
-## What This Demo Shows
+## Alur Demo
 
-A 6-step banking flow: **Login → View Balance → Transfer Funds → Confirm → Success Notification → CTA**.
+6 langkah: **Login → Lihat Saldo → Transfer Dana → Konfirmasi → Notifikasi Sukses → CTA**
 
-Each step renders a mock banking UI with hotspots, a scripted pointer, caption bar, progress indicator, and smooth CSS transitions.
+| Step | Fitur | Template | Annotations | Hotspots |
+|------|-------|----------|-------------|----------|
+| 1 | Login Aman | `login` | box | 4 |
+| 2 | Lihat Saldo | `dashboard` | text | 3 |
+| 3 | Transfer Dana | `form` | arrow | 4 |
+| 4 | Konfirmasi Transfer | `table` | box | 3 |
+| 5 | Notifikasi Sukses | `terminal` | text | 3 |
+| 6 | Buka Akun (CTA) | `login` | — | 1 |
 
-## Files
-
-| File | Purpose |
-|------|---------|
-| `index.html` | Standalone demo — open directly in any browser |
-| `script.json` | DemoScript JSON in `@cue-vin/core` schema format |
-| `README.md` | This file — gap analysis and findings |
-
-## How to Run
+## Cara Menjalankan
 
 ```bash
-# No install needed — just open the file
+# Dari root repo cue — build dulu jika belum:
+cd packages/templates && npx tsup src/index.ts --format cjs,esm --dts --clean
+cd ../player && pnpm run build:utils
+
+# Lalu buka langsung di browser:
 open showcase/fintech/index.html
-# or
-xdg-open showcase/fintech/index.html
-# or serve locally:
-npx serve showcase/fintech/
 ```
 
-## Features Per Step
+Tidak perlu `npm install` di folder ini. Tidak perlu server.
 
-| Step | Feature | Hotspots | Pointer | CTA | Duration |
-|------|---------|----------|---------|-----|----------|
-| 1 | Secure Login | 3 (Email, Password, Sign In) | (0.50, 0.58) | — | 6000ms |
-| 2 | View Balance | 4 (Total, Savings, Checking, Investment) | (0.35, 0.30) | — | 6000ms |
-| 3 | Initiate Transfer | 4 (Amount, Recipient, Bank, Note) | (0.50, 0.52) | — | 6000ms |
-| 4 | Confirm Transfer | 3 (Details, No Fees, Confirm) | (0.50, 0.70) | — | 5000ms |
-| 5 | Success Notification | 3 (Badge, Reference, ETA) | (0.50, 0.30) | — | 5000ms |
-| 6 | Open Account (CTA) | 2 (Zero Fees, APY) | (0.50, 0.65) | button | 5000ms |
+## File
 
----
-
-## What We Used from cue SDK
-
-### DemoScript Schema (`@cue-vin/core`)
-
-We structured all data in `script.json` following the `DemoScript` interface:
-
-- **`DemoScript`** — `id`, `title`, `steps[]`, `loop`, `theme` — used exactly as specified
-- **`DemoStep`** — `id`, `duration`, `pointer`, `hotspots`, `annotations`, `caption`, `cta` — all fields utilized
-- **`DemoPointer`** — fractional coordinates (0–1) for pointer positioning, converted to pixels in JS
-- **`DemoHotspot`** — `id`, `x`, `y`, `label`, `alwaysShow` — rendered as pulsing circles with labels
-- **`DemoAnnotation`** — `type: "box"|"arrow"|"text"` with custom properties — used for visual highlights
-- **`DemoCta`** — `type: "button"`, `label`, `href` — defined for the final step
-- **`DemoTheme`** — `accent: "#2563EB"`, `bg: "#0a0f1a"`, `font` — applied to CSS custom properties
-
-### Coordinate System
-
-The fractional (0–1) coordinate system from cue was used for both `DemoPointer` and `DemoHotspot` positions, converted to absolute pixels at render time: `px = fraction * containerWidth`. This ensures resolution independence.
+| File | Fungsi |
+|------|--------|
+| `index.html` | Demo standalone — menggunakan CueUtils IIFE + @cue-vin/templates ESM |
+| `script.json` | DemoScript JSON dengan `DemoStep.template`, annotations, dan CTA |
+| `README.md` | File ini — gap analysis |
 
 ---
 
-## What We Could NOT Use from cue SDK (Gaps)
+## Fitur cue SDK yang Dipakai
 
-### 1. `@cue-vin/player` Web Component — ❌ Cannot Use
+### `CueUtils` IIFE (Timeline + Pointer) — ✅ Dipakai
 
-The `<cue-embed>` custom element from `@cue-vin/player` was not used because:
+Versi sebelumnya harus implementasi auto-advance timer (`setTimeout`) dan pointer movement (CSS transitions) manual. Sekarang menggunakan **resmi SDK API**:
 
-- **Node.js import crash**: The barrel export (`@cue-vin/player`) imports `CueEmbed` which extends `HTMLElement`, causing `ReferenceError: HTMLElement is not defined` when imported in Node.js. This makes it impossible to use `exportToHtml()` in a build pipeline.
-- **React dependency**: The `CuePlayer` React component requires `react >=18.0.0` and `react-dom`. For a standalone HTML file with zero dependencies, this is a non-starter.
-- **CDN IIFE bundle**: While `cue-player.iife.js` is available via unpkg CDN, the demo felt too complex for the web component to handle well — we needed custom mock UI per step (login form, balance cards, transfer form, confirmation dialog), which the player doesn't natively render. The player expects `screen` (screenshot images) for visual content, but we wanted CSS-rendered mock UI.
+- **`window.CueUtils.Pointer`** — Pointer bergerak via `moveTo()` dengan callback `onChange` yang meng-update posisi SVG cursor. Mendukung `click()` untuk simulasi klik.
+- **`window.CueUtils.Timeline`** — Auto-advance timer via `tl.add(duration, callback)`. Mendukung `play()` dan `dispose()` untuk cleanup.
+- **Bundle size**: 2.65 kB (minified), loaded via `<script src="../../packages/player/dist/cue-utils.iife.js">`
 
-**Impact**: We had to build a custom vanilla JS renderer from scratch, essentially re-implementing what the player should provide.
+**Ini menutup gap #5 dari showcase fintech sebelumnya** (Timeline + Pointer tidak tersedia sebagai IIFE).
 
-**Suggested Fix**:
-- Add a `"./export"` sub-path export that's Node.js-safe (only `exportToHtml`, no HTMLElement)
-- Consider a "headless" rendering mode where the player can render mock UI from DemoScript annotations/data instead of requiring screenshots
-- Provide a standalone IIFE build that doesn't require React
+### `@cue-vin/templates` — ✅ Dipakai
 
-### 2. `generate()` — Not Applicable
+Setiap step menggunakan template resmi dari `@cue-vin/templates`:
 
-`generate()` from `@cue-vin/core` creates a DemoScript from feature descriptions, but:
-- It doesn't produce the **mock UI content** (HTML/CSS) for each step — only metadata (caption, pointer, hotspots)
-- For a Fintech demo with realistic banking UI, we needed actual visual content (forms, cards, balance displays), which `generate()` can't provide
-- The function doesn't support custom HTML templates or component definitions per step
+| Template | Step | Data |
+|----------|------|------|
+| `login` | Login (step 1), CTA (step 6) | brand, title, subtitle, fields[], submitLabel, footerLinks[] |
+| `dashboard` | Lihat Saldo (step 2) | greeting, columns, metrics[] (label, value, change, icon) |
+| `form` | Transfer (step 3) | title, description, fields[] (name, type, label, value, options), layout |
+| `table` | Konfirmasi (step 4) | columns[], rows[] (cells, status), showRowNumbers |
+| `terminal` | Notifikasi (step 5) | cwd, prompt, lines[] (text, type: command/output/success/error) |
 
-**Suggested Enhancement**: Add a `template` or `layout` field to `GenerateFeature` that maps to predefined UI templates (e.g., `"login-form"`, `"dashboard"`, `"transfer-form"`), which the player could then render automatically.
+Import via ESM: `import { renderTemplate } from "../../packages/templates/dist/index.mjs"`
+Setiap template dipanggil: `renderTemplate({ type, ...data }, theme)`
 
-### 3. No Built-in Mock UI Components — ❌
+**Ini menutup gap #3 dari showcase fintech sebelumnya** (tidak ada mock UI templates).
 
-The cue SDK provides `AppWindow` and `FilePickerOverlay` in `@cue-vin/react`, but these are React-only and limited to generic app chrome. There are no:
+### `DemoStep.template` Schema — ✅ Dipakai
 
-- **Fintech-specific mock components**: login forms, balance cards, transfer forms, confirmation dialogs
-- **Industry-specific templates**: banking, e-commerce, healthcare, etc.
-- **Data-driven UI rendering**: a way to define "show a login form with these fields" in DemoScript and have it rendered automatically
+`script.json` menggunakan field `template` di setiap `DemoStep`:
 
-**Suggested Enhancement**: Create a `@cue-vin/templates` package with industry-specific UI templates that can be parameterized from DemoScript data.
+```json
+{
+  "id": "secure-login",
+  "template": { "type": "login", "data": { "brand": "BankFlow", ... } },
+  "pointer": { "x": 0.50, "y": 0.62 },
+  "hotspots": [...],
+  "annotations": [...]
+}
+```
 
-### 4. No Annotation Rendering in Player — ⚠️
+**Ini menutup gap #6 dari showcase fintech sebelumnya** (tidak ada field `html` atau `template` di DemoStep).
 
-While `DemoAnnotation` is defined in the schema (`type: "arrow" | "box" | "text"`), the current player implementation doesn't render them visually. Our custom renderer also doesn't fully render annotations (we used CSS pseudo-elements for boxes/text instead of the annotation data).
+### Concrete Annotation Types — ✅ Dipakai
 
-The `annotations` field in `DemoStep` has `[key: string]: unknown` which is too loosely typed — there's no standard spec for what properties an `arrow` or `box` annotation should have.
+Menggunakan **3 annotation types baru** (discriminated union):
 
-**Suggested Fix**: Define concrete annotation schemas:
+- **`BoxAnnotation`** — `type: "box"`, `x`, `y`, `width`, `height`, `color`, `cornerRadius`, `label`
+- **`ArrowAnnotation`** — `type: "arrow"`, `x1`, `y1`, `x2`, `y2`, `color`, `label`
+- **`TextAnnotation`** — `type: "text"`, `x`, `y`, `text`, `color`, `fontSize`, `align`
+
+Rendered secara visual di HTML: box annotation sebagai border overlay, arrow sebagai garis+panah, text sebagai positioned label.
+
+**Ini menutup gap #4 dari showcase fintech sebelumnya** (annotation schema terlalu longgar).
+
+### Skema DemoScript Lengkap — ✅ Dipakai
+
+- `DemoScript` — `id`, `title`, `steps[]`, `loop: true`, `theme`
+- `DemoStep` — `id`, `duration`, `template`, `pointer`, `hotspots`, `annotations`, `caption`, `cta`
+- `DemoPointer` — fractional coordinates (0–1)
+- `DemoHotspot` — `id`, `x`, `y`, `label`, `alwaysShow`
+- `DemoCta` — `type: "email_capture"` dengan `placeholder`, `submitLabel`, `successMessage`
+- `DemoTheme` — `accent: "#2563EB"`, `bg: "#0a0f1a"`, `font`
+
+### Node.js-Safe Player Export — ✅ Terverifikasi
+
+`@cue-vin/player` sekarang punya sub-path `"./node"` yang aman untuk import di Node.js tanpa crash HTMLElement. Barrel export juga sudah menggunakan dynamic import untuk `CueEmbed`.
+
+**Ini menutup gap #1 dari showcase fintech sebelumnya** (player crash di Node.js).
+
+---
+
+## Gap yang Masih Ada
+
+### 1. Templates Tidak Ada di CDN — ⚠️
+
+`@cue-vin/templates` belum dipublikasikan ke npm/CDN, jadi harus di-load via relative path ke `packages/templates/dist/index.mjs`. Ini berarti showcase hanya bisa jalan dari dalam repo, tidak standalone.
+
+**Saran**: Publikasikan `@cue-vin/templates` ke npm dan sediakan CDN URL di unpkg.
+
+### 2. Templates Tidak Support Custom Per-Step Styling — ⚠️
+
+Template menghasilkan HTML yang sudah distyle, tapi tidak ada cara untuk menambahkan elemen kustom di atas template (misalnya: badge "GRATIS" di step konfirmasi, atau success icon animasi di step notifikasi). Semua konten harus sesuai dengan template schema.
+
+**Saran**: Tambahkan field `extraHtml` di template config untuk injeksi HTML kustom.
+
+### 3. Annotation Rendering Tidak Otomatis — ⚠️
+
+SDK punya annotation types yang bagus, tapi **player/renderernya harus dibuat sendiri**. `@cue-vin/player` React component sudah render annotations, tapi untuk vanilla HTML demo, kita harus implementasi rendering sendiri (box borders, arrow lines, text labels).
+
+**Saran**: Sediakan `renderAnnotations()` di `@cue-vin/templates` atau di CueUtils IIFE.
+
+### 4. CueUtils IIFE Tidak Ada di CDN — ⚠️
+
+`cue-utils.iife.js` harus di-load via relative path ke `packages/player/dist/`. Tidak ada CDN URL yang stabil.
+
+**Saran**: Publikasikan `@cue-vin/player` versi terbaru ke npm, sehingga `https://unpkg.com/@cue-vin/player/dist/cue-utils.iife.js` bisa dipakai.
+
+### 5. Tidak Ada Template "CTA" atau "Success" — ⚠️
+
+Template yang tersedia: `login`, `dashboard`, `form`, `table`, `terminal`. Tidak ada template untuk:
+- **CTA/success page** dengan benefit cards + email capture
+- **Confirmation dialog** dengan action button
+- **Chart/visualization** placeholder
+
+Untuk step CTA, kami pakai template `login` yang kurang ideal (fields vs email capture CTA).
+
+**Saran**: Tambahkan template types: `"cta"`, `"confirm"`, `"chart"`.
+
+### 6. `generate()` Masih Tidak Menghasilkan `DemoStep.template` — ⚠️
+
+`generate()` masih tidak punya field `layout` atau `template` di `GenerateFeature`, sehingga tidak bisa menghasilkan DemoScript yang menggunakan template.
+
+**Saran**: Tambahkan field di `GenerateFeature`:
 ```typescript
-interface ArrowAnnotation extends DemoAnnotation {
-  type: "arrow";
-  x1: number; y1: number; x2: number; y2: number;
-  color?: string; label?: string;
-}
-interface BoxAnnotation extends DemoAnnotation {
-  type: "box";
-  x: number; y: number; width: number; height: number;
-  color?: string; cornerRadius?: number; label?: string;
+interface GenerateFeature {
+  // ...existing fields...
+  layout?: "login" | "dashboard" | "form" | "table" | "terminal";
+  layoutData?: Record<string, unknown>;
 }
 ```
 
-### 5. No Auto-play Timing API in Standalone HTML — ⚠️
-
-The `Timeline` class from `@cue-vin/core` provides `setTimeout`-based scheduling with loop support, but it requires a JS runtime (Node.js or browser module system). For a standalone HTML file with no build step, we had to implement our own auto-advance timer with `setTimeout`.
-
-**Suggested Enhancement**: Expose `Timeline` as a standalone IIFE bundle that can be loaded via `<script>` tag, similar to the player IIFE.
-
-### 6. No Pointer Animation Library for Vanilla JS — ⚠️
-
-The `Pointer` class from `@cue-vin/core` manages cursor movement with `moveTo()`, `click()`, and keyframe-based animation, but it's only available as an ES module. For vanilla HTML, we implemented pointer movement with CSS transitions (`transition: left 0.6s, top 0.6s`) and `simulateClick()` with a CSS class toggle.
-
-**Suggested Enhancement**: Provide a `@cue-vin/player-vanilla` package or IIFE bundle that includes pointer animation without React dependency.
-
 ---
 
-## Summary
+## Ringkasan: Perbaikan dari Showcase Sebelumnya
 
-| cue Feature | Used? | Notes |
-|-------------|-------|-------|
-| `DemoScript` schema | ✅ Yes | Structured all demo data in script.json |
-| `DemoStep` schema | ✅ Yes | All fields utilized (pointer, hotspots, annotations, caption, cta) |
-| Fractional coordinate system | ✅ Yes | Converted 0–1 to pixels for pointer and hotspots |
-| `DemoTheme` | ✅ Yes | Applied accent/bg/font to CSS |
-| `generate()` | ❌ No | Doesn't produce UI content, only metadata |
-| `@cue-vin/player` / `<cue-embed>` | ❌ No | Requires React or CDN IIFE; can't render custom mock UI |
-| `exportToHtml()` | ❌ No | Barrel export crashes in Node.js; pure string builder not useful with custom UI |
-| `Timeline` | ❌ No | Not available as standalone IIFE for vanilla HTML |
-| `Pointer` | ❌ No | Not available as standalone IIFE; CSS transitions used instead |
-| `CueAnalytics` | ❌ No | No endpoint to send to in standalone demo |
+| Gap Sebelumnya | Status Sekarang | Solusi |
+|----------------|-----------------|--------|
+| Player crash di Node.js | ✅ Fixed | Dynamic import + `./node` sub-path |
+| Tidak ada mock UI templates | ✅ Fixed | `@cue-vin/templates` (5 template types) |
+| Tidak ada field template di DemoStep | ✅ Fixed | `DemoStep.template?: DemoTemplate` |
+| Annotation schema terlalu longgar | ✅ Fixed | Discriminated union (Arrow/Box/Text) |
+| Timeline/Pointer tidak ada IIFE | ✅ Fixed | `cue-utils.iife.js` (2.65 kB) |
+| Font over-escaping di exportToHtml | ✅ Fixed | Font string dipakai langsung di CSS |
 
-## Priority Fixes for cue
+## Prioritas Perbaikan Selanjutnya
 
-1. **Node.js-safe sub-path export for `@cue-vin/player`** — `import { exportToHtml } from "@cue-vin/player/export"` without HTMLElement crash
-2. **Standalone vanilla JS player bundle** — IIFE build that renders DemoScript without React
-3. **Mock UI templates in DemoScript** — `layout` field per step that maps to built-in UI templates (login, dashboard, form, etc.)
-4. **Concrete annotation schemas** — Replace `[key: string]: unknown` with typed arrow/box/text interfaces
-5. **Standalone Timeline + Pointer IIFE** — For use in vanilla HTML demos without module bundler
-6. **`generate()` should set `step.cta`** — Currently only appends CTA text to caption; CTA overlay is invisible
+1. **Publikasikan `@cue-vin/templates` ke npm** — agar bisa di-load via CDN
+2. **Tambahkan `renderAnnotations()` di CueUtils IIFE** — rendering otomatis untuk vanilla HTML
+3. **Tambahkan template types: `cta`, `confirm`, `chart`**
+4. **Field `layout` + `layoutData` di `GenerateFeature`** — agar `generate()` bisa menghasilkan DemoScript dengan template
+5. **Field `extraHtml` di template config** — untuk injeksi konten kustom per step
