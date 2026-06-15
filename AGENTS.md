@@ -1821,9 +1821,9 @@ ffmpeg -framerate 1/3 -i step-%d.png -c:v libx264 -pix_fmt yuv420p -r 15 promo.m
 | `AnnotationLayer` | Component | 2 | SVG overlay for arrows, boxes, text |
 | `AnnotationLayerProps` | Type | 2 | AnnotationLayer props |
 | `Annotation` | Type | 2 | Union type for all annotation variants |
-| `AnnotationArrow` | Type | 2 | Arrow annotation |
-| `AnnotationBox` | Type | 2 | Highlight box annotation |
-| `AnnotationText` | Type | 2 | Text callout annotation |
+| `ArrowAnnotation` | Type | 2 | Arrow annotation |
+| `BoxAnnotation` | Type | 2 | Highlight box annotation |
+| `TextAnnotation` | Type | 2 | Text callout annotation |
 | `ScreenSlide` | Component | 2 | Screenshot/image slide with overlay slot |
 | `ScreenSlideProps` | Type | 2 | ScreenSlide props |
 | `useDemoController` | Hook | 2 | Step-based demo navigation controller |
