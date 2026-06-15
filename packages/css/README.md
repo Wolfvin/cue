@@ -106,6 +106,50 @@ Override in your own CSS to change defaults globally:
 | `.cue-hidden` | `opacity: 0; pointer-events: none` |
 | `.cue-visible` | `opacity: 1; pointer-events: auto` |
 
+### Canvas — Fixed Aspect Ratio Containers
+
+`.cue-canvas` creates a responsive container with a fixed aspect ratio. It uses `container-type: size` so child elements can use container query units (`cqw`, `cqh`). Width follows the parent; height is derived from the ratio.
+
+Use `data-ratio` to pick the preset:
+
+| `data-ratio` | Aspect Ratio | Use Case |
+|--------------|--------------|----------|
+| `"1:1"` | 1 / 1 | Instagram post / square |
+| `"4:5"` | 4 / 5 | Instagram portrait |
+| `"9:16"` | 9 / 16 | Reels / TikTok / Story |
+| `"16:9"` | 16 / 9 | Landscape / widescreen (default) |
+
+If no `data-ratio` is set, the canvas defaults to **16:9**.
+
+```html
+<!-- Square canvas for IG post -->
+<div class="cue-canvas" data-ratio="1:1" style="width: 400px">
+  <cue-embed ...></cue-embed>
+</div>
+
+<!-- 9:16 canvas for Reels / TikTok, full-width -->
+<div class="cue-canvas" data-ratio="9:16">
+  <cue-embed ...></cue-embed>
+</div>
+
+<!-- Using container query units inside a canvas -->
+<div class="cue-canvas" data-ratio="1:1" style="width: 400px">
+  <div style="font-size: 5cqw;">Scales with canvas</div>
+</div>
+```
+
+#### `.cue-canvas-center` — Full-Screen Centering
+
+Wrap a `.cue-canvas` in `.cue-canvas-center` to center it vertically and horizontally in the viewport. Set `--cue-canvas-center-bg` to add a background color.
+
+```html
+<div class="cue-canvas-center" style="--cue-canvas-center-bg: #111">
+  <div class="cue-canvas" data-ratio="9:16" style="max-width: 420px">
+    <cue-embed ...></cue-embed>
+  </div>
+</div>
+```
+
 ## Dependencies
 
 None — pure CSS, zero JavaScript.

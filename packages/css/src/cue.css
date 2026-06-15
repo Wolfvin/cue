@@ -227,3 +227,39 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* ── Canvas Utilities ──────────────────────────────────────────────────── */
+
+.cue-canvas {
+  container-type: size;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+.cue-canvas[data-ratio="1:1"] {
+  aspect-ratio: 1 / 1;
+}
+
+.cue-canvas[data-ratio="4:5"] {
+  aspect-ratio: 4 / 5;
+}
+
+.cue-canvas[data-ratio="9:16"] {
+  aspect-ratio: 9 / 16;
+}
+
+.cue-canvas[data-ratio="16:9"] {
+  aspect-ratio: 16 / 9;
+}
+
+.cue-canvas-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--cue-canvas-center-bg, transparent);
+}
