@@ -150,6 +150,52 @@ Wrap a `.cue-canvas` in `.cue-canvas-center` to center it vertically and horizon
 </div>
 ```
 
+
+### Standalone Cursor — `.cue-pointer`
+
+A standalone, absolute-positioned cursor element for vanilla JS demos and showcases. Visually matches the `ScriptedPointer` component from `@cue-vin/react`.
+
+```html
+<div style="position: relative;">
+  <div class="cue-pointer" id="cursor"></div>
+</div>
+```
+
+```js
+const cursor = document.getElementById('cursor');
+
+// Move the cursor
+cursor.style.left = '120px';
+cursor.style.top = '80px';
+
+// Simulate a click
+cursor.classList.add('cue-pointer-clicking');
+setTimeout(() => cursor.classList.remove('cue-pointer-clicking'), 150);
+```
+
+#### Classes
+
+| Class | Description |
+|---|---|
+| `.cue-pointer` | Renders the arrow cursor with smooth movement transitions |
+| `.cue-pointer-clicking` | Scales down slightly to simulate a click press |
+
+#### Custom Property
+
+| Property | Description |
+|---|---|
+| `--cue-cursor-url` | Data URI of the embedded cursor SVG. Override to use a custom cursor image. |
+
+```css
+/* Override with a custom cursor */
+:root {
+  --cue-cursor-url: url('./my-custom-cursor.svg');
+}
+```
+
+The SVG is embedded as a base64 data URI so **no extra file request** is needed when loaded from a CDN.
+
+
 ## Dependencies
 
 None — pure CSS, zero JavaScript.

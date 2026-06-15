@@ -263,3 +263,31 @@
   min-height: 100dvh;
   background: var(--cue-canvas-center-bg, transparent);
 }
+
+/* ── Standalone Cursor Asset ───────────────────────────────────────────── */
+
+:root {
+  --cue-cursor-url: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZURyb3BTaGFkb3cgZHg9IjAiIGR5PSIxIiBzdGREZXZpYXRpb249IjEuNSIgZmxvb2QtY29sb3I9InJnYmEoMCwwLDAsMC4zNSkiLz4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KICA8cGF0aCBkPSJNNS41IDJMNS41IDE4LjVMOSAxNC41TDEyLjUgMjEuNUwxNC41IDIwLjVMMTEgMTMuNUwxNiAxMy41WiIKICAgICAgICBmaWxsPSJ3aGl0ZSIKICAgICAgICBzdHJva2U9ImJsYWNrIgogICAgICAgIHN0cm9rZS13aWR0aD0iMS4yIgogICAgICAgIHN0cm9rZS1saW5lam9pbj0icm91bmQiCiAgICAgICAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogICAgICAgIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+Cjwvc3ZnPgo=');
+}
+
+/* Standalone pointer — absolute-positioned cursor for vanilla JS demos */
+.cue-pointer {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-image: var(--cue-cursor-url);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top left;
+  pointer-events: none;
+  transform-origin: top left;
+  transition: left var(--cue-duration-normal) var(--cue-ease-out),
+              top var(--cue-duration-normal) var(--cue-ease-out),
+              transform var(--cue-duration-fast) var(--cue-ease-spring);
+  will-change: left, top;
+}
+
+/* Click feedback — scale down slightly to simulate press */
+.cue-pointer-clicking {
+  transform: scale(0.85);
+}
