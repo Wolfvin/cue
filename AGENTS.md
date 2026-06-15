@@ -40,7 +40,7 @@ Pilih jalur berdasarkan kebutuhan:
 
 **Gunakan ketika:** Kamu butuh demo yang jalan di satu HTML file tanpa npm, tanpa build step, tanpa React. Cocok untuk one-file demo, email embed, landing page embed, atau promo canvas.
 
-**Cara kerja:** Load `cue-player.iife.js` via `<script>` tag, definisikan DemoScript di `window.__CUE_SCRIPT__`, lalu render `<cue-embed>` custom element.
+**Cara kerja:** Load `cue-player.iife.js` via `<script>` tag, definisikan DemoScript di `window.__CUE_SCRIPT__`, lalu render `<cue-embed>` custom element dengan `id`, `autoplay`, dan `loop` attribute, serta bridge script yang menghubungkan `window.__CUE_SCRIPT__` ke `data` attribute.
 
 ```html
 <!DOCTYPE html>
@@ -87,8 +87,16 @@ Pilih jalur berdasarkan kebutuhan:
     };
   </script>
 
-  <!-- 3. Place the custom element -->
-  <cue-embed></cue-embed>
+  <!-- 3. Place the custom element with id, autoplay, and loop -->
+  <cue-embed id="player" autoplay loop></cue-embed>
+
+  <!-- 4. Bridge: pass DemoScript to <cue-embed> data attribute -->
+  <script>
+    var el = document.getElementById('player');
+    if (el && window.__CUE_SCRIPT__) {
+      el.setAttribute('data', JSON.stringify(window.__CUE_SCRIPT__));
+    }
+  </script>
 
 </body>
 </html>
@@ -97,7 +105,7 @@ Pilih jalur berdasarkan kebutuhan:
 **Keuntungan:**
 - Zero npm install — hanya satu HTML file
 - `window.Cue` global tersedia untuk programmatic control
-- `<cue-embed>` auto-renders dari `window.__CUE_SCRIPT__`
+- `<cue-embed>` menerima DemoScript via `data` attribute (bridge script menghubungkan `window.__CUE_SCRIPT__`)
 - Bisa di-host di GitHub Pages, S3, atau mana saja
 
 **Juga tersedia — cue-utils.iife.js (2.6 kB):**
@@ -1642,7 +1650,13 @@ curl http://localhost:3001/health
       };
     </script>
 
-    <cue-embed></cue-embed>
+    <cue-embed id="player" autoplay loop></cue-embed>
+    <script>
+      var el = document.getElementById('player');
+      if (el && window.__CUE_SCRIPT__) {
+        el.setAttribute('data', JSON.stringify(window.__CUE_SCRIPT__));
+      }
+    </script>
   </div>
 
 </body>
@@ -1716,7 +1730,13 @@ curl http://localhost:3001/health
       };
     </script>
 
-    <cue-embed></cue-embed>
+    <cue-embed id="player" autoplay loop></cue-embed>
+    <script>
+      var el = document.getElementById('player');
+      if (el && window.__CUE_SCRIPT__) {
+        el.setAttribute('data', JSON.stringify(window.__CUE_SCRIPT__));
+      }
+    </script>
   </div>
 
 </body>
