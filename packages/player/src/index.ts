@@ -17,3 +17,12 @@ export function initCue(): void {
     customElements.define("cue-embed", CueEmbed);
   }
 }
+
+// ─── Auto-register in browser environments ──────────────────────────────
+// When this module is loaded as an IIFE via <script src>, the custom
+// element must be registered immediately so that any <cue-embed> tags
+// already in the DOM are upgraded without requiring an explicit
+// initCue() call.
+if (typeof customElements !== "undefined") {
+  initCue();
+}
