@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APIForge — Developer API Demo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#00FF94;--c:#00D4FF;--bg:#0A0E17;--bg2:#111827;--bg3:#1E293B;
+--muted:#4A5568;--font:'Courier New',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+body{background:var(--bg);color:#E2E8F0;font-family:var(--font);overflow:hidden;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.scanline{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,148,.015) 2px,rgba(0,255,148,.015) 4px)}
+.container{width:90%;max-width:880px;position:relative}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.logo{color:var(--g);font-size:20px;font-weight:700;letter-spacing:2px}
+.logo span{color:var(--c)}
+.cursor-blink{display:inline-block;width:8px;height:18px;background:var(--g);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+.step-indicator{display:flex;gap:8px;margin-bottom:16px;align-items:center}
+.step-dot{width:10px;height:10px;border-radius:50%;background:var(--muted);transition:all .4s var(--ease);position:relative}
+.step-dot.active{background:var(--g);box-shadow:0 0 12px var(--g);transform:scale(1.3)}
+.step-dot.done{background:var(--c)}
+.step-line{height:2px;flex:1;background:var(--muted);position:relative;overflow:hidden}
+.step-line .fill{height:100%;background:var(--g);width:0;transition:width .6s var(--ease)}
+.terminal{background:var(--bg2);border:1px solid #1E3A3A;border-radius:8px;overflow:hidden;position:relative}
+.terminal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:.4}
+.titlebar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,0,0,.3);border-bottom:1px solid #1E3A3A}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.r{background:#FF5F57}.dot.y{background:#FEBC2E}.dot.gr{background:#28C840}
+.titlebar-text{margin-left:8px;font-size:12px;color:var(--muted)}
+.body{padding:16px 20px;min-height:280px;position:relative}
+.step-title{font-size:16px;font-weight:700;color:var(--g);min-height:22px;margin-bottom:14px;white-space:nowrap;overflow:visible}
+.step-content{font-size:13px;line-height:1.7;color:#C9D1D9;min-height:200px}
+.code-block{background:rgba(0,0,0,.4);border:1px solid #1E3A3A;border-radius:6px;padding:12px 14px;font-size:12px;line-height:1.6;overflow:hidden}
+.code-block .prompt{color:var(--c)}
+.code-block .kw{color:#FF7B72}
+.code-block .str{color:#A5D6FF}
+.code-block .fn{color:#D2A8FF}
+.code-block .cm{color:var(--muted)}
+.code-block .num{color:#79C0FF}
+.code-block .ok{color:var(--g)}
+.response-box{background:rgba(0,255,148,.04);border-left:3px solid var(--g);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:8px;font-size:12px;line-height:1.6}
+.progress-ring{display:inline-block;position:relative;width:50px;height:50px;margin:14px auto}
+.progress-ring svg{transform:rotate(-90deg)}
+.progress-ring circle{fill:none;stroke-width:3}
+.progress-ring .bg{stroke:var(--bg3)}
+.progress-ring .fg{stroke:var(--g);stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:138;transition:stroke-dashoffset .8s var(--ease)}
+.progress-ring .label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--g)}
+.deploy-btn{display:inline-block;padding:8px 24px;background:transparent;color:var(--g);border:1px solid var(--g);border-radius:4px;font-family:var(--font);font-size:13px;cursor:default;position:relative;overflow:hidden;margin-top:10px}
+.deploy-btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,255,148,.15),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{100%{left:100%}}
+.deploy-btn.launched{background:var(--g);color:var(--bg);border-color:var(--g)}
+.matrix-col{position:fixed;top:0;font-size:11px;color:var(--g);opacity:.06;pointer-events:none;z-index:0;line-height:1.2;writing-mode:vertical-rl;animation:fall linear infinite}
+@keyframes fall{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+.nav-hint{margin-top:16px;font-size:11px;color:var(--muted);text-align:center}
+.nav-hint kbd{background:var(--bg3);padding:2px 8px;border-radius:3px;font-size:10px;border:1px solid #2D3748}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700;margin-left:6px}
+.status-badge.live{background:rgba(0,255,148,.15);color:var(--g)}
+.status-badge.proc{background:rgba(0,212,255,.15);color:var(--c)}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+<div class="header">
+<div class="logo">API<span>FORGE</span></div>
+<div class="cursor-blink" id="mainCursor"></div>
+</div>
+<div class="step-indicator" id="stepIndicator"></div>
+<div class="terminal">
+<div class="titlebar">
+<div class="dot r"></div><div class="dot y"></div><div class="dot gr"></div>
+<div class="titlebar-text">apiforge-cli — ~/projects/my-api</div>
+</div>
+<div class="body">
+<div class="step-title" id="stepTitle"></div>
+<div class="step-content" id="stepContent"></div>
+</div>
+</div>
+<div class="nav-hint"><kbd>→</kbd> next &nbsp; <kbd>←</kbd> prev &nbsp; <kbd>Space</kbd> pause/play</div>
+</div>
+<script>
+const STEPS=[
+{id:"connect",title:"$ apiforge connect --db postgres://localhost:5432/shopdb",code:[
+{t:'prompt',v:'$ '},{t:'kw',v:'apiforge'},{t:'fn',v:' connect '},{t:'str',v:'--db postgres://localhost:5432/shopdb'},
+],sub:"Scanning schema...",res:null,subDelay:600,visual:"progress"},
+{id:"schema",title:"$ apiforge schema analyze",code:[
+{t:'',v:'┌─────────────┐┌──────────────┐┌─────────────┐'},
+{t:'',v:'│  users      ││  products    ││  orders     │'},
+{t:'',v:'│  id (PK)    ││  id (PK)     ││  id (PK)    │'},
+{t:'',v:'│  email      ││  name        ││  user_id FK │'},
+{t:'',v:'│  name       ││  price       ││  total      │'},
+{t:'',v:'│  created_at ││  stock       ││  status     │'},
+{t:'',v:'└─────────────┘└──────────────┘└─────────────┘'},
+{t:'cm',v:'// 3 tables detected — 15 columns mapped'},
+],sub:null,res:null,visual:"schema"},
+{id:"generate",title:"$ apiforge generate --resource users --rest",code:[
+{t:'prompt',v:'$ '},{t:'kw',v:'apiforge'},{t:'fn',v:' generate '},{t:'str',v:'--resource users --rest'},
+],sub:"Generating CRUD endpoints...",res:[
+{t:'ok',v:'  CREATE '},{t:'',v:'GET    /api/v1/users'},
+{t:'ok',v:'  CREATE '},{t:'',v:'GET    /api/v1/users/:id'},
+{t:'ok',v:'  CREATE '},{t:'',v:'POST   /api/v1/users'},
+{t:'ok',v:'  CREATE '},{t:'',v:'PUT    /api/v1/users/:id'},
+{t:'ok',v:'  CREATE '},{t:'',v:'DELETE /api/v1/users/:id'},
+],subDelay:400,visual:"code"},
+{id:"test",title:"$ apiforge test --endpoint GET /api/v1/users",code:[
+{t:'prompt',v:'$ '},{t:'kw',v:'apiforge'},{t:'fn',v:' test '},{t:'str',v:'--endpoint GET /api/v1/users'},
+],sub:"Sending request...",res:[
+{t:'ok',v:'200 OK '},{t:'',v:'in '},{t:'num',v:'23ms'},
+{t:'cm',v:'// Response:'},
+{t:'',v:'{ "data": ['},
+{t:'',v:'    { "id": 1, "email": "alice@dev.io", "name": "Alice" },'},
+{t:'',v:'    { "id": 2, "email": "bob@dev.io", "name": "Bob" }'},
+{t:'',v:'  ], "total": 2 }'},
+],subDelay:500,visual:"response"},
+{id:"deploy",title:"$ apiforge deploy --target production",code:[
+{t:'prompt',v:'$ '},{t:'kw',v:'apiforge'},{t:'fn',v:' deploy '},{t:'str',v:'--target production'},
+],sub:"Deploying to production...",res:[
+{t:'ok',v:'✓ '},{t:'',v:'Build completed'},
+{t:'ok',v:'✓ '},{t:'',v:'5 endpoints validated'},
+{t:'ok',v:'✓ '},{t:'',v:'SSL certificate active'},
+{t:'ok',v:'✓ '},{t:'',v:'Live at '},{t:'str',v:'https://api.myapp.dev'},
+],subDelay:700,visual:"deploy"}
+];
+let cur=0,playing=true,typing=false,timers=[],progressAnim=null;
+function $(s){return document.getElementById(s)}
+function clearTimeouts(){timers.forEach(clearTimeout);timers=[];}
+function typeText(el,text,speed=30){return new Promise(r=>{typing=true;let i=0;const go=()=>{if(i<text.length){el.textContent+=text[i];i++;timers.push(setTimeout(go,speed))}else{typing=false;r()}};go()})}
+function typeCodeLines(container,lines,speed=18){return new Promise(r=>{typing=true;let lineIdx=0;const goLine=()=>{if(lineIdx>=lines.length){typing=false;r();return}const line=lines[lineIdx];const div=document.createElement('div');div.style.minHeight='1.6em';container.appendChild(div);if(typeof line==='string'){let ci=0;const gc=()=>{if(ci<line.length){div.textContent+=line[ci];ci++;timers.push(setTimeout(gc,speed))}else{lineIdx++;timers.push(setTimeout(goLine,60))}};gc()}else{let segI=0;const goSeg=()=>{if(segI>=line.length){lineIdx++;timers.push(setTimeout(goLine,60));return}const seg=line[segI];const span=document.createElement('span');span.className=seg.t||'';div.appendChild(span);let ci=0;const gc=()=>{if(ci<seg.v.length){span.textContent+=seg.v[ci];ci++;timers.push(setTimeout(gc,speed))}else{segI++;timers.push(setTimeout(goSeg,20))}};gc()};goSeg()}};goLine()})}
+function buildIndicator(){const el=$('stepIndicator');el.innerHTML='';STEPS.forEach((_,i)=>{if(i>0){const l=document.createElement('div');l.className='step-line';l.innerHTML='<div class="fill" id="lineFill'+i+'"></div>';el.appendChild(l)}const d=document.createElement('div');d.className='step-dot';d.id='dot'+i;el.appendChild(d)})}
+function updateIndicator(){STEPS.forEach((_,i)=>{const d=$('dot'+i);d.className='step-dot'+(i===cur?' active':i<cur?' done':'');if(i>0){const f=$('lineFill'+i);f.style.width=i<=cur?'100%':'0'}})}
+function showProgress(pct){const c=$('stepContent');c.innerHTML='<div class="progress-ring"><svg width="50" height="50"><circle class="bg" cx="22" cy="22" r="22"/><circle class="fg" id="ringFg" cx="22" cy="22" r="22"/></svg><div class="label" id="ringLabel">0%</div></div>';setTimeout(()=>{const fg=$('ringFg');const lb=$('ringLabel');const off=138-(138*pct/100);fg.style.strokeDashoffset=off;lb.textContent=pct+'%'},50)}
+function showDeploy(){const c=$('stepContent');c.innerHTML='<div style="text-align:center;padding:20px 0"><div class="deploy-btn" id="deployBtn">DEPLOY TO PRODUCTION</div></div>';setTimeout(()=>{const b=$('deployBtn');b.classList.add('launched');b.textContent='LIVE';const badge=document.createElement('span');badge.className='status-badge live';badge.textContent='● LIVE';b.parentElement.appendChild(badge)},1500)}
+async function runStep(idx){if(idx<0||idx>=STEPS.length)return;clearTimeouts();const s=STEPS[idx];const title=$('stepTitle');const content=$('stepContent');title.textContent='';content.innerHTML='';updateIndicator();await typeText(title,s.title,25);if(s.visual==='progress'){showProgress(0);let p=0;const tick=()=>{if(p<100&&cur===idx){p+=2+(Math.random()*4|0);if(p>100)p=100;showProgress(p);if(p<100)timers.push(setTimeout(tick,40))}};timers.push(setTimeout(tick,s.subDelay||400))}else if(s.visual==='schema'){const cb=document.createElement('div');cb.className='code-block';content.appendChild(cb);await typeCodeLines(cb,s.code,8)}else if(s.visual==='deploy'){if(s.code){const cb=document.createElement('div');cb.className='code-block';content.appendChild(cb);await typeCodeLines(cb,s.code,22)}timers.push(setTimeout(()=>showDeploy(),s.subDelay||700))}else{if(s.code){const cb=document.createElement('div');cb.className='code-block';content.appendChild(cb);await typeCodeLines(cb,s.code,22)}if(s.sub){const sub=document.createElement('div');sub.style.color='var(--c)';sub.style.marginTop='10px';sub.style.fontSize='12px';const dots=document.createElement('span');sub.textContent=s.sub;sub.appendChild(dots);content.appendChild(sub);let d=0;const dotAnim=()=>{d=(d+1)%4;dots.textContent='.'.repeat(d);timers.push(setTimeout(dotAnim,300))};timers.push(setTimeout(dotAnim,200))}if(s.res){const delay=s.sub?(s.subDelay||600)+800:(s.subDelay||400);timers.push(setTimeout(async()=>{const rb=document.createElement('div');rb.className='response-box';content.appendChild(rb);await typeCodeLines(rb,s.res,16)},delay))}}}
+function next(){if(cur<STEPS.length-1){cur++;runStep(cur)}}
+function prev(){if(cur>0){cur--;runStep(cur)}}
+function togglePause(){playing=!playing;$('mainCursor').style.animationPlayState=playing?'running':'paused'}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();next()}else if(e.key==='ArrowLeft'){e.preventDefault();prev()}else if(e.key===' '){e.preventDefault();togglePause()}});
+function spawnMatrix(){const chars='01アイウエオカキクケコ';for(let i=0;i<8;i++){const d=document.createElement('div');d.className='matrix-col';d.style.left=Math.random()*100+'%';d.style.animationDuration=(8+Math.random()*12)+'s';d.style.animationDelay=(-Math.random()*10)+'s';let t='';for(let j=0;j<30;j++)t+=chars[Math.random()*chars.length|0]+'\n';d.textContent=t;document.body.appendChild(d)}}
+buildIndicator();runStep(0);spawnMatrix();
+</script>
+</body>
+</html>

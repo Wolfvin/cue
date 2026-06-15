@@ -1,0 +1,86 @@
+{
+  "id": "apiforge-devtool-demo",
+  "title": "APIForge — Connect, Generate, Test, Deploy",
+  "steps": [
+    {
+      "id": "connect",
+      "caption": "Connect your database. APIForge introspects schema, tables, and relations automatically.",
+      "duration": 6000,
+      "pointer": { "x": 0.5, "y": 0.35, "clicking": false },
+      "hotspots": [
+        { "id": "h-connect-uri", "x": 0.55, "y": 0.25, "label": "DB URI", "alwaysShow": true },
+        { "id": "h-connect-scan", "x": 0.5, "y": 0.55, "label": "Scanning..." }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.15, "y": 0.85, "text": "Step 1/5", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "schema",
+      "caption": "Schema analyzed. 3 tables detected with 15 columns — ready for code generation.",
+      "duration": 5000,
+      "pointer": { "x": 0.35, "y": 0.45, "clicking": false },
+      "hotspots": [
+        { "id": "h-schema-users", "x": 0.2, "y": 0.4, "label": "users", "alwaysShow": true },
+        { "id": "h-schema-products", "x": 0.5, "y": 0.4, "label": "products", "alwaysShow": true },
+        { "id": "h-schema-orders", "x": 0.8, "y": 0.4, "label": "orders", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.14, "y": 0.3, "width": 0.22, "height": 0.35, "color": "#00D4FF" },
+        { "type": "text", "x": 0.15, "y": 0.85, "text": "Step 2/5", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "generate",
+      "caption": "Generate full REST CRUD endpoints from schema. 5 endpoints created in milliseconds.",
+      "duration": 5000,
+      "pointer": { "x": 0.5, "y": 0.6, "clicking": false },
+      "hotspots": [
+        { "id": "h-gen-get", "x": 0.6, "y": 0.4, "label": "GET /users", "alwaysShow": true },
+        { "id": "h-gen-post", "x": 0.6, "y": 0.52, "label": "POST /users" },
+        { "id": "h-gen-delete", "x": 0.6, "y": 0.72, "label": "DELETE /users/:id" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.15, "y": 0.85, "text": "Step 3/5", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "test",
+      "caption": "Test your endpoint instantly. 200 OK in 23ms — no Postman needed.",
+      "duration": 6000,
+      "pointer": { "x": 0.55, "y": 0.5, "clicking": true },
+      "hotspots": [
+        { "id": "h-test-status", "x": 0.3, "y": 0.35, "label": "200 OK", "alwaysShow": true },
+        { "id": "h-test-latency", "x": 0.6, "y": 0.35, "label": "23ms" }
+      ],
+      "annotations": [
+        { "type": "arrow", "x1": 0.3, "y1": 0.32, "x2": 0.3, "y2": 0.45, "color": "#00FF94" },
+        { "type": "text", "x": 0.15, "y": 0.85, "text": "Step 4/5", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "deploy",
+      "caption": "One command to production. SSL, validation, and live URL — done.",
+      "duration": 6000,
+      "pointer": { "x": 0.5, "y": 0.55, "clicking": true },
+      "hotspots": [
+        { "id": "h-deploy-url", "x": 0.6, "y": 0.7, "label": "https://api.myapp.dev", "alwaysShow": true },
+        { "id": "h-deploy-ssl", "x": 0.4, "y": 0.6, "label": "SSL active" }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.35, "y": 0.55, "width": 0.45, "height": 0.22, "color": "#00FF94" },
+        { "type": "text", "x": 0.15, "y": 0.85, "text": "Step 5/5", "color": "#00FF94" }
+      ],
+      "cta": {
+        "type": "button",
+        "label": "Start Building with APIForge"
+      }
+    }
+  ],
+  "loop": true,
+  "theme": {
+    "accent": "#00FF94",
+    "bg": "#0A0E17",
+    "font": "'Courier New', monospace"
+  }
+}
