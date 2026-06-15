@@ -201,6 +201,7 @@ function TextAnnotationSvg({
   const size = annotation.fontSize ?? 13;
   const color = annotation.color ?? "#f5f5f5";
   const align = annotation.align ?? "left";
+  const fontWeight = annotation.fontWeight ?? "normal";
   const padding = 6;
 
   const px = annotation.x * w;
@@ -238,6 +239,7 @@ function TextAnnotationSvg({
         y={py}
         fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
         fontSize={size}
+        fontWeight={fontWeight}
         fill={color}
         textAnchor={textAnchor}
       >

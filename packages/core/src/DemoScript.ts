@@ -70,6 +70,8 @@ export interface TextAnnotation {
   fontSize?: number;
   /** Text alignment. Default: "left". */
   align?: "left" | "center" | "right";
+  /** Font weight. Default: "normal". */
+  fontWeight?: number | "bold" | "normal";
 }
 
 /** Discriminated union of all annotation variants. Replaces the old loosely-typed DemoAnnotation. */
