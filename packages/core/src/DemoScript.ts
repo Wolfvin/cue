@@ -12,13 +12,68 @@ export interface DemoHotspot {
   alwaysShow?: boolean;
 }
 
-/** An annotation overlay drawn on a demo step. */
-export interface DemoAnnotation {
-  /** Shape / type of annotation. */
-  type: "arrow" | "box" | "text";
-  /** Additional properties specific to each annotation type. */
-  [key: string]: unknown;
+/** Arrow annotation pointing from (x1,y1) to (x2,y2). */
+export interface ArrowAnnotation {
+  /** Discriminator: "arrow". */
+  type: "arrow";
+  /** Start X position as a fraction (0–1) of the slide width. */
+  x1: number;
+  /** Start Y position as a fraction (0–1) of the slide height. */
+  y1: number;
+  /** End X position as a fraction (0–1) of the slide width. */
+  x2: number;
+  /** End Y position as a fraction (0–1) of the slide height. */
+  y2: number;
+  /** Stroke color. Default: "#3b82f6". */
+  color?: string;
+  /** Optional label displayed near the arrow midpoint. */
+  label?: string;
+  /** Line width in pixels. Default: 2. */
+  lineWidth?: number;
 }
+
+/** Highlight box annotation with optional label. */
+export interface BoxAnnotation {
+  /** Discriminator: "box". */
+  type: "box";
+  /** Top-left X position as a fraction (0–1) of the slide width. */
+  x: number;
+  /** Top-left Y position as a fraction (0–1) of the slide height. */
+  y: number;
+  /** Width as a fraction (0–1) of the slide width. */
+  width: number;
+  /** Height as a fraction (0–1) of the slide height. */
+  height: number;
+  /** Stroke color. Default: "#3b82f6". */
+  color?: string;
+  /** Corner radius in pixels. Default: 4. */
+  cornerRadius?: number;
+  /** Optional label displayed above the box. */
+  label?: string;
+  /** Opacity (0–1). Default: 1. */
+  opacity?: number;
+}
+
+/** Text callout annotation. */
+export interface TextAnnotation {
+  /** Discriminator: "text". */
+  type: "text";
+  /** X position as a fraction (0–1) of the slide width. */
+  x: number;
+  /** Y position as a fraction (0–1) of the slide height. */
+  y: number;
+  /** Text content to display. */
+  text: string;
+  /** Text color. Default: "#f5f5f5". */
+  color?: string;
+  /** Font size in pixels. Default: 13. */
+  fontSize?: number;
+  /** Text alignment. Default: "left". */
+  align?: "left" | "center" | "right";
+}
+
+/** Discriminated union of all annotation variants. Replaces the old loosely-typed DemoAnnotation. */
+export type DemoAnnotation = ArrowAnnotation | BoxAnnotation | TextAnnotation;
 
 /** Pointer position and click state for a demo step. */
 export interface DemoPointer {

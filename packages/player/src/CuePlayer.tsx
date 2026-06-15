@@ -6,7 +6,6 @@ import { HotspotOverlay } from "@cue-vin/react";
 import { AnnotationLayer } from "@cue-vin/react";
 import { StepProgress } from "@cue-vin/react";
 import { ChapterNav } from "@cue-vin/react";
-import type { Annotation } from "@cue-vin/react";
 
 /** Props for the CuePlayer component. */
 export interface CuePlayerProps {
@@ -50,10 +49,7 @@ function toPixelHotspots(
   }));
 }
 
-/** Cast DemoAnnotation[] to the Annotation union type expected by AnnotationLayer. */
-function toAnnotations(annotations: DemoAnnotation[]): Annotation[] {
-  return annotations as Annotation[];
-}
+
 
 /**
  * Standalone embeddable demo player that renders a DemoScript with
@@ -199,7 +195,11 @@ export function CuePlayer({
 
           {/* Annotation overlay */}
           {step.annotations && step.annotations.length > 0 && (
-            <AnnotationLayer annotations={toAnnotations(step.annotations)} />
+            <AnnotationLayer
+              annotations={step.annotations}
+              containerWidth={width}
+              containerHeight={height}
+            />
           )}
         </ScreenSlide>
       ) : (
