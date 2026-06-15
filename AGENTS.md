@@ -28,23 +28,129 @@ User minta apa?
 ├─ "Capture app nyata jadi DemoScript?" → Recipe 7 (Record Browser Session) — gunakan cue-record CLI
 ├─ "Generate demo dari deskripsi fitur?" → Recipe 8 (Generate DemoScript) — gunakan generate()
 ├─ "Self-hosted analytics server?" → Recipe 9 (Analytics Server) — gunakan cue-analytics
+├─ "Konten untuk IG/TikTok/Reels?" → Recipe 10 (Promo Canvas) — gunakan IIFE + aspect-ratio container
 └─ "Gabungan" → Combine sesuai kebutuhan
 ```
+
+## Quick Start for AI Agents
+
+Pilih jalur berdasarkan kebutuhan:
+
+### Path A: Zero-Install (IIFE) — **Recommended untuk demo cepat**
+
+**Gunakan ketika:** Kamu butuh demo yang jalan di satu HTML file tanpa npm, tanpa build step, tanpa React. Cocok untuk one-file demo, email embed, landing page embed, atau promo canvas.
+
+**Cara kerja:** Load `cue-player.iife.js` via `<script>` tag, definisikan DemoScript di `window.__CUE_SCRIPT__`, lalu render `<cue-embed>` custom element.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cue Demo — Zero Install</title>
+</head>
+<body style="margin:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;min-height:100vh">
+
+  <!-- 1. Load the IIFE player -->
+  <script src="https://unpkg.com/@cue-vin/player@latest/dist/cue-player.iife.js"></script>
+
+  <!-- 2. Define your DemoScript -->
+  <script>
+    window.__CUE_SCRIPT__ = {
+      id: "my-demo",
+      title: "My Product Demo",
+      steps: [
+        {
+          id: "welcome",
+          caption: "Welcome to our product",
+          duration: 4000,
+          pointer: { x: 0.5, y: 0.4 }
+        },
+        {
+          id: "feature",
+          caption: "Key feature highlighted here",
+          duration: 4000,
+          pointer: { x: 0.6, y: 0.5 },
+          hotspots: [
+            { id: "h1", x: 0.6, y: 0.5, label: "Feature", alwaysShow: true }
+          ]
+        },
+        {
+          id: "cta",
+          caption: "Get started today",
+          cta: { type: "button", label: "Try Now", href: "#" }
+        }
+      ],
+      loop: true,
+      theme: { accent: "#3b82f6", bg: "#0a0a0a" }
+    };
+  </script>
+
+  <!-- 3. Place the custom element -->
+  <cue-embed></cue-embed>
+
+</body>
+</html>
+```
+
+**Keuntungan:**
+- Zero npm install — hanya satu HTML file
+- `window.Cue` global tersedia untuk programmatic control
+- `<cue-embed>` auto-renders dari `window.__CUE_SCRIPT__`
+- Bisa di-host di GitHub Pages, S3, atau mana saja
+
+**Juga tersedia — cue-utils.iife.js (2.6 kB):**
+Jika kamu hanya butuh `Timeline` + `Pointer` tanpa full player:
+```html
+<script src="https://unpkg.com/@cue-vin/player@latest/dist/cue-utils.iife.js"></script>
+<script>
+  const { Timeline, Pointer } = window.CueUtils;
+  const tl = new Timeline({ loop: true });
+  tl.add(0, () => renderStep(0));
+  tl.add(3000, () => renderStep(1));
+  tl.play();
+</script>
+```
+
+### Path B: Full SDK (React) — **Untuk integrasi dalam Next.js app**
+
+**Gunakan ketika:** Kamu membangun Next.js app dan perlu komponen React (`DemoTheater`, `ScriptedPointer`, `AppWindow`, hooks, dll).
+
+**Cara kerja:** Install packages via npm/pnpm, import React components dan core classes.
+
+```bash
+pnpm add @cue-vin/core @cue-vin/react @cue-vin/css
+```
+
+```tsx
+"use client";
+import { DemoTheater, ScriptedPointer } from "@cue-vin/react";
+import { Pointer, Timeline, type PointerState } from "@cue-vin/core";
+import "@cue-vin/css/cue.css";
+// ... lihat Recipe 1 untuk contoh lengkap
+```
+
+**Keuntungan:**
+- Full React component library (DemoTheater, AppWindow, hooks)
+- Type-safe dengan TypeScript
+- Tree-shakeable ES modules
+- Integrasi seamless dengan Next.js App Router
 
 ## Recipe 1: Auto-Demo Theater (scroll-triggered, loops otomatis)
 
 **Gunakan ketika:** User minta "product demo yang auto-play" atau "landing page dengan animated demo".
 
-**Prinsip:** DemoTheater mengunci canvas ke fixed size, ScriptedPointer digerakkan oleh `Pointer` dari `@cue/core`, StateMachine mengatur scene, Timeline mengatur timing.
+**Prinsip:** DemoTheater mengunci canvas ke fixed size, ScriptedPointer digerakkan oleh `Pointer` dari `@cue-vin/core`, StateMachine mengatur scene, Timeline mengatur timing.
 
 ```tsx
 // page.tsx — Auto-Demo Theater
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { DemoTheater, ScriptedPointer, AppWindow } from "@cue/react";
-import { Pointer, StateMachine, Timeline, type PointerState } from "@cue/core";
-import "@cue/css/cue.css";
+import { DemoTheater, ScriptedPointer, AppWindow } from "@cue-vin/react";
+import { Pointer, StateMachine, Timeline, type PointerState } from "@cue-vin/core";
+import "@cue-vin/css/cue.css";
 
 const SCENES = [
   { id: "idle", label: "Dashboard" },
@@ -148,10 +254,10 @@ export default function AutoDemoPage() {
 "use client";
 
 import { useState, useCallback } from "react";
-import { DemoTheater, AppWindow, FilePickerOverlay, ExcelPopup, type FileEntry } from "@cue/react";
-import { StateMachine } from "@cue/core";
-import type { ExcelCell } from "@cue/react";
-import "@cue/css/cue.css";
+import { DemoTheater, AppWindow, FilePickerOverlay, ExcelPopup, type FileEntry } from "@cue-vin/react";
+import { StateMachine } from "@cue-vin/core";
+import type { ExcelCell } from "@cue-vin/react";
+import "@cue-vin/css/cue.css";
 
 const FILES: FileEntry[] = [
   { id: "1", name: "sales-q4.csv", type: "spreadsheet" },
@@ -258,7 +364,7 @@ export default function InteractiveDemoPage() {
 
 **Gunakan ketika:** User sudah punya halaman/section dan minta "tambah animasi" tanpa mengubah struktur React. Atau user minta "animate these elements on scroll" di project non-React.
 
-**Prinsip:** Import `cue.css`, tambah class ke elemen yang ada. Tidak perlu install `@cue/react` atau `@cue/core`.
+**Prinsip:** Import `cue.css`, tambah class ke elemen yang ada. Tidak perlu install `@cue-vin/react` atau `@cue-vin/core`.
 
 ```html
 <!-- index.html — CSS Primitives Only -->
@@ -268,7 +374,7 @@ export default function InteractiveDemoPage() {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cue CSS Primitives Demo</title>
-  <link rel="stylesheet" href="./node_modules/@cue/css/src/cue.css">
+  <link rel="stylesheet" href="./node_modules/@cue-vin/css/src/cue.css">
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
     .container { max-width: 800px; margin: 0 auto; padding: 80px 24px; }
@@ -323,8 +429,8 @@ export default function InteractiveDemoPage() {
 // ScrollRevealSection.tsx — Drop into existing React page
 "use client";
 
-import { useScrollReveal, useStagger } from "@cue/react";
-import "@cue/css/cue.css";
+import { useScrollReveal, useStagger } from "@cue-vin/react";
+import "@cue-vin/css/cue.css";
 
 const FEATURES = [
   { title: "Fast", desc: "Sub-100ms response time" },
@@ -443,10 +549,10 @@ Easing standar:
 
 ## API Reference (Quick)
 
-### @cue/core
+### @cue-vin/core
 
 ```ts
-import { Timeline, Pointer, StateMachine, ScrollTrigger } from "@cue/core";
+import { Timeline, Pointer, StateMachine, ScrollTrigger } from "@cue-vin/core";
 
 // Timeline — chain setTimeout with cleanup
 const tl = new Timeline({ loop: true, loopDelay: 2000, onComplete: () => {} });
@@ -480,13 +586,13 @@ st.disconnect();
 st.reset();
 ```
 
-### @cue/react
+### @cue-vin/react
 
 ```tsx
 import {
   DemoTheater, ScriptedPointer, AppWindow, FilePickerOverlay, ExcelPopup,
   useEnter, useCountUp, useStagger, useScrollReveal,
-} from "@cue/react";
+} from "@cue-vin/react";
 
 // DemoTheater — fixed-size artboard with responsive scale
 <DemoTheater width={960} height={540} background="#fff">
@@ -514,10 +620,10 @@ const visible = useStagger({ count: 5, interval: 100 });
 const [scrollRef, isVisible] = useScrollReveal({ threshold: 0.2, once: true });
 ```
 
-### @cue/css
+### @cue-vin/css
 
 ```css
-@import "@cue/css/cue.css";
+@import "@cue-vin/css/cue.css";
 
 /* Enter animations — add to element on mount */
 .cue-enter              /* slide-up */
@@ -564,12 +670,12 @@ import {
   DemoTheater, ScriptedPointer, ScreenSlide,
   HotspotOverlay, AnnotationLayer, StepProgress, ChapterNav,
   useDemoController,
-} from "@cue/react";
+} from "@cue-vin/react";
 import {
   Pointer, type PointerState, type DemoScript,
   validateDemoScript, getDemoStep,
-} from "@cue/core";
-import "@cue/css/cue.css";
+} from "@cue-vin/core";
+import "@cue-vin/css/cue.css";
 
 // ── Helper: convert File to data URL (browser-side) ──
 async function fileToDataUrl(file: File): Promise<string> {
@@ -796,9 +902,9 @@ import { useRef, useState, useEffect } from "react";
 import {
   DemoTheater, ScreenSlide, HotspotOverlay, AnnotationLayer,
   ScriptedPointer, StepProgress, ChapterNav, useDemoController,
-} from "@cue/react";
-import { type DemoScript, type DemoStep, type PointerState, validateDemoScript, getDemoStep } from "@cue/core";
-import "@cue/css/cue.css";
+} from "@cue-vin/react";
+import { type DemoScript, type DemoStep, type PointerState, validateDemoScript, getDemoStep } from "@cue-vin/core";
+import "@cue-vin/css/cue.css";
 
 interface CuePlayerProps {
   /** DemoScript object or URL to fetch JSON from. */
@@ -897,7 +1003,7 @@ function CuePlayerInner({ script, loop, width, height, onStepChange }: {
 **Gunakan ketika:** Agent perlu track demo views, step completions, dan user interactions. Dua mode: POST ke endpoint, atau callback ke custom handler.
 
 ```ts
-// lib/cue-analytics.ts — Analytics module (add to @cue/core or use standalone)
+// lib/cue-analytics.ts — Analytics module (add to @cue-vin/core or use standalone)
 
 /** Analytics event types emitted by the demo player. */
 type CueEventType =
@@ -1230,11 +1336,11 @@ File `demo.json` berisi DemoScript yang valid dan bisa langsung di-feed ke CuePl
 
 **Gunakan ketika:** Agent ingin membuat demo dari deskripsi fitur tanpa screenshot real. Cocok untuk "describe fitur → auto-generate DemoScript siap pakai". Tidak memanggil LLM — pure heuristic/template based.
 
-**Prinsip:** Fungsi `generate()` dari `@cue/core` menerima structured input (id, title, array of features) dan menghasilkan valid DemoScript. Setiap feature jadi satu DemoStep. Steps dengan CTA tidak auto-advance (duration undefined), step tanpa CTA menggunakan `defaultDuration`.
+**Prinsip:** Fungsi `generate()` dari `@cue-vin/core` menerima structured input (id, title, array of features) dan menghasilkan valid DemoScript. Setiap feature jadi satu DemoStep. Steps dengan CTA tidak auto-advance (duration undefined), step tanpa CTA menggunakan `defaultDuration`.
 
 ```ts
 // generate-demo.ts — Generate DemoScript from feature descriptions
-import { generate, validateDemoScript } from "@cue/core";
+import { generate, validateDemoScript } from "@cue-vin/core";
 import { writeFileSync } from "node:fs";
 
 const script = generate({
@@ -1330,7 +1436,7 @@ console.log(`Generated demo: ${script.id} with ${script.steps.length} steps`);
 Fungsi `slugify()` diexport bersama `generate()` — berguna jika agent perlu generate step id sendiri:
 
 ```ts
-import { slugify } from "@cue/core";
+import { slugify } from "@cue-vin/core";
 
 slugify("Upload File");       // "upload-file"
 slugify("API Integration");   // "api-integration"
@@ -1452,9 +1558,203 @@ curl http://localhost:3001/health
 
 ---
 
+## Recipe 10: Square/Vertical Promo Canvas (IG, TikTok, Reels)
+
+**Gunakan ketika:** User minta konten visual untuk social media — Instagram post (1080x1080), Reels/TikTok (1080x1920), atau Story (1080x1920). Cue sebagai "demo theater" SDK sangat natural untuk konten visual dengan aspect ratio 1:1 atau 9:16.
+
+**Prinsip:** Gunakan Path A (IIFE) untuk zero-install, set DemoScript theme dan viewport, bungkus `<cue-embed>` dalam container dengan fixed aspect ratio menggunakan CSS `container-type: size` + `aspect-ratio`.
+
+### Kapan pakai format ini
+
+| Platform | Size | Aspect Ratio | Contoh Use Case |
+|----------|------|--------------|-----------------|
+| Instagram Post | 1080×1080 | 1:1 | Product showcase, feature highlight |
+| Instagram Reels | 1080×1920 | 9:16 | App demo, step-by-step tutorial |
+| TikTok | 1080×1920 | 9:16 | Product demo, walkthrough |
+| IG Story | 1080×1920 | 9:16 | Promo, limited-time offer |
+| YouTube Shorts | 1080×1920 | 9:16 | Quick tip, feature reveal |
+| LinkedIn Post | 1200×1200 | 1:1 | Professional product demo |
+
+### Contoh minimal: 1:1 Square Canvas (Instagram Post)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo Canvas — 1:1 Square</title>
+  <style>
+    /* Container locks the player to 1:1 aspect ratio */
+    .promo-canvas {
+      container-type: size;
+      width: 100vw;
+      max-width: 1080px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      background: #0a0a0a;
+    }
+    cue-embed {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body style="margin:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;min-height:100vh">
+
+  <div class="promo-canvas">
+    <!-- Load IIFE player -->
+    <script src="https://unpkg.com/@cue-vin/player@latest/dist/cue-player.iife.js"></script>
+
+    <!-- Define DemoScript optimized for square canvas -->
+    <script>
+      window.__CUE_SCRIPT__ = {
+        id: "promo-square",
+        title: "Product Highlight",
+        steps: [
+          {
+            id: "hook",
+            caption: "Your problem → solved",
+            duration: 3000,
+            pointer: { x: 0.5, y: 0.3 },
+            annotations: [
+              { type: "text", x: 0.5, y: 0.15, text: "Tired of slow demos?", fontSize: 32, color: "#ffffff", fontWeight: "bold" }
+            ]
+          },
+          {
+            id: "feature",
+            caption: "One-click setup, instant results",
+            duration: 3000,
+            pointer: { x: 0.5, y: 0.55 },
+            hotspots: [
+              { id: "h1", x: 0.5, y: 0.5, label: "One Click", alwaysShow: true }
+            ]
+          },
+          {
+            id: "cta",
+            caption: "Start free today",
+            cta: { type: "button", label: "Get Started", href: "#" }
+          }
+        ],
+        loop: true,
+        theme: { accent: "#3b82f6", bg: "#0a0a0a" }
+      };
+    </script>
+
+    <cue-embed></cue-embed>
+  </div>
+
+</body>
+</html>
+```
+
+### Contoh: 9:16 Vertical Canvas (Reels/TikTok)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo Canvas — 9:16 Vertical</title>
+  <style>
+    .promo-canvas {
+      container-type: size;
+      width: 100vw;
+      max-width: 420px;  /* phone-width preview on desktop */
+      aspect-ratio: 9 / 16;
+      margin: 0 auto;
+      background: #0a0a0a;
+    }
+    cue-embed {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body style="margin:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;min-height:100vh">
+
+  <div class="promo-canvas">
+    <script src="https://unpkg.com/@cue-vin/player@latest/dist/cue-player.iife.js"></script>
+
+    <script>
+      window.__CUE_SCRIPT__ = {
+        id: "promo-vertical",
+        title: "App Walkthrough",
+        steps: [
+          {
+            id: "splash",
+            caption: "Open the app",
+            duration: 2500,
+            pointer: { x: 0.5, y: 0.35 }
+          },
+          {
+            id: "action",
+            caption: "Tap to start",
+            duration: 2500,
+            pointer: { x: 0.5, y: 0.65 },
+            hotspots: [
+              { id: "h-tap", x: 0.5, y: 0.65, label: "Tap here", alwaysShow: true }
+            ]
+          },
+          {
+            id: "result",
+            caption: "Instant results",
+            duration: 2500,
+            pointer: { x: 0.5, y: 0.5 }
+          },
+          {
+            id: "download",
+            caption: "Download now — it's free",
+            cta: { type: "button", label: "Download App", href: "#" }
+          }
+        ],
+        loop: true,
+        theme: { accent: "#8b5cf6", bg: "#0f0f23" }
+      };
+    </script>
+
+    <cue-embed></cue-embed>
+  </div>
+
+</body>
+</html>
+```
+
+### Tips untuk Promo Canvas
+
+1. **Step count:** 3–5 step optimal untuk attention span social media (under 15 detik total)
+2. **Durasi:** 2500–3500ms per step — cukup lama untuk dibaca, cukup cepat untuk tidak boring
+3. **Caption:** Pendek dan punchy — bukan paragraf, tapi tagline
+4. **Pointer:** Gunakan untuk direct attention — gerak ke elemen kunci sebelum hotspot muncul
+5. **CTA:** Selalu di step terakhir — jangan buat user scroll untuk menemukan action button
+6. **Aspect ratio CSS:** Gunakan `container-type: size` + `aspect-ratio` untuk lock ratio tanpa JS
+7. **Font size:** Untuk 1080px canvas, gunakan `fontSize: 24–36` pada annotations agar readable
+
+### Export ke Video
+
+Untuk mengubah promo canvas menjadi video file:
+
+1. **Per-step PNG export:** Gunakan `exportToPng()` dari `@cue-vin/player` untuk capture setiap step sebagai PNG
+2. **Combine dengan ffmpeg:** Gabungkan PNG frames menjadi video
+
+```bash
+# Export frames (jalankan di Node.js dengan puppeteer)
+# Setiap step → step-0.png, step-1.png, dst.
+
+# Combine menjadi 15fps video, 3 detik per frame
+ffmpeg -framerate 1/3 -i step-%d.png -c:v libx264 -pix_fmt yuv420p -r 15 promo.mp4
+```
+
+**Note:** `exportToPng()` membutuhkan puppeteer (Node.js) — tidak bisa dijalankan di browser. Untuk browser-only export, gunakan screenshot per step secara manual atau integrasikan dengan html2canvas.
+
+---
+
 ## Quick Reference — All Exports (Phase 1 + 2 + 3 + 4)
 
-### @cue/core
+### @cue-vin/core
 
 | Export | Kind | Phase | Description |
 |--------|------|-------|-------------|
@@ -1491,7 +1791,7 @@ curl http://localhost:3001/health
 | `slugify` | Fn | 4 | Slugify text into kebab-case identifier |
 | `GenerateOptions` | Type | 4 | Options for generate() function |
 
-### @cue/react
+### @cue-vin/react
 
 | Export | Kind | Phase | Description |
 |--------|------|-------|-------------|
@@ -1536,7 +1836,7 @@ curl http://localhost:3001/health
 | `CuePlayer` | Component | 3 | Full demo player (script-driven, embeddable) |
 | `initCue` | Fn | 3 | Programmatic init for web component / non-React |
 
-### @cue/css
+### @cue-vin/css
 
 | Class/Variable | Kind | Phase | Description |
 |----------------|------|-------|-------------|
