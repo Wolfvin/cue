@@ -6,7 +6,7 @@
  * specs) can call `generate()` to produce a ready-to-play DemoScript.
  */
 
-import type { DemoScript, DemoStep, DemoHotspot, DemoTheme } from "./DemoScript";
+import type { DemoScript, DemoStep, DemoHotspot, DemoTheme, DemoCta } from "./DemoScript";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -175,11 +175,27 @@ export function generate(options: GenerateOptions): DemoScript {
       // CTA steps: no auto-advance, player waits for user interaction
       step.duration = undefined;
 
+      // BUG 2 FIX: Set step.cta so CtaOverlay actually renders in the player.
+      // Previously only the caption text was updated — the structured CTA data
+      // that CtaOverlay requires was never set on the step.
+      step.cta = buildDemoCta(feature.cta);
+
       // Append CTA info to caption so any player can render it
       const ctaLine = buildCtaCaption(feature.cta);
       step.caption = `${feature.description}\n${ctaLine}`;
     } else {
       step.duration = defaultDuration;
+    }
+
+    // BUG 3 FIX: Auto-place pointer so the cursor moves in the player.
+    // Previously generate() never set step.pointer, so ScriptedPointer
+    // was never rendered and the cursor never moved.
+    if (hotspots && hotspots.length > 0) {
+      // Pointer at the first hotspot position
+      step.pointer = { x: hotspots[0].x, y: hotspots[0].y };
+    } else if (feature.cta) {
+      // Pointer near center-bottom where CTA overlays typically appear
+      step.pointer = { x: 0.5, y: 0.7 };
     }
 
     return step;
@@ -215,4 +231,28 @@ function buildCtaCaption(cta: GenerateCta): string {
     default:
       return `[${cta.label}]`;
   }
+}
+
+/**
+ * Convert a GenerateCta (simplified input) into a DemoCta (full player format).
+ * Fills in defaults for email_capture fields that were not provided.
+ */
+function buildDemoCta(cta: GenerateCta): DemoCta {
+  const base: DemoCta = {
+    type: cta.type,
+    label: cta.label,
+  };
+
+  if (cta.href) {
+    base.href = cta.href;
+  }
+
+  // email_capture defaults — ensure CtaOverlay has all required data
+  if (cta.type === "email_capture") {
+    base.placeholder = "Enter your email";
+    base.submitLabel = cta.label;
+    base.successMessage = "Thanks! We'll be in touch.";
+  }
+
+  return base;
 }

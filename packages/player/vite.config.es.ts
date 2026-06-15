@@ -12,6 +12,10 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime"],
+      output: {
+        // Give deterministic names to dynamic-import chunks instead of hashes
+        chunkFileNames: "[name].js",
+      },
     },
     outDir: "dist",
     // Don't clear dist/ — the IIFE build ran first

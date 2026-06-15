@@ -74,12 +74,12 @@ export function exportToHtml(options: ExportOptions): string {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: ${escapeHtml(font)};
+      font-family: ${font};
     }
   </style>
 </head>
 <body>
-  <cue-embed id="player" width="${width}" height="${height}"></cue-embed>
+  <cue-embed id="player" width="${width}" height="${height}" autoplay${script.loop ? ' loop' : ''}></cue-embed>
 
   <script>window.__CUE_SCRIPT__ = ${scriptJson};</script>
   ${playerScriptTag}

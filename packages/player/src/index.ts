@@ -1,9 +1,5 @@
-import { CueEmbed } from "./WebComponent";
-
 export { CuePlayer } from "./CuePlayer";
 export type { CuePlayerProps } from "./CuePlayer";
-
-export { CueEmbed } from "./WebComponent";
 
 export { exportToHtml } from "./export";
 export type { ExportOptions } from "./export";
@@ -11,18 +7,17 @@ export type { ExportOptions } from "./export";
 /**
  * Register the <cue-embed> custom element if not already defined.
  * Call this once before using <cue-embed> in your HTML.
+ *
+ * The CueEmbed class is imported lazily via dynamic import() so that
+ * importing this barrel file in Node.js does not crash on the missing
+ * HTMLElement global. When running in a browser the class is loaded on
+ * first call; in Node.js the early `typeof customElements` guard returns
+ * before the import is evaluated.
  */
-export function initCue(): void {
-  if (!customElements.get("cue-embed")) {
-    customElements.define("cue-embed", CueEmbed);
-  }
-}
+export async function initCue(): Promise<void> {
+  if (typeof customElements === "undefined") return;
+  if (customElements.get("cue-embed")) return;
 
-// ─── Auto-register in browser environments ──────────────────────────────
-// When this module is loaded as an IIFE via <script src>, the custom
-// element must be registered immediately so that any <cue-embed> tags
-// already in the DOM are upgraded without requiring an explicit
-// initCue() call.
-if (typeof customElements !== "undefined") {
-  initCue();
+  const { CueEmbed } = await import("./WebComponent");
+  customElements.define("cue-embed", CueEmbed);
 }
