@@ -1,0 +1,106 @@
+{
+  "id": "deploykit-devops-demo",
+  "title": "DeployKit — Zero-Downtime Deployment Platform",
+  "steps": [
+    {
+      "id": "pipeline",
+      "caption": "Monitor all services at a glance. Health status updates in real-time — green means go, yellow means watch, red means act.",
+      "duration": 6000,
+      "pointer": { "x": 0.28, "y": 0.42, "clicking": false },
+      "hotspots": [
+        { "id": "h-pipe-status", "x": 0.72, "y": 0.42, "label": "Health Status", "alwaysShow": true },
+        { "id": "h-pipe-payment", "x": 0.38, "y": 0.55, "label": "Degraded" },
+        { "id": "h-pipe-analytics", "x": 0.38, "y": 0.68, "label": "Down" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.15, "y": 0.88, "text": "Step 1/6", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "trigger",
+      "caption": "Pick your service, branch, and environment. One command triggers the entire deployment pipeline.",
+      "duration": 6000,
+      "pointer": { "x": 0.55, "y": 0.50, "clicking": false },
+      "hotspots": [
+        { "id": "h-trig-svc", "x": 0.50, "y": 0.35, "label": "Service selector", "alwaysShow": true },
+        { "id": "h-trig-branch", "x": 0.50, "y": 0.48, "label": "Branch" },
+        { "id": "h-trig-env", "x": 0.50, "y": 0.58, "label": "Environment", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.28, "y": 0.28, "width": 0.44, "height": 0.38, "color": "#00D4FF" },
+        { "type": "text", "x": 0.15, "y": 0.88, "text": "Step 2/6", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "build",
+      "caption": "Watch the build happen in real-time. TypeScript compiles, Docker image builds, artifact pushes — all streamed to your terminal.",
+      "duration": 7000,
+      "pointer": { "x": 0.50, "y": 0.45, "clicking": false },
+      "hotspots": [
+        { "id": "h-build-ok", "x": 0.50, "y": 0.40, "label": "Build OK", "alwaysShow": true },
+        { "id": "h-build-warn", "x": 0.50, "y": 0.72, "label": "Deprecation warning" },
+        { "id": "h-build-time", "x": 0.55, "y": 0.80, "label": "8.5s total", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "arrow", "x1": 0.25, "y1": 0.40, "x2": 0.40, "y2": 0.40, "color": "#00FF94" },
+        { "type": "text", "x": 0.15, "y": 0.88, "text": "Step 3/6", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "health",
+      "caption": "Automated health checks verify DNS, SSL, database connectivity, and API liveness before any traffic shifts.",
+      "duration": 6000,
+      "pointer": { "x": 0.30, "y": 0.50, "clicking": true },
+      "hotspots": [
+        { "id": "h-health-dns", "x": 0.35, "y": 0.30, "label": "DNS", "alwaysShow": true },
+        { "id": "h-health-ssl", "x": 0.35, "y": 0.48, "label": "SSL", "alwaysShow": true },
+        { "id": "h-health-db", "x": 0.35, "y": 0.60, "label": "Database" },
+        { "id": "h-health-api", "x": 0.35, "y": 0.75, "label": "API /ping", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.15, "y": 0.25, "width": 0.70, "height": 0.55, "color": "#00FF94", "strokeWidth": 1 },
+        { "type": "text", "x": 0.15, "y": 0.88, "text": "Step 4/6", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "canary",
+      "caption": "Canary rollout shifts traffic gradually. Error rate and P99 latency are monitored — promote only when metrics are green.",
+      "duration": 8000,
+      "pointer": { "x": 0.50, "y": 0.30, "clicking": false },
+      "hotspots": [
+        { "id": "h-canary-bar", "x": 0.50, "y": 0.28, "label": "Canary %", "alwaysShow": true },
+        { "id": "h-canary-err", "x": 0.22, "y": 0.72, "label": "Error Rate" },
+        { "id": "h-canary-lat", "x": 0.50, "y": 0.72, "label": "P99 Latency", "alwaysShow": true },
+        { "id": "h-canary-rps", "x": 0.78, "y": 0.72, "label": "Requests/s" }
+      ],
+      "annotations": [
+        { "type": "arrow", "x1": 0.50, "y1": 0.35, "x2": 0.50, "y2": 0.45, "color": "#00D4FF", "label": "Traffic shift" },
+        { "type": "text", "x": 0.15, "y": 0.88, "text": "Step 5/6", "color": "#00FF94" }
+      ]
+    },
+    {
+      "id": "cta",
+      "caption": "Ship with confidence. DeployKit gives you zero-downtime deployments, canary rollouts, and full observability — in under 5 minutes.",
+      "duration": 5000,
+      "pointer": { "x": 0.50, "y": 0.65, "clicking": true },
+      "hotspots": [
+        { "id": "h-cta-btn", "x": 0.50, "y": 0.55, "label": "Get Started", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.30, "y": 0.48, "width": 0.40, "height": 0.18, "color": "#00FF94", "strokeWidth": 2, "cornerRadius": 4 },
+        { "type": "text", "x": 0.15, "y": 0.88, "text": "Step 6/6", "color": "#00FF94" }
+      ],
+      "cta": {
+        "type": "button",
+        "label": "Deploy dalam 5 Menit",
+        "href": "#get-started"
+      }
+    }
+  ],
+  "loop": true,
+  "theme": {
+    "accent": "#00FF94",
+    "bg": "#080C14",
+    "font": "'Courier New', monospace"
+  }
+}

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeployKit — Zero-Downtime Deployment Platform</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#00FF94;--c:#00D4FF;--warn:#FEBC2E;--err:#FF5F57;--bg:#080C14;--bg2:#0D1321;--bg3:#151D2E;
+--muted:#4A5568;--font:'Courier New',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+body{background:var(--bg);color:#E2E8F0;font-family:var(--font);overflow:hidden;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* ── Scanline overlay ──────────────────────────────────────── */
+.scanline{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;
+background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,148,.012) 2px,rgba(0,255,148,.012) 4px)}
+
+/* ── Container ─────────────────────────────────────────────── */
+.container{width:90%;max-width:900px;position:relative;z-index:1}
+
+/* ── Header ────────────────────────────────────────────────── */
+.header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.logo{color:var(--g);font-size:20px;font-weight:700;letter-spacing:2px}
+.logo span{color:var(--c)}
+.cursor-blink{display:inline-block;width:8px;height:18px;background:var(--g);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+
+/* ── Step indicator ────────────────────────────────────────── */
+.step-indicator{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.step-dot{width:10px;height:10px;border-radius:50%;background:var(--muted);transition:all .4s var(--ease)}
+.step-dot.active{background:var(--g);box-shadow:0 0 12px var(--g);transform:scale(1.3)}
+.step-dot.done{background:var(--c)}
+.step-line{height:2px;flex:1;background:var(--muted);position:relative;overflow:hidden}
+.step-line .fill{height:100%;background:var(--g);width:0;transition:width .6s var(--ease)}
+
+/* ── Terminal ──────────────────────────────────────────────── */
+.terminal{background:var(--bg2);border:1px solid #1E3A3A;border-radius:8px;overflow:hidden;position:relative}
+.terminal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:.4}
+.titlebar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,0,0,.3);border-bottom:1px solid #1E3A3A}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.r{background:#FF5F57}.dot.y{background:#FEBC2E}.dot.gr{background:#28C840}
+.titlebar-text{margin-left:8px;font-size:12px;color:var(--muted)}
+.body{padding:16px 20px;min-height:300px;position:relative}
+
+/* ── Step content ──────────────────────────────────────────── */
+.step-title{font-size:15px;font-weight:700;color:var(--g);min-height:20px;margin-bottom:14px;white-space:nowrap;overflow:visible}
+.step-content{font-size:13px;line-height:1.7;color:#C9D1D9;min-height:220px}
+
+/* ── Pipeline / service list ───────────────────────────────── */
+.svc-row{display:flex;align-items:center;gap:10px;padding:4px 0;font-size:12px;opacity:0;transform:translateX(-8px);transition:all .35s var(--ease)}
+.svc-row.visible{opacity:1;transform:translateX(0)}
+.svc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.svc-dot.green{background:var(--g);box-shadow:0 0 6px var(--g)}
+.svc-dot.yellow{background:var(--warn);box-shadow:0 0 6px var(--warn)}
+.svc-dot.red{background:var(--err);box-shadow:0 0 6px var(--err)}
+.svc-name{flex:1;color:#C9D1D9}
+.svc-status{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:700}
+.svc-status.healthy{background:rgba(0,255,148,.12);color:var(--g)}
+.svc-status.degraded{background:rgba(254,188,46,.12);color:var(--warn)}
+.svc-status.down{background:rgba(255,95,87,.12);color:var(--err)}
+
+/* ── Deploy form ───────────────────────────────────────────── */
+.deploy-form{margin-top:6px}
+.form-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;opacity:0;transform:translateY(6px);transition:all .35s var(--ease)}
+.form-row.visible{opacity:1;transform:translateY(0)}
+.form-label{width:100px;text-align:right;color:var(--c);font-size:12px;flex-shrink:0}
+.form-value{background:var(--bg);border:1px solid #1E3A3A;border-radius:4px;padding:4px 10px;font-family:var(--font);font-size:12px;color:#E2E8F0;min-width:160px;position:relative}
+.form-value.sel{border-color:var(--c)}
+.form-value .caret{display:inline-block;width:7px;height:13px;background:var(--c);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+
+/* ── Build log ─────────────────────────────────────────────── */
+.log-line{font-size:12px;line-height:1.6;opacity:0;transition:opacity .3s}
+.log-line.visible{opacity:1}
+.log-ts{color:var(--muted)}
+.log-ok{color:var(--g)}
+.log-warn{color:var(--warn)}
+.log-info{color:var(--c)}
+.log-err{color:var(--err)}
+
+/* ── Health checks ─────────────────────────────────────────── */
+.check-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;opacity:0;transform:scale(.95);transition:all .4s var(--ease)}
+.check-item.visible{opacity:1;transform:scale(1)}
+.check-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border-radius:50%}
+.check-icon.pass{background:rgba(0,255,148,.15);color:var(--g)}
+.check-icon.wait{background:rgba(74,85,104,.3);color:var(--muted)}
+.check-label{flex:1;color:#C9D1D9}
+.check-ms{color:var(--muted);font-size:11px}
+
+/* ── Canary rollout ────────────────────────────────────────── */
+.canary-wrap{margin-top:8px}
+.canary-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.canary-label .pct{color:var(--g);font-weight:700}
+.canary-bar{height:14px;background:var(--bg);border-radius:7px;border:1px solid #1E3A3A;overflow:hidden;position:relative}
+.canary-bar .fill{height:100%;background:linear-gradient(90deg,var(--c),var(--g));border-radius:7px;width:0;transition:width .15s linear;position:relative}
+.canary-bar .fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2));animation:barGlow 1.2s ease-in-out infinite}
+@keyframes barGlow{50%{opacity:.3}}
+.metrics-row{display:flex;gap:16px;margin-top:14px}
+.metric-card{flex:1;background:var(--bg);border:1px solid #1E3A3A;border-radius:6px;padding:10px 12px;text-align:center}
+.metric-card .val{font-size:18px;font-weight:700;color:var(--g)}
+.metric-card .lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.metric-card .val.warn{color:var(--warn)}
+.metric-card .val.err{color:var(--err)}
+
+/* ── CTA ───────────────────────────────────────────────────── */
+.cta-area{text-align:center;padding:24px 0 10px}
+.cta-btn{display:inline-block;padding:12px 36px;background:transparent;color:var(--g);border:1px solid var(--g);border-radius:4px;font-family:var(--font);font-size:14px;cursor:default;position:relative;overflow:hidden;letter-spacing:1px;opacity:0;transform:scale(.9);transition:all .5s var(--ease)}
+.cta-btn.visible{opacity:1;transform:scale(1)}
+.cta-btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,255,148,.15),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{100%{left:100%}}
+.cta-btn:hover{background:var(--g);color:var(--bg)}
+.cta-sub{font-size:11px;color:var(--muted);margin-top:10px;opacity:0;transition:opacity .6s .3s}
+.cta-sub.visible{opacity:1}
+
+/* ── Nav hint ──────────────────────────────────────────────── */
+.nav-hint{margin-top:16px;font-size:11px;color:var(--muted);text-align:center}
+.nav-hint kbd{background:var(--bg3);padding:2px 8px;border-radius:3px;font-size:10px;border:1px solid #2D3748}
+
+/* ── Pointer ───────────────────────────────────────────────── */
+.pointer{position:absolute;width:16px;height:22px;pointer-events:none;z-index:50;transition:left .6s var(--ease),top .6s var(--ease);opacity:0}
+.pointer.visible{opacity:1}
+.pointer::before{content:'';position:absolute;width:12px;height:16px;background:#fff;border-radius:0 8px 4px 0;transform:rotate(-30deg);transform-origin:0 0}
+.pointer::after{content:'';position:absolute;width:5px;height:5px;background:var(--g);border-radius:50%;top:4px;left:3px;box-shadow:0 0 6px var(--g)}
+
+/* ── Hotspot ───────────────────────────────────────────────── */
+.hotspot{position:absolute;pointer-events:none;z-index:40;opacity:0;transition:opacity .4s}
+.hotspot.visible{opacity:1}
+.hotspot-ring{width:20px;height:20px;border-radius:50%;border:2px solid var(--c);position:absolute;top:-10px;left:-10px;animation:hotspotPulse 2s ease-in-out infinite}
+@keyframes hotspotPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.5);opacity:.3}}
+.hotspot-label{position:absolute;top:14px;left:14px;font-size:10px;color:var(--c);white-space:nowrap;background:rgba(0,212,255,.1);padding:1px 6px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+<div class="header">
+  <div class="logo">DEPLOY<span>KIT</span></div>
+  <div class="cursor-blink" id="mainCursor"></div>
+</div>
+<div class="step-indicator" id="stepIndicator"></div>
+<div class="terminal" id="terminal">
+  <div class="titlebar">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot gr"></div>
+    <div class="titlebar-text">deploykit-cli — ~/infrastructure</div>
+  </div>
+  <div class="body" id="termBody">
+    <div class="step-title" id="stepTitle"></div>
+    <div class="step-content" id="stepContent"></div>
+  </div>
+  <!-- pointer overlay -->
+  <div class="pointer" id="pointer"></div>
+  <!-- hotspot container -->
+  <div id="hotspotContainer"></div>
+</div>
+<div class="nav-hint"><kbd>&rarr;</kbd> next &nbsp; <kbd>&larr;</kbd> prev &nbsp; <kbd>Space</kbd> pause/play</div>
+</div>
+
+<script>
+// ── Step data ────────────────────────────────────────────────
+const STEPS = [
+  { id: "pipeline",   title: "$ deploykit pipeline status",          visual: "pipeline" },
+  { id: "trigger",    title: "$ deploykit deploy --trigger",         visual: "trigger"  },
+  { id: "build",      title: "$ deploykit build --watch",            visual: "build"    },
+  { id: "health",     title: "$ deploykit healthcheck --wait",       visual: "health"   },
+  { id: "canary",     title: "$ deploykit canary --promote",         visual: "canary"   },
+  { id: "cta",        title: "$ deploykit — ship with confidence",   visual: "cta"      }
+];
+
+const SERVICES = [
+  { name: "api-gateway",      status: "healthy",  dot: "green"  },
+  { name: "auth-service",     status: "healthy",  dot: "green"  },
+  { name: "payment-engine",   status: "degraded", dot: "yellow" },
+  { name: "notification-svc", status: "healthy",  dot: "green"  },
+  { name: "analytics-worker", status: "down",     dot: "red"    },
+  { name: "cdn-proxy",        status: "healthy",  dot: "green"  }
+];
+
+const LOG_LINES = [
+  { ts: "14:32:01.012", lvl: "info", msg: "Cloning repository... done" },
+  { ts: "14:32:02.348", lvl: "info", msg: "Resolving dependencies... 142 packages" },
+  { ts: "14:32:04.891", lvl: "ok",   msg: "TypeScript compilation successful (0 errors)" },
+  { ts: "14:32:06.112", lvl: "ok",   msg: "Docker image built: sha:e4f2a1c" },
+  { ts: "14:32:07.443", lvl: "info", msg: "Pushing image to registry... done" },
+  { ts: "14:32:08.917", lvl: "ok",   msg: "Build artifact verified (checksum OK)" },
+  { ts: "14:32:09.201", lvl: "warn", msg: "1 deprecation warning in deps (non-blocking)" },
+  { ts: "14:32:10.556", lvl: "ok",   msg: "Build pipeline complete — 8.5s" }
+];
+
+const CHECKS = [
+  { label: "DNS Resolution",    ms: "12ms"  },
+  { label: "SSL Certificate",   ms: "34ms"  },
+  { label: "Database Connect",  ms: "87ms"  },
+  { label: "API Health (/ping)",ms: "23ms"  }
+];
+
+// ── State ────────────────────────────────────────────────────
+let cur = 0, playing = true, timers = [];
+
+// ── Helpers ──────────────────────────────────────────────────
+function $(s){ return document.getElementById(s) }
+function clearTimeouts(){ timers.forEach(clearTimeout); timers = [] }
+
+function typeText(el, text, speed=28){
+  return new Promise(r => {
+    let i = 0;
+    const go = () => {
+      if(i < text.length){ el.textContent += text[i]; i++; timers.push(setTimeout(go, speed)) }
+      else r()
+    };
+    go()
+  })
+}
+
+function buildIndicator(){
+  const el = $('stepIndicator');
+  el.innerHTML = '';
+  STEPS.forEach((_,i) => {
+    if(i > 0){
+      const l = document.createElement('div');
+      l.className = 'step-line';
+      l.innerHTML = '<div class="fill" id="lineFill'+i+'"></div>';
+      el.appendChild(l)
+    }
+    const d = document.createElement('div');
+    d.className = 'step-dot';
+    d.id = 'dot'+i;
+    el.appendChild(d)
+  })
+}
+
+function updateIndicator(){
+  STEPS.forEach((_,i) => {
+    const d = $('dot'+i);
+    d.className = 'step-dot' + (i===cur ? ' active' : i<cur ? ' done' : '');
+    if(i > 0){
+      const f = $('lineFill'+i);
+      f.style.width = i <= cur ? '100%' : '0'
+    }
+  })
+}
+
+function setPointer(xFrac, yFrac){
+  const ptr = $('pointer');
+  const term = $('terminal');
+  const rect = term.getBoundingClientRect();
+  ptr.style.left = (xFrac * rect.width) + 'px';
+  ptr.style.top  = (yFrac * rect.height) + 'px';
+  ptr.classList.add('visible')
+}
+
+function clearHotspots(){
+  $('hotspotContainer').innerHTML = ''
+}
+
+function addHotspot(id, xFrac, yFrac, label, alwaysShow){
+  const term = $('terminal');
+  const rect = term.getBoundingClientRect();
+  const hs = document.createElement('div');
+  hs.className = 'hotspot';
+  hs.style.left = (xFrac * rect.width) + 'px';
+  hs.style.top  = (yFrac * rect.height) + 'px';
+  hs.innerHTML = '<div class="hotspot-ring" style="border-color:' + (alwaysShow ? 'var(--c)' : 'var(--muted)') + '"></div>'
+    + (label ? '<div class="hotspot-label">' + label + '</div>' : '');
+  $('hotspotContainer').appendChild(hs);
+  timers.push(setTimeout(() => hs.classList.add('visible'), 100))
+}
+
+// ── Step renderers ───────────────────────────────────────────
+
+function renderPipeline(content){
+  // header row
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;gap:10px;padding:4px 0;font-size:11px;color:var(--muted);border-bottom:1px solid #1E3A3A;margin-bottom:6px';
+  hdr.innerHTML = '<span style="width:8px"></span><span style="flex:1">SERVICE</span><span>STATUS</span>';
+  content.appendChild(hdr);
+
+  SERVICES.forEach((svc, i) => {
+    const row = document.createElement('div');
+    row.className = 'svc-row';
+    row.innerHTML = '<div class="svc-dot ' + svc.dot + '"></div>'
+      + '<div class="svc-name">' + svc.name + '</div>'
+      + '<div class="svc-status ' + svc.status + '">' + svc.status.toUpperCase() + '</div>';
+    content.appendChild(row);
+    timers.push(setTimeout(() => row.classList.add('visible'), 120 * i + 100))
+  })
+}
+
+function renderTrigger(content){
+  const form = document.createElement('div');
+  form.className = 'deploy-form';
+  content.appendChild(form);
+
+  const fields = [
+    { label: 'service:', value: 'api-gateway', sel: true },
+    { label: 'branch:',  value: 'main',        sel: false },
+    { label: 'env:',     value: 'staging',      sel: true }
+  ];
+
+  fields.forEach((f, i) => {
+    const row = document.createElement('div');
+    row.className = 'form-row';
+    const caretHtml = f.sel ? '<span class="caret"></span>' : '';
+    row.innerHTML = '<div class="form-label">' + f.label + '</div>'
+      + '<div class="form-value' + (f.sel ? ' sel' : '') + '">' + f.value + caretHtml + '</div>';
+    form.appendChild(row);
+    timers.push(setTimeout(() => row.classList.add('visible'), 200 * i + 200))
+  });
+
+  // environment toggle hint
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:11px;color:var(--muted);margin-top:10px;opacity:0;transition:opacity .4s';
+  hint.textContent = 'Use ↑↓ to switch environment: staging → production';
+  content.appendChild(hint);
+  timers.push(setTimeout(() => hint.style.opacity = '1', 900))
+}
+
+function renderBuild(content){
+  LOG_LINES.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'log-line';
+    div.innerHTML = '<span class="log-ts">[' + line.ts + ']</span> '
+      + '<span class="log-' + line.lvl + '">' + (line.lvl === 'ok' ? '✓ ' : line.lvl === 'warn' ? '⚠ ' : line.lvl === 'err' ? '✗ ' : '→ ') + '</span>'
+      + line.msg;
+    div.style.minHeight = '1.6em';
+    content.appendChild(div);
+    timers.push(setTimeout(() => div.classList.add('visible'), 250 * i + 200))
+  })
+}
+
+function renderHealth(content){
+  CHECKS.forEach((chk, i) => {
+    const item = document.createElement('div');
+    item.className = 'check-item';
+    item.innerHTML = '<div class="check-icon wait" id="chkIcon' + i + '">·</div>'
+      + '<div class="check-label">' + chk.label + '</div>'
+      + '<div class="check-ms" id="chkMs' + i + '">—</div>';
+    content.appendChild(item);
+
+    // appear
+    timers.push(setTimeout(() => item.classList.add('visible'), 300 * i + 200));
+
+    // pass after delay
+    timers.push(setTimeout(() => {
+      const icon = $('chkIcon' + i);
+      if(icon){ icon.className = 'check-icon pass'; icon.textContent = '✓' }
+      const ms = $('chkMs' + i);
+      if(ms) ms.textContent = chk.ms
+    }, 300 * i + 1200))
+  })
+}
+
+function renderCanary(content){
+  // progress bar
+  const wrap = document.createElement('div');
+  wrap.className = 'canary-wrap';
+  content.appendChild(wrap);
+
+  const label = document.createElement('div');
+  label.className = 'canary-label';
+  label.innerHTML = '<span>Canary Traffic</span><span class="pct" id="canaryPct">0%</span>';
+  wrap.appendChild(label);
+
+  const bar = document.createElement('div');
+  bar.className = 'canary-bar';
+  bar.innerHTML = '<div class="fill" id="canaryFill"></div>';
+  wrap.appendChild(bar);
+
+  // metrics cards
+  const mRow = document.createElement('div');
+  mRow.className = 'metrics-row';
+  mRow.innerHTML =
+    '<div class="metric-card"><div class="val" id="mErr">0.0%</div><div class="lbl">Error Rate</div></div>'
+    + '<div class="metric-card"><div class="val" id="mLat">12ms</div><div class="lbl">P99 Latency</div></div>'
+    + '<div class="metric-card"><div class="val" id="mRps">1.2k</div><div class="lbl">Requests/s</div></div>';
+  content.appendChild(mRow);
+
+  // animate progress
+  let pct = 0;
+  const tick = () => {
+    if(pct < 100 && cur === 4){
+      pct += Math.random() < 0.3 ? 2 : 1;
+      if(pct > 100) pct = 100;
+      const fill = $('canaryFill');
+      const pctEl = $('canaryPct');
+      if(fill) fill.style.width = pct + '%';
+      if(pctEl) pctEl.textContent = pct + '%';
+
+      // update metrics dynamically
+      const errEl = $('mErr');
+      const latEl = $('mLat');
+      if(errEl){
+        const errVal = (0.02 + Math.random() * 0.08).toFixed(2);
+        errEl.textContent = errVal + '%';
+        errEl.className = 'val' + (parseFloat(errVal) > 0.05 ? ' warn' : '');
+      }
+      if(latEl){
+        const latVal = (10 + Math.random() * 8).toFixed(0);
+        latEl.textContent = latVal + 'ms';
+      }
+
+      timers.push(setTimeout(tick, 80 + Math.random() * 120))
+    }
+  };
+  timers.push(setTimeout(tick, 600))
+}
+
+function renderCta(content){
+  const area = document.createElement('div');
+  area.className = 'cta-area';
+  area.innerHTML =
+    '<div class="cta-btn" id="ctaBtn">DEPLOY DALAM 5 MENIT</div>'
+    + '<div class="cta-sub" id="ctaSub">Zero-downtime. Canary rollout. Full observability.</div>';
+  content.appendChild(area);
+
+  timers.push(setTimeout(() => {
+    const btn = $('ctaBtn');
+    if(btn) btn.classList.add('visible')
+  }, 400));
+  timers.push(setTimeout(() => {
+    const sub = $('ctaSub');
+    if(sub) sub.classList.add('visible')
+  }, 800))
+}
+
+// ── Main step runner ─────────────────────────────────────────
+async function runStep(idx){
+  if(idx < 0 || idx >= STEPS.length) return;
+  clearTimeouts();
+  clearHotspots();
+
+  const s = STEPS[idx];
+  const title = $('stepTitle');
+  const content = $('stepContent');
+
+  title.textContent = '';
+  content.innerHTML = '';
+  updateIndicator();
+
+  await typeText(title, s.title, 22);
+
+  switch(s.visual){
+    case 'pipeline': renderPipeline(content); setPointer(0.28, 0.42); addHotspot('h-pipe-status',0.72,0.42,'Health Status',true); addHotspot('h-pipe-payment',0.38,0.55,'Degraded',false); break;
+    case 'trigger':  renderTrigger(content);  setPointer(0.55, 0.50); addHotspot('h-trig-svc',0.50,0.35,'Service',true); addHotspot('h-trig-env',0.50,0.58,'Environment',true); break;
+    case 'build':    renderBuild(content);     setPointer(0.50, 0.45); addHotspot('h-build-ok',0.50,0.40,'Build OK',true); addHotspot('h-build-warn',0.50,0.72,'Warning',false); break;
+    case 'health':   renderHealth(content);    setPointer(0.30, 0.50); addHotspot('h-health-dns',0.35,0.30,'DNS',true); addHotspot('h-health-ssl',0.35,0.48,'SSL',true); addHotspot('h-health-db',0.35,0.60,'DB',false); addHotspot('h-health-api',0.35,0.75,'API',true); break;
+    case 'canary':   renderCanary(content);    setPointer(0.50, 0.30); addHotspot('h-canary-bar',0.50,0.28,'Canary %',true); addHotspot('h-canary-err',0.22,0.72,'Error Rate',false); addHotspot('h-canary-lat',0.50,0.72,'P99 Latency',true); break;
+    case 'cta':      renderCta(content);       setPointer(0.50, 0.65); addHotspot('h-cta-btn',0.50,0.55,'CTA Button',true); break;
+  }
+}
+
+function next(){ if(cur < STEPS.length - 1){ cur++; runStep(cur) } }
+function prev(){ if(cur > 0){ cur--; runStep(cur) } }
+function togglePause(){ playing = !playing; $('mainCursor').style.animationPlayState = playing ? 'running' : 'paused' }
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight'){ e.preventDefault(); next() }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); prev() }
+  else if(e.key === ' '){ e.preventDefault(); togglePause() }
+});
+
+buildIndicator();
+runStep(0);
+</script>
+</body>
+</html>
