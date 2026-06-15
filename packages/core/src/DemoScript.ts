@@ -170,14 +170,15 @@ export function validateDemoScript(script: unknown): script is DemoScript {
   const obj = script as Record<string, unknown>;
 
   // Required string fields
-  if (typeof obj.id !== "string") return false;
+  if (typeof obj.id !== "string" || obj.id.trim().length === 0) return false;
   if (typeof obj.title !== "string") return false;
 
   // steps must be an array of objects with at least an `id` string
   if (!Array.isArray(obj.steps)) return false;
   for (const step of obj.steps) {
     if (typeof step !== "object" || step === null) return false;
-    if (typeof (step as Record<string, unknown>).id !== "string") return false;
+    const stepId = (step as Record<string, unknown>).id;
+    if (typeof stepId !== "string" || stepId.trim().length === 0) return false;
   }
 
   // Optional fields type-checks (best-effort; skip if absent)
