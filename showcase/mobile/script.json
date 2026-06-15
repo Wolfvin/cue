@@ -1,0 +1,82 @@
+{
+  "id": "paketku-mobile-demo",
+  "title": "PaketKu — Lacak Paket Kiriman",
+  "steps": [
+    {
+      "id": "splash-login",
+      "duration": 7000,
+      "caption": "Masuk dengan nomor HP — tanpa password, langsung OTP.",
+      "pointer": { "x": 0.50, "y": 0.62 },
+      "hotspots": [
+        { "id": "h-phone-input", "x": 0.50, "y": 0.56, "label": "Input nomor HP", "alwaysShow": true },
+        { "id": "h-login-btn", "x": 0.50, "y": 0.70, "label": "Masuk", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.15, "y": 0.42, "width": 0.70, "height": 0.36, "color": "#4F46E5", "strokeWidth": 2, "cornerRadius": 12, "label": "Login Form" }
+      ]
+    },
+    {
+      "id": "home-list",
+      "duration": 6000,
+      "caption": "Semua paket aktif ditampilkan — status real-time dengan badge warna.",
+      "pointer": { "x": 0.50, "y": 0.50 },
+      "hotspots": [
+        { "id": "h-paket-otp", "x": 0.50, "y": 0.38, "label": "Menunggu Pickup" },
+        { "id": "h-paket-transit", "x": 0.50, "y": 0.50, "label": "Dalam Perjalanan", "alwaysShow": true },
+        { "id": "h-paket-done", "x": 0.50, "y": 0.62, "label": "Terkirim" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.50, "y": 0.20, "text": "4 paket aktif", "fontSize": 11, "color": "#94A3B8" }
+      ]
+    },
+    {
+      "id": "detail-timeline",
+      "duration": 7000,
+      "caption": "Timeline pengiriman detail — langkah aktif di-highlight dengan warna indigo.",
+      "pointer": { "x": 0.50, "y": 0.55 },
+      "hotspots": [
+        { "id": "h-tl-eta", "x": 0.50, "y": 0.28, "label": "Estimasi tiba", "alwaysShow": true },
+        { "id": "h-tl-active", "x": 0.50, "y": 0.62, "label": "Step aktif", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.08, "y": 0.52, "width": 0.84, "height": 0.38, "color": "#4F46E5", "strokeWidth": 2, "cornerRadius": 8, "label": "Timeline pengiriman" }
+      ]
+    },
+    {
+      "id": "notification",
+      "duration": 6000,
+      "caption": "Push notification real-time — ketahui posisi paket tanpa buka app.",
+      "pointer": { "x": 0.50, "y": 0.18 },
+      "hotspots": [
+        { "id": "h-notif-push", "x": 0.50, "y": 0.15, "label": "Push notification", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "arrow", "x1": 0.50, "y1": 0.08, "x2": 0.50, "y2": 0.14, "color": "#4F46E5", "label": "Slide dari atas" }
+      ]
+    },
+    {
+      "id": "cta-download",
+      "duration": 5000,
+      "caption": "Download PaketKu gratis — tersedia di App Store dan Google Play.",
+      "pointer": { "x": 0.50, "y": 0.70 },
+      "hotspots": [
+        { "id": "h-cta-ios", "x": 0.50, "y": 0.62, "label": "App Store", "alwaysShow": true },
+        { "id": "h-cta-android", "x": 0.50, "y": 0.76, "label": "Google Play", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.10, "y": 0.56, "width": 0.80, "height": 0.32, "color": "#4F46E5", "strokeWidth": 2, "cornerRadius": 12, "label": "Download buttons" }
+      ],
+      "cta": {
+        "type": "button",
+        "label": "Download PaketKu",
+        "href": "#download"
+      }
+    }
+  ],
+  "loop": true,
+  "theme": {
+    "accent": "#4F46E5",
+    "bg": "#0B0F1A",
+    "font": "'Inter','Segoe UI',system-ui,-apple-system,sans-serif"
+  }
+}
