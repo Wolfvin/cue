@@ -5,88 +5,189 @@
     {
       "id": "secure-login",
       "duration": 6000,
-      "pointer": { "x": 0.50, "y": 0.58 },
+      "template": {
+        "type": "login",
+        "data": {
+          "brand": "BankFlow",
+          "title": "Selamat Datang",
+          "subtitle": "Masuk ke akun perbankan Anda",
+          "fields": [
+            { "name": "email", "type": "email", "label": "Email", "placeholder": "aditya@bankflow.id", "value": "aditya@bankflow.id" },
+            { "name": "password", "type": "password", "label": "Kata Sandi", "placeholder": "••••••••••", "value": "••••••••••" }
+          ],
+          "submitLabel": "Masuk dengan Aman"
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.62 },
       "hotspots": [
-        { "id": "h-login-email", "x": 0.50, "y": 0.38, "label": "Email field", "alwaysShow": true },
-        { "id": "h-login-pass", "x": 0.50, "y": 0.50, "label": "Password field", "alwaysShow": true },
-        { "id": "h-login-btn", "x": 0.50, "y": 0.62, "label": "Sign In", "alwaysShow": true }
+        { "id": "h-login-brand", "x": 0.50, "y": 0.18, "label": "Brand", "alwaysShow": true },
+        { "id": "h-login-email", "x": 0.50, "y": 0.40, "label": "Email" },
+        { "id": "h-login-pass", "x": 0.50, "y": 0.52, "label": "Kata Sandi" },
+        { "id": "h-login-btn", "x": 0.50, "y": 0.65, "label": "Masuk", "alwaysShow": true }
       ],
       "annotations": [
-        { "type": "box", "x": 0.30, "y": 0.30, "width": 0.40, "height": 0.40, "color": "#2563EB", "strokeWidth": 2, "cornerRadius": 8, "label": "Secure Login Form" }
+        { "type": "box", "x": 0.28, "y": 0.12, "width": 0.44, "height": 0.72, "color": "#2563EB", "cornerRadius": 12, "label": "Secure Login Form" }
       ],
-      "caption": "Secure login with 2FA authentication — your money, protected from the first click."
+      "caption": "Login aman dengan autentikasi 2FA — uang Anda terlindungi dari klik pertama."
     },
     {
       "id": "view-balance",
       "duration": 6000,
-      "pointer": { "x": 0.35, "y": 0.30 },
+      "template": {
+        "type": "dashboard",
+        "data": {
+          "title": "Dashboard",
+          "greeting": "Selamat datang, Aditya!",
+          "columns": 3,
+          "metrics": [
+            { "label": "Total Saldo", "value": "Rp 142.750.000", "change": "+2.4%", "icon": "💰" },
+            { "label": "Tabungan", "value": "Rp 85.200.000", "change": "+1.8%", "icon": "🏦" },
+            { "label": "Investasi", "value": "Rp 25.000.000", "change": "+5.2%", "icon": "📈" }
+          ]
+        }
+      },
+      "pointer": { "x": 0.25, "y": 0.40 },
       "hotspots": [
-        { "id": "h-bal-total", "x": 0.35, "y": 0.28, "label": "Total balance", "alwaysShow": true },
-        { "id": "h-bal-savings", "x": 0.25, "y": 0.48, "label": "Savings account" },
-        { "id": "h-bal-checking", "x": 0.55, "y": 0.48, "label": "Checking account" },
-        { "id": "h-bal-invest", "x": 0.75, "y": 0.48, "label": "Investment portfolio" }
+        { "id": "h-bal-total", "x": 0.25, "y": 0.40, "label": "Total Saldo", "alwaysShow": true },
+        { "id": "h-bal-savings", "x": 0.55, "y": 0.40, "label": "Tabungan" },
+        { "id": "h-bal-invest", "x": 0.80, "y": 0.40, "label": "Investasi" }
       ],
       "annotations": [
-        { "type": "text", "x": 0.50, "y": 0.15, "text": "Rp 142,750,000", "fontSize": 28, "color": "#ffffff", "fontWeight": "bold" }
+        { "type": "text", "x": 0.50, "y": 0.20, "text": "Selamat datang, Aditya!", "color": "#ffffff", "fontSize": 16, "align": "center" }
       ],
-      "caption": "All your accounts at a glance — savings, checking, and investments in one dashboard."
+      "caption": "Semua akun dalam satu tampilan — tabungan, giro, dan investasi terintegrasi."
     },
     {
       "id": "initiate-transfer",
       "duration": 6000,
-      "pointer": { "x": 0.50, "y": 0.52 },
+      "template": {
+        "type": "form",
+        "data": {
+          "title": "Transfer Dana",
+          "description": "Kirim uang ke rekening manapun dalam hitungan detik",
+          "fields": [
+            { "name": "amount", "label": "Jumlah Transfer", "type": "text", "value": "Rp 5.000.000", "required": true },
+            { "name": "recipient", "label": "Nama Penerima", "type": "text", "value": "Siti Rahayu" },
+            { "name": "account", "label": "Nomor Rekening", "type": "text", "value": "8821-4567-8901" },
+            { "name": "bank", "label": "Bank Tujuan", "type": "select", "value": "BCA", "options": ["BCA", "BNI", "BRI", "Mandiri", "BSI"] },
+            { "name": "note", "label": "Catatan", "type": "text", "value": "Bantuan bulanan keluarga" }
+          ],
+          "submitLabel": "Lanjut ke Konfirmasi",
+          "layout": "centered"
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.50 },
       "hotspots": [
-        { "id": "h-xfer-amount", "x": 0.50, "y": 0.35, "label": "Transfer amount", "alwaysShow": true },
-        { "id": "h-xfer-recipient", "x": 0.50, "y": 0.48, "label": "Recipient account" },
-        { "id": "h-xfer-bank", "x": 0.50, "y": 0.58, "label": "Destination bank" },
-        { "id": "h-xfer-note", "x": 0.50, "y": 0.70, "label": "Transfer note" }
+        { "id": "h-xfer-amount", "x": 0.50, "y": 0.35, "label": "Jumlah", "alwaysShow": true },
+        { "id": "h-xfer-recipient", "x": 0.50, "y": 0.47, "label": "Penerima" },
+        { "id": "h-xfer-bank", "x": 0.50, "y": 0.60, "label": "Bank Tujuan" },
+        { "id": "h-xfer-btn", "x": 0.50, "y": 0.80, "label": "Lanjutkan", "alwaysShow": true }
       ],
       "annotations": [
-        { "type": "arrow", "x1": 0.18, "y1": 0.35, "x2": 0.38, "y2": 0.35, "color": "#2563EB", "label": "Quick fill" }
+        { "type": "arrow", "x1": 0.15, "y1": 0.35, "x2": 0.35, "y2": 0.35, "color": "#2563EB", "label": "Isi otomatis" }
       ],
-      "caption": "Transfer funds in seconds — fill the amount, pick a recipient, and you're almost done."
+      "caption": "Transfer dana dalam hitungan detik — isi jumlah, pilih penerima, hampir selesai."
     },
     {
       "id": "confirm-transfer",
-      "duration": 5000,
-      "pointer": { "x": 0.50, "y": 0.70 },
+      "duration": 6000,
+      "template": {
+        "type": "table",
+        "data": {
+          "title": "Konfirmasi Transfer",
+          "showRowNumbers": false,
+          "columns": [
+            { "key": "field", "label": "Detail" },
+            { "key": "value", "label": "Informasi" }
+          ],
+          "rows": [
+            { "cells": { "field": "Jumlah", "value": "Rp 5.000.000" } },
+            { "cells": { "field": "Penerima", "value": "Siti Rahayu" } },
+            { "cells": { "field": "Bank", "value": "BCA — 8821-4567-8901" } },
+            { "cells": { "field": "Catatan", "value": "Bantuan bulanan keluarga" } },
+            { "cells": { "field": "Biaya", "value": "GRATIS" }, "status": "success" },
+            { "cells": { "field": "Estimasi", "value": "Instan (real-time)" }, "status": "success" }
+          ]
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.75 },
       "hotspots": [
-        { "id": "h-confirm-detail", "x": 0.50, "y": 0.35, "label": "Transfer details" },
-        { "id": "h-confirm-fee", "x": 0.50, "y": 0.55, "label": "No fees", "alwaysShow": true },
-        { "id": "h-confirm-btn", "x": 0.50, "y": 0.72, "label": "Confirm & Send", "alwaysShow": true }
+        { "id": "h-confirm-amount", "x": 0.60, "y": 0.32, "label": "Jumlah" },
+        { "id": "h-confirm-fee", "x": 0.60, "y": 0.62, "label": "Gratis!", "alwaysShow": true },
+        { "id": "h-confirm-btn", "x": 0.50, "y": 0.85, "label": "Konfirmasi & Kirim", "alwaysShow": true }
       ],
       "annotations": [
-        { "type": "box", "x": 0.25, "y": 0.25, "width": 0.50, "height": 0.55, "color": "#2563EB", "strokeWidth": 2, "cornerRadius": 12, "label": "Review before sending" }
+        { "type": "box", "x": 0.15, "y": 0.15, "width": 0.70, "height": 0.72, "color": "#2563EB", "cornerRadius": 12, "label": "Review sebelum kirim" }
       ],
-      "caption": "Double-check before you send — full transparency on amount, fees, and recipient details."
+      "caption": "Periksa kembali sebelum mengirim — transparansi penuh atas jumlah, biaya, dan detail penerima."
     },
     {
       "id": "success-notification",
-      "duration": 5000,
-      "pointer": { "x": 0.50, "y": 0.30 },
+      "duration": 6000,
+      "template": {
+        "type": "terminal",
+        "data": {
+          "title": "BankFlow Terminal",
+          "cwd": "~/transfer",
+          "prompt": "$",
+          "lines": [
+            { "text": "bankflow transfer --to 8821-4567-8901 --amount 5000000", "type": "command" },
+            { "text": "Verifying recipient... OK", "type": "output" },
+            { "text": "Checking balance... Sufficient (Rp 142.750.000)", "type": "output" },
+            { "text": "Processing transfer...", "type": "output" },
+            { "text": "", "type": "output" },
+            { "text": "✓ Transfer berhasil!", "type": "success" },
+            { "text": "  Ref: BF-20260615-84729", "type": "output" },
+            { "text": "  Jumlah: Rp 5.000.000", "type": "output" },
+            { "text": "  Biaya: Rp 0 (GRATIS)", "type": "success" },
+            { "text": "  Estimasi tiba: Instan", "type": "success" }
+          ]
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.55 },
       "hotspots": [
-        { "id": "h-success-badge", "x": 0.50, "y": 0.28, "label": "Transfer successful", "alwaysShow": true },
-        { "id": "h-success-ref", "x": 0.50, "y": 0.50, "label": "Reference number" },
-        { "id": "h-success-timer", "x": 0.50, "y": 0.62, "label": "Estimated arrival: instant" }
+        { "id": "h-success-ref", "x": 0.45, "y": 0.58, "label": "Nomor Referensi", "alwaysShow": true },
+        { "id": "h-success-free", "x": 0.45, "y": 0.68, "label": "Gratis!" },
+        { "id": "h-success-instant", "x": 0.45, "y": 0.76, "label": "Instan" }
       ],
       "annotations": [
-        { "type": "text", "x": 0.50, "y": 0.22, "text": "Transfer Successful!", "fontSize": 22, "color": "#22c55e", "fontWeight": "bold" }
+        { "type": "text", "x": 0.50, "y": 0.10, "text": "Transfer Berhasil!", "color": "#22c55e", "fontSize": 18, "align": "center" }
       ],
-      "caption": "Instant confirmation with reference number — your money arrives in seconds, not hours."
+      "caption": "Konfirmasi instan dengan nomor referensi — uang Anda sampai dalam hitungan detik."
     },
     {
       "id": "open-account",
       "duration": 5000,
-      "pointer": { "x": 0.50, "y": 0.65 },
+      "template": {
+        "type": "login",
+        "data": {
+          "brand": "BankFlow",
+          "title": "Buka Akun Gratis",
+          "subtitle": "Bergabung dengan 2 juta+ pengguna yang mempercayai BankFlow",
+          "fields": [
+            { "name": "fullname", "type": "text", "label": "Nama Lengkap", "placeholder": "Nama lengkap Anda" },
+            { "name": "email", "type": "email", "label": "Email", "placeholder": "email@andatoko.id" },
+            { "name": "phone", "type": "tel", "label": "Nomor HP", "placeholder": "+62 812 3456 7890" }
+          ],
+          "submitLabel": "Buka Akun Sekarang",
+          "footerLinks": [
+            { "label": "Tanpa biaya daftar" },
+            { "label": "Proses < 5 menit" },
+            { "label": "Deposit awal Rp 0" }
+          ]
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.72 },
       "hotspots": [
-        { "id": "h-open-benefit", "x": 0.35, "y": 0.40, "label": "Zero fees" },
-        { "id": "h-open-rate", "x": 0.60, "y": 0.40, "label": "4.5% APY savings" }
+        { "id": "h-cta-benefits", "x": 0.50, "y": 0.82, "label": "Tanpa biaya", "alwaysShow": true }
       ],
-      "caption": "Join 2 million+ users banking smarter with BankFlow — open your free account today.",
+      "caption": "Bergabung dengan 2 juta+ pengguna — buka akun gratis hari ini, tanpa biaya tersembunyi.",
       "cta": {
-        "type": "button",
-        "label": "Open Free Account",
-        "href": "#signup"
+        "type": "email_capture",
+        "label": "Buka Akun Gratis",
+        "placeholder": "Email Anda",
+        "submitLabel": "Daftar Sekarang",
+        "successMessage": "Selamat! Akun BankFlow Anda sudah aktif."
       }
     }
   ],
