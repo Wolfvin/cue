@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taskly — Project Management Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: &#39;Inter&#39;, &#39;Segoe UI&#39;, system-ui, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <cue-embed id="player" width="840" height="520"></cue-embed>
+
+  <script>window.__CUE_SCRIPT__ = {"id":"taskly-saas-demo","title":"Taskly — Project Management, Simplified","steps":[{"id":"create-project","caption":"Start a new project workspace in seconds — name it, pick a template, and go.","hotspots":[{"id":"create-project-hotspot-0","x":0.15,"y":0.22,"label":"New Project button"},{"id":"create-project-hotspot-1","x":0.55,"y":0.45,"label":"Template gallery"}],"duration":5000},{"id":"invite-team","caption":"Add collaborators by email — they get instant access to the project board.\n[Send Invite]","hotspots":[{"id":"invite-team-hotspot-0","x":0.42,"y":0.3,"label":"Invite field"},{"id":"invite-team-hotspot-1","x":0.72,"y":0.3,"label":"Role selector"}]},{"id":"assign-task","caption":"Drag a task card onto a team member's column to assign it instantly.","hotspots":[{"id":"assign-task-hotspot-0","x":0.3,"y":0.5,"label":"Task card"},{"id":"assign-task-hotspot-1","x":0.7,"y":0.5,"label":"Assignee avatar"}],"duration":5000},{"id":"set-deadline","caption":"Click the calendar icon on any task to set a due date and get automated reminders.","hotspots":[{"id":"set-deadline-hotspot-0","x":0.5,"y":0.35,"label":"Calendar picker"},{"id":"set-deadline-hotspot-1","x":0.5,"y":0.65,"label":"Reminder toggle"}],"duration":5000},{"id":"dashboard-overview","caption":"See burndown charts, task completion rates, and team velocity at a glance.","hotspots":[{"id":"dashboard-overview-hotspot-0","x":0.35,"y":0.4,"label":"Burndown chart"},{"id":"dashboard-overview-hotspot-1","x":0.65,"y":0.4,"label":"Completion rate"},{"id":"dashboard-overview-hotspot-2","x":0.5,"y":0.7,"label":"Team velocity"}],"duration":5000},{"id":"get-started","caption":"Join 50,000+ teams managing projects with Taskly\n[Start free trial] ✉️"}],"loop":false,"theme":{"accent":"#6366f1","bg":"#0f172a","font":"'Inter', 'Segoe UI', system-ui, sans-serif"}};</script>
+  <script src="https://unpkg.com/@cue-vin/player@0.1.2/dist/cue-player.iife.js"></script>
+
+  <script>
+    if (window.Cue && typeof window.Cue.initCue === 'function') {
+      window.Cue.initCue();
+    }
+    var player = document.getElementById('player');
+    if (player && window.__CUE_SCRIPT__) {
+      player.setAttribute('data', JSON.stringify(window.__CUE_SCRIPT__));
+    }
+  </script>
+</body>
+</html>
