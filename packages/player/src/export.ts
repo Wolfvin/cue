@@ -116,9 +116,9 @@ function escapeHtml(str: string): string {
  */
 function readPlayerBundle(): string {
   try {
-    // @ts-expect-error — Node.js only; not available in browser
+    // @ts-ignore — Node.js only; not available in browser
     const fs: typeof import("fs") = require("fs");
-    // @ts-expect-error — Node.js only
+    // @ts-ignore — Node.js only
     const path: typeof import("path") = require("path");
 
     // Resolve relative to the current file's directory.
@@ -127,7 +127,7 @@ function readPlayerBundle(): string {
     try {
       dir = path.dirname(new URL(import.meta.url).pathname);
     } catch {
-      // @ts-expect-error — __dirname for CJS contexts
+      // @ts-ignore — __dirname for CJS contexts
       dir = __dirname;
     }
 

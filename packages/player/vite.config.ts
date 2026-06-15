@@ -28,8 +28,10 @@ export default defineConfig({
       fileName: () => "cue-player.iife.js",
     },
     rollupOptions: {
-      // Bundle react + react-dom inline for standalone <script> usage
-      external: [],
+      // Bundle react + react-dom inline for standalone <script> usage.
+      // Externalize puppeteer — it's a Node.js-only peer dep that must
+      // not be pulled into the browser IIFE bundle.
+      external: ["puppeteer", "puppeteer-core"],
     },
     outDir: "dist",
   },
