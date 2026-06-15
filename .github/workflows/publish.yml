@@ -30,7 +30,7 @@ jobs:
 
       - name: Publish all packages
         run: |
-          for pkg in packages/core packages/react packages/css packages/player packages/recorder packages/analytics-server packages/mcp; do
+          for pkg in packages/core packages/react packages/css packages/player packages/recorder packages/analytics-server packages/mcp packages/templates; do
             echo "Publishing $pkg..."
             cd $pkg
             pnpm publish --no-git-checks --access public || true
