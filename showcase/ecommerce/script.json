@@ -1,0 +1,93 @@
+{
+  "id": "shopflow-ecommerce-demo",
+  "title": "ShopFlow — Jualan Online untuk UMKM",
+  "steps": [
+    {
+      "id": "dashboard-penjual",
+      "duration": 6000,
+      "pointer": { "x": 0.25, "y": 0.42 },
+      "hotspots": [
+        { "id": "h-dash-revenue", "x": 0.25, "y": 0.42, "label": "Total Pendapatan", "alwaysShow": true },
+        { "id": "h-dash-orders", "x": 0.50, "y": 0.42, "label": "Pesanan Hari Ini" },
+        { "id": "h-dash-products", "x": 0.75, "y": 0.42, "label": "Produk Aktif" },
+        { "id": "h-dash-chart", "x": 0.50, "y": 0.68, "label": "Grafik Penjualan" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.50, "y": 0.18, "text": "Selamat Datang, Rina!", "fontSize": 20, "color": "#ffffff", "fontWeight": "bold" }
+      ],
+      "caption": "Dashboard penjual — pantau pendapatan, pesanan, dan performa produk dalam satu tampilan."
+    },
+    {
+      "id": "tambah-produk",
+      "duration": 6000,
+      "pointer": { "x": 0.42, "y": 0.50 },
+      "hotspots": [
+        { "id": "h-add-photo", "x": 0.30, "y": 0.38, "label": "Upload Foto", "alwaysShow": true },
+        { "id": "h-add-name", "x": 0.62, "y": 0.35, "label": "Nama Produk" },
+        { "id": "h-add-price", "x": 0.62, "y": 0.47, "label": "Harga & Stok" },
+        { "id": "h-add-cat", "x": 0.62, "y": 0.58, "label": "Kategori" },
+        { "id": "h-add-btn", "x": 0.62, "y": 0.72, "label": "Simpan Produk", "alwaysShow": true }
+      ],
+      "caption": "Tambah produk baru — upload foto, isi harga, dan langsung tampil di toko Anda."
+    },
+    {
+      "id": "atur-stok",
+      "duration": 6000,
+      "pointer": { "x": 0.72, "y": 0.52 },
+      "hotspots": [
+        { "id": "h-stock-search", "x": 0.30, "y": 0.32, "label": "Cari Produk" },
+        { "id": "h-stock-edit", "x": 0.72, "y": 0.52, "label": "Quick Edit Stok", "alwaysShow": true },
+        { "id": "h-stock-alert", "x": 0.80, "y": 0.64, "label": "Peringatan Stok Rendah" },
+        { "id": "h-stock-batch", "x": 0.30, "y": 0.82, "label": "Update Massal" }
+      ],
+      "caption": "Atur stok dengan cepat — edit satuan atau sekaligus, dapat peringatan kalau hampir habis."
+    },
+    {
+      "id": "proses-pesanan",
+      "duration": 6000,
+      "pointer": { "x": 0.60, "y": 0.50 },
+      "hotspots": [
+        { "id": "h-order-inbox", "x": 0.30, "y": 0.35, "label": "Inbox Pesanan", "alwaysShow": true },
+        { "id": "h-order-detail", "x": 0.62, "y": 0.42, "label": "Detail Pesanan" },
+        { "id": "h-order-status", "x": 0.62, "y": 0.58, "label": "Status Tracking" },
+        { "id": "h-order-confirm", "x": 0.62, "y": 0.74, "label": "Konfirmasi Kirim", "alwaysShow": true }
+      ],
+      "caption": "Proses pesanan masuk — lihat detail, update status pengiriman, konfirmasi dalam satu klik."
+    },
+    {
+      "id": "laporan-penjualan",
+      "duration": 6000,
+      "pointer": { "x": 0.50, "y": 0.50 },
+      "hotspots": [
+        { "id": "h-report-chart", "x": 0.50, "y": 0.45, "label": "Grafik Revenue", "alwaysShow": true },
+        { "id": "h-report-filter", "x": 0.25, "y": 0.32, "label": "Filter Periode" },
+        { "id": "h-report-top", "x": 0.75, "y": 0.55, "label": "Produk Terlaris" },
+        { "id": "h-report-export", "x": 0.80, "y": 0.32, "label": "Export CSV" }
+      ],
+      "caption": "Laporan penjualan mingguan — grafik revenue, produk terlaris, dan export data untuk analisis."
+    },
+    {
+      "id": "mulai-gratis",
+      "duration": 5000,
+      "pointer": { "x": 0.50, "y": 0.65 },
+      "hotspots": [
+        { "id": "h-cta-free", "x": 0.30, "y": 0.50, "label": "Gratis Selamanya" },
+        { "id": "h-cta-support", "x": 0.70, "y": 0.50, "label": "Support 24/7" }
+      ],
+      "caption": "Mulai jualan online hari ini — gratis untuk UMKM, tanpa biaya tersembunyi.",
+      "cta": {
+        "type": "email_capture",
+        "label": "Mulai Gratis",
+        "placeholder": "Email toko Anda",
+        "submitLabel": "Daftar Sekarang",
+        "successMessage": "Selamat! Toko Anda sudah siap."
+      }
+    }
+  ],
+  "loop": true,
+  "theme": {
+    "accent": "#f59e0b",
+    "bg": "#0c0f1a",
+    "font": "'Inter', 'Segoe UI', system-ui, sans-serif"
+  }
+}
