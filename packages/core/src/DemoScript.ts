@@ -177,10 +177,22 @@ export function validateDemoScript(script: unknown): script is DemoScript {
 
   // steps must be an array of objects with at least an `id` string
   if (!Array.isArray(obj.steps)) return false;
+  const validAnnotationTypes = new Set(["arrow", "box", "text"]);
   for (const step of obj.steps) {
     if (typeof step !== "object" || step === null) return false;
-    const stepId = (step as Record<string, unknown>).id;
+    const stepObj = step as Record<string, unknown>;
+    const stepId = stepObj.id;
     if (typeof stepId !== "string" || stepId.trim().length === 0) return false;
+
+    // Validate annotations array if present
+    if (stepObj.annotations !== undefined) {
+      if (!Array.isArray(stepObj.annotations)) return false;
+      for (const ann of stepObj.annotations) {
+        if (typeof ann !== "object" || ann === null || Array.isArray(ann)) return false;
+        const annObj = ann as Record<string, unknown>;
+        if (typeof annObj.type !== "string" || !validAnnotationTypes.has(annObj.type)) return false;
+      }
+    }
   }
 
   // Optional fields type-checks (best-effort; skip if absent)
