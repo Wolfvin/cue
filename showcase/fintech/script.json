@@ -1,0 +1,99 @@
+{
+  "id": "bankflow-fintech-demo",
+  "title": "BankFlow — Modern Banking, Simplified",
+  "steps": [
+    {
+      "id": "secure-login",
+      "duration": 6000,
+      "pointer": { "x": 0.50, "y": 0.58 },
+      "hotspots": [
+        { "id": "h-login-email", "x": 0.50, "y": 0.38, "label": "Email field", "alwaysShow": true },
+        { "id": "h-login-pass", "x": 0.50, "y": 0.50, "label": "Password field", "alwaysShow": true },
+        { "id": "h-login-btn", "x": 0.50, "y": 0.62, "label": "Sign In", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.30, "y": 0.30, "width": 0.40, "height": 0.40, "color": "#2563EB", "strokeWidth": 2, "cornerRadius": 8, "label": "Secure Login Form" }
+      ],
+      "caption": "Secure login with 2FA authentication — your money, protected from the first click."
+    },
+    {
+      "id": "view-balance",
+      "duration": 6000,
+      "pointer": { "x": 0.35, "y": 0.30 },
+      "hotspots": [
+        { "id": "h-bal-total", "x": 0.35, "y": 0.28, "label": "Total balance", "alwaysShow": true },
+        { "id": "h-bal-savings", "x": 0.25, "y": 0.48, "label": "Savings account" },
+        { "id": "h-bal-checking", "x": 0.55, "y": 0.48, "label": "Checking account" },
+        { "id": "h-bal-invest", "x": 0.75, "y": 0.48, "label": "Investment portfolio" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.50, "y": 0.15, "text": "Rp 142,750,000", "fontSize": 28, "color": "#ffffff", "fontWeight": "bold" }
+      ],
+      "caption": "All your accounts at a glance — savings, checking, and investments in one dashboard."
+    },
+    {
+      "id": "initiate-transfer",
+      "duration": 6000,
+      "pointer": { "x": 0.50, "y": 0.52 },
+      "hotspots": [
+        { "id": "h-xfer-amount", "x": 0.50, "y": 0.35, "label": "Transfer amount", "alwaysShow": true },
+        { "id": "h-xfer-recipient", "x": 0.50, "y": 0.48, "label": "Recipient account" },
+        { "id": "h-xfer-bank", "x": 0.50, "y": 0.58, "label": "Destination bank" },
+        { "id": "h-xfer-note", "x": 0.50, "y": 0.70, "label": "Transfer note" }
+      ],
+      "annotations": [
+        { "type": "arrow", "x1": 0.18, "y1": 0.35, "x2": 0.38, "y2": 0.35, "color": "#2563EB", "label": "Quick fill" }
+      ],
+      "caption": "Transfer funds in seconds — fill the amount, pick a recipient, and you're almost done."
+    },
+    {
+      "id": "confirm-transfer",
+      "duration": 5000,
+      "pointer": { "x": 0.50, "y": 0.70 },
+      "hotspots": [
+        { "id": "h-confirm-detail", "x": 0.50, "y": 0.35, "label": "Transfer details" },
+        { "id": "h-confirm-fee", "x": 0.50, "y": 0.55, "label": "No fees", "alwaysShow": true },
+        { "id": "h-confirm-btn", "x": 0.50, "y": 0.72, "label": "Confirm & Send", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.25, "y": 0.25, "width": 0.50, "height": 0.55, "color": "#2563EB", "strokeWidth": 2, "cornerRadius": 12, "label": "Review before sending" }
+      ],
+      "caption": "Double-check before you send — full transparency on amount, fees, and recipient details."
+    },
+    {
+      "id": "success-notification",
+      "duration": 5000,
+      "pointer": { "x": 0.50, "y": 0.30 },
+      "hotspots": [
+        { "id": "h-success-badge", "x": 0.50, "y": 0.28, "label": "Transfer successful", "alwaysShow": true },
+        { "id": "h-success-ref", "x": 0.50, "y": 0.50, "label": "Reference number" },
+        { "id": "h-success-timer", "x": 0.50, "y": 0.62, "label": "Estimated arrival: instant" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.50, "y": 0.22, "text": "Transfer Successful!", "fontSize": 22, "color": "#22c55e", "fontWeight": "bold" }
+      ],
+      "caption": "Instant confirmation with reference number — your money arrives in seconds, not hours."
+    },
+    {
+      "id": "open-account",
+      "duration": 5000,
+      "pointer": { "x": 0.50, "y": 0.65 },
+      "hotspots": [
+        { "id": "h-open-benefit", "x": 0.35, "y": 0.40, "label": "Zero fees" },
+        { "id": "h-open-rate", "x": 0.60, "y": 0.40, "label": "4.5% APY savings" }
+      ],
+      "caption": "Join 2 million+ users banking smarter with BankFlow — open your free account today.",
+      "cta": {
+        "type": "button",
+        "label": "Open Free Account",
+        "href": "#signup"
+      }
+    }
+  ],
+  "loop": true,
+  "theme": {
+    "accent": "#2563EB",
+    "bg": "#0a0f1a",
+    "font": "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif"
+  }
+}
