@@ -12,15 +12,15 @@ Inspired by [HowdyGo](https://www.howygo.com/), [Arcade](https://www.arcade.soft
 
 ```bash
 # Install the packages you need
-pnpm add @cue/react @cue/css
+pnpm add @cue-vin/react @cue-vin/css
 
 # Core is framework-agnostic (optional)
-pnpm add @cue/core
+pnpm add @cue-vin/core
 ```
 
 ```tsx
-import { DemoTheater, ScriptedPointer, useCountUp } from "@cue/react";
-import "@cue/css/cue.css";
+import { DemoTheater, ScriptedPointer, useCountUp } from "@cue-vin/react";
+import "@cue-vin/css/cue.css";
 ```
 
 ---
@@ -48,7 +48,7 @@ cd examples/e2e && pnpm start
   "mcpServers": {
     "cue": {
       "command": "npx",
-      "args": ["@cue/mcp"]
+      "args": ["@cue-vin/mcp"]
     }
   }
 }
@@ -60,7 +60,7 @@ Claude sekarang bisa panggil: `cue_generate`, `cue_export_html`, `cue_validate`,
 
 ## Packages
 
-### `@cue/core` — Framework-agnostic engine
+### `@cue-vin/core` — Framework-agnostic engine
 
 Zero runtime dependencies. Vanilla TypeScript.
 
@@ -72,10 +72,10 @@ Zero runtime dependencies. Vanilla TypeScript.
 | `ScrollTrigger` | `IntersectionObserver` wrapper with threshold & played-guard |
 
 ```ts
-import { Timeline, Pointer, StateMachine, ScrollTrigger } from "@cue/core";
+import { Timeline, Pointer, StateMachine, ScrollTrigger } from "@cue-vin/core";
 ```
 
-### `@cue/react` — React components & hooks
+### `@cue-vin/react` — React components & hooks
 
 Peer dependency: `react >= 18`.
 
@@ -103,10 +103,10 @@ import {
   DemoTheater, ScriptedPointer, AppWindow,
   FilePickerOverlay, ExcelPopup,
   useEnter, useCountUp, useStagger, useScrollReveal,
-} from "@cue/react";
+} from "@cue-vin/react";
 ```
 
-### `@cue/css` — Pure CSS animation primitives
+### `@cue-vin/css` — Pure CSS animation primitives
 
 Zero JS dependency. Single file: `cue.css`.
 
@@ -117,7 +117,7 @@ Zero JS dependency. Single file: `cue.css`.
 **Custom Properties:** `--cue-ease-out`, `--cue-ease-spring`, `--cue-ease-in-out`, `--cue-duration-fast`, `--cue-duration-normal`, `--cue-duration-slow`
 
 ```css
-@import "@cue/css/cue.css";
+@import "@cue-vin/css/cue.css";
 ```
 
 ---

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DemoTheater, AppWindow, FilePickerOverlay, type FileEntry } from "@cue/react";
+import { DemoTheater, AppWindow, FilePickerOverlay, type FileEntry } from "@cue-vin/react";
 
 const FILES: FileEntry[] = [
   { id: "1", name: "report-q4.pdf", type: "doc" },

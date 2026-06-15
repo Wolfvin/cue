@@ -1,6 +1,6 @@
 "use client";
 
-import { useEnter, useCountUp, useStagger } from "@cue/react";
+import { useEnter, useCountUp, useStagger } from "@cue-vin/react";
 
 function EnterCard() {
   const ref = useEnter({ delay: 200 });

@@ -1,4 +1,4 @@
-# @cue/example-e2e
+# @cue-vin/example-e2e
 
 End-to-end example that demonstrates the full cue SDK workflow: from a plain feature description to a working, embeddable HTML demo — all in one script, no build step required.
 
@@ -6,11 +6,11 @@ End-to-end example that demonstrates the full cue SDK workflow: from a plain fea
 
 `run.ts` executes four steps in sequence:
 
-1. **Generate** — Calls `generate()` from `@cue/core` with a list of features for a fictional product called "TaskFlow". Each feature becomes one step in the demo, complete with optional hotspots and call-to-action overlays.
+1. **Generate** — Calls `generate()` from `@cue-vin/core` with a list of features for a fictional product called "TaskFlow". Each feature becomes one step in the demo, complete with optional hotspots and call-to-action overlays.
 
 2. **Validate** — Calls `validateDemoScript()` to confirm the generated DemoScript conforms to the expected schema (required `id`, `title`, `steps` fields, correct types).
 
-3. **Export** — Calls `exportToHtml()` from `@cue/player` to produce a self-contained HTML file that embeds the DemoScript as JSON and loads the cue-player from a CDN.
+3. **Export** — Calls `exportToHtml()` from `@cue-vin/player` to produce a self-contained HTML file that embeds the DemoScript as JSON and loads the cue-player from a CDN.
 
 4. **Print summary** — Logs the step count, validation result, and file size to the console.
 
