@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DemoTheater, ScriptedPointer, AppWindow } from "@cue/react";
-import { Pointer, type PointerState } from "@cue/core";
+import { DemoTheater, ScriptedPointer, AppWindow } from "@cue-vin/react";
+import { Pointer, type PointerState } from "@cue-vin/core";
 
 export default function AutoDemoPage() {
   const [pointerState, setPointerState] = useState<PointerState>({
