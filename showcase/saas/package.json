@@ -1,0 +1,14 @@
+{
+  "name": "@cue/showcase-saas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "tsx generate.ts"
+  },
+  "dependencies": {
+    "@cue-vin/core": "0.1.2",
+    "@cue-vin/player": "0.1.2",
+    "tsx": "^4"
+  }
+}
