@@ -13,6 +13,7 @@ export type { ScrollTriggerOptions } from "./ScrollTrigger";
 export type {
   DemoScript,
   DemoStep,
+  DemoTemplate,
   DemoHotspot,
   DemoAnnotation,
   ArrowAnnotation,

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template Demo — Build Demos Without Screenshots</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#3b82f6;--bg:#0a0a0a;--bgCard:#111827;--bgInput:#1e293b;--border:#1e293b;
+--text:#f1f5f9;--textMuted:#94a3b8;--textDim:#64748b;--font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+--radius:12px;--ease:cubic-bezier(.16,1,.3,1)}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;height:100vh;
+display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+.theater{position:relative;width:840px;height:520px;background:var(--bgCard);border-radius:8px;
+border:1px solid rgba(255,255,255,.08);overflow:hidden;
+box-shadow:0 0 80px rgba(59,130,246,.06),0 25px 50px rgba(0,0,0,.4)}
+
+/* Step container */
+.step{position:absolute;inset:0;transition:opacity .4s var(--ease);opacity:0;pointer-events:none}
+.step.active{opacity:1;pointer-events:auto}
+
+/* Template content fills the slide */
+.template-content{width:100%;height:100%;overflow:hidden}
+.template-content .cue-template{width:100%;height:100%}
+
+/* Caption bar */
+.caption{background:#111;color:#fff;padding:8px 16px;font-size:13px;line-height:1.5;min-height:36px;
+border-top:1px solid rgba(255,255,255,.06)}
+
+/* Controls */
+.controls{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 16px;background:var(--bgCard)}
+.dots{display:flex;gap:8px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--textDim);transition:all .3s var(--ease)}
+.dot.active{background:var(--accent);box-shadow:0 0 10px var(--accent);transform:scale(1.3)}
+.dot.done{background:var(--accent);opacity:.6}
+.dot-line{height:2px;width:16px;background:var(--textDim);border-radius:1px;overflow:hidden}
+.dot-line .fill{height:100%;background:var(--accent);transition:width .4s var(--ease)}
+.btn{padding:6px 16px;background:transparent;color:var(--textMuted);border:1px solid var(--border);
+border-radius:6px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.3;cursor:default}
+
+/* Step badge */
+.step-badge{position:absolute;top:12px;right:12px;font-size:11px;color:var(--textDim);
+background:rgba(0,0,0,.5);padding:2px 10px;border-radius:10px;z-index:10}
+
+/* Pointer */
+.pointer{position:absolute;width:16px;height:22px;pointer-events:none;z-index:50;
+transition:left .6s var(--ease),top .6s var(--ease);opacity:0}
+.pointer.visible{opacity:1}
+.pointer::before{content:'';position:absolute;width:12px;height:16px;background:#fff;
+border-radius:0 8px 4px 0;transform:rotate(-30deg);transform-origin:0 0}
+.pointer::after{content:'';position:absolute;width:5px;height:5px;background:var(--accent);
+border-radius:50%;top:4px;left:3px;box-shadow:0 0 6px var(--accent)}
+
+/* Hotspot */
+.hotspot{position:absolute;pointer-events:none;z-index:40;opacity:0;transition:opacity .4s}
+.hotspot.visible{opacity:1}
+.hotspot-ring{width:20px;height:20px;border-radius:50%;border:2px solid var(--accent);
+position:absolute;top:-10px;left:-10px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.5);opacity:.3}}
+.hotspot-label{position:absolute;top:14px;left:14px;font-size:10px;color:var(--accent);
+white-space:nowrap;background:rgba(59,130,246,.1);padding:1px 6px;border-radius:3px}
+
+.nav-hint{margin-top:16px;font-size:11px;color:var(--textDim);text-align:center}
+.nav-hint kbd{background:var(--bgCard);padding:2px 8px;border-radius:3px;font-size:10px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div class="theater" id="theater">
+  <div id="stepContainer"></div>
+  <div class="pointer" id="pointer"></div>
+  <div id="hotspotContainer"></div>
+  <div class="step-badge" id="stepBadge"></div>
+</div>
+<div class="caption" id="caption"></div>
+<div class="controls">
+  <div class="dots" id="dots"></div>
+  <button class="btn" id="prevBtn">&larr; Prev</button>
+  <button class="btn" id="nextBtn">Next &rarr;</button>
+</div>
+<div class="nav-hint"><kbd>&rarr;</kbd> next &nbsp; <kbd>&larr;</kbd> prev</div>
+
+<script type="module">
+// Import templates package (ESM from workspace dist)
+import { renderTemplate } from "../../packages/templates/dist/index.mjs";
+
+const SCRIPT = {
+  id: "template-demo",
+  title: "Template Demo",
+  steps: [
+    {
+      id: "login",
+      caption: "Login template — brand, fields, and submit button, all from data. No screenshot needed.",
+      template: {
+        type: "login",
+        data: { title: "Sign In", brand: "DemoApp",
+          fields: [
+            { name: "email", type: "email", placeholder: "you@demoapp.io" },
+            { name: "password", type: "password", placeholder: "••••••••" }
+          ],
+          submitLabel: "Sign In"
+        }
+      },
+      pointer: { x: 0.50, y: 0.58 },
+      hotspots: [
+        { id: "h1", x: 0.50, y: 0.22, label: "Brand", alwaysShow: true },
+        { id: "h2", x: 0.50, y: 0.70, label: "Submit", alwaysShow: true }
+      ]
+    },
+    {
+      id: "dashboard",
+      caption: "Dashboard template — metrics, greeting, and grid layout. Just pass data, get a polished UI.",
+      template: {
+        type: "dashboard",
+        data: {
+          title: "Dashboard",
+          greeting: "Good morning, Andi",
+          metrics: [
+            { label: "Revenue", value: "$42,500", change: "+12.5%", positive: true, icon: "💰" },
+            { label: "Users", value: "1,234", change: "+8.2%", positive: true, icon: "👥" },
+            { label: "Orders", value: "389", change: "-2.1%", positive: false, icon: "📦" },
+            { label: "Conversion", value: "3.2%", change: "+0.5%", positive: true, icon: "📈" }
+          ],
+          columns: 2
+        }
+      },
+      pointer: { x: 0.35, y: 0.40 },
+      hotspots: [
+        { id: "h3", x: 0.30, y: 0.20, label: "Greeting", alwaysShow: true },
+        { id: "h4", x: 0.25, y: 0.48, label: "Revenue" }
+      ]
+    },
+    {
+      id: "form",
+      caption: "Form template — multi-field data entry with layout variants. Perfect for SaaS onboarding flows.",
+      template: {
+        type: "form",
+        data: {
+          title: "Create Project",
+          description: "Set up a new project in your workspace.",
+          fields: [
+            { name: "projectName", label: "Project Name", type: "text", placeholder: "my-awesome-project", required: true },
+            { name: "environment", label: "Environment", type: "select", options: ["Staging", "Production"], required: true },
+            { name: "description", label: "Description", type: "textarea", placeholder: "What is this project about?" }
+          ],
+          submitLabel: "Create Project"
+        }
+      },
+      pointer: { x: 0.50, y: 0.50 },
+      hotspots: [
+        { id: "h5", x: 0.50, y: 0.38, label: "Project Name", alwaysShow: true },
+        { id: "h6", x: 0.50, y: 0.85, label: "Submit", alwaysShow: true }
+      ]
+    },
+    {
+      id: "terminal",
+      caption: "Terminal template — log lines, prompts, and color-coded output. Ideal for DevOps and CLI demos.",
+      template: {
+        type: "terminal",
+        data: {
+          title: "Deploy",
+          cwd: "~/projects/demoapp",
+          lines: [
+            { text: "npm run build", type: "command" },
+            { text: "Compiling TypeScript...", type: "output" },
+            { text: "✓ Build complete (2.1s)", type: "success" },
+            { text: "Deploying to production...", type: "output" },
+            { text: "✓ Deployed to https://demoapp.example.com", type: "success" }
+          ]
+        }
+      },
+      pointer: { x: 0.30, y: 0.40 },
+      hotspots: [
+        { id: "h7", x: 0.35, y: 0.32, label: "Command", alwaysShow: true },
+        { id: "h8", x: 0.45, y: 0.55, label: "Success", alwaysShow: true }
+      ]
+    }
+  ],
+  theme: { accent: "#3b82f6", bg: "#0a0a0a" }
+};
+
+// ── State ────────────────────────────────────────────────
+let cur = 0;
+const total = SCRIPT.steps.length;
+
+// ── DOM refs ─────────────────────────────────────────────
+const theater     = document.getElementById("theater");
+const stepContainer = document.getElementById("stepContainer");
+const hotspotContainer = document.getElementById("hotspotContainer");
+const pointerEl   = document.getElementById("pointer");
+const captionEl   = document.getElementById("caption");
+const stepBadge   = document.getElementById("stepBadge");
+const dotsEl      = document.getElementById("dots");
+const prevBtn     = document.getElementById("prevBtn");
+const nextBtn     = document.getElementById("nextBtn");
+
+// ── Build step slides ────────────────────────────────────
+function buildSlides() {
+  SCRIPT.steps.forEach((step, i) => {
+    const div = document.createElement("div");
+    div.className = "step" + (i === 0 ? " active" : "");
+    div.id = "slide-" + i;
+
+    // Render template HTML
+    if (step.template) {
+      const config = { type: step.template.type, ...(step.template.data || {}) };
+      const theme = {
+        ...(SCRIPT.theme?.accent ? { accent: SCRIPT.theme.accent } : {}),
+        ...(step.template.theme?.accent ? { accent: step.template.theme.accent } : {}),
+        ...(SCRIPT.theme?.bg ? { bg: SCRIPT.theme.bg } : {}),
+        ...(step.template.theme?.bg ? { bg: step.template.theme.bg } : {}),
+      };
+      const html = renderTemplate(config, theme);
+      const content = document.createElement("div");
+      content.className = "template-content";
+      content.innerHTML = html;
+      div.appendChild(content);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.style.cssText = "width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#6B7280;font-size:14px";
+      placeholder.textContent = "No template for this step";
+      div.appendChild(placeholder);
+    }
+
+    stepContainer.appendChild(div);
+  });
+}
+
+// ── Build dots ───────────────────────────────────────────
+function buildDots() {
+  dotsEl.innerHTML = "";
+  for (let i = 0; i < total; i++) {
+    if (i > 0) {
+      const line = document.createElement("div");
+      line.className = "dot-line";
+      line.innerHTML = '<div class="fill" id="lineFill' + i + '"></div>';
+      dotsEl.appendChild(line);
+    }
+    const d = document.createElement("div");
+    d.className = "dot";
+    d.id = "dot" + i;
+    dotsEl.appendChild(d);
+  }
+}
+
+function updateDots() {
+  for (let i = 0; i < total; i++) {
+    const d = document.getElementById("dot" + i);
+    d.className = "dot" + (i === cur ? " active" : i < cur ? " done" : "");
+    if (i > 0) {
+      const f = document.getElementById("lineFill" + i);
+      f.style.width = i <= cur ? "100%" : "0";
+    }
+  }
+}
+
+// ── Hotspots ─────────────────────────────────────────────
+function updateHotspots() {
+  hotspotContainer.innerHTML = "";
+  const step = SCRIPT.steps[cur];
+  if (!step.hotspots) return;
+
+  const rect = theater.getBoundingClientRect();
+  step.hotspots.forEach(hs => {
+    const el = document.createElement("div");
+    el.className = "hotspot";
+    el.style.left = (hs.x * rect.width) + "px";
+    el.style.top = (hs.y * rect.height) + "px";
+    el.innerHTML = '<div class="hotspot-ring"></div>' +
+      (hs.label ? '<div class="hotspot-label">' + hs.label + '</div>' : '');
+    hotspotContainer.appendChild(el);
+    setTimeout(() => el.classList.add("visible"), 50);
+  });
+}
+
+// ── Pointer ──────────────────────────────────────────────
+function updatePointer() {
+  const step = SCRIPT.steps[cur];
+  if (!step.pointer) {
+    pointerEl.classList.remove("visible");
+    return;
+  }
+  const rect = theater.getBoundingClientRect();
+  pointerEl.style.left = (step.pointer.x * rect.width) + "px";
+  pointerEl.style.top  = (step.pointer.y * rect.height) + "px";
+  pointerEl.classList.add("visible");
+}
+
+// ── Navigate ─────────────────────────────────────────────
+function goTo(idx) {
+  if (idx < 0 || idx >= total) return;
+  // Deactivate old slide
+  const old = document.getElementById("slide-" + cur);
+  if (old) old.classList.remove("active");
+  cur = idx;
+  // Activate new slide
+  const next = document.getElementById("slide-" + cur);
+  if (next) next.classList.add("active");
+  // Update UI
+  captionEl.textContent = SCRIPT.steps[cur].caption || "";
+  stepBadge.textContent = "Step " + (cur + 1) + "/" + total;
+  updateDots();
+  updatePointer();
+  updateHotspots();
+  prevBtn.disabled = cur === 0;
+  nextBtn.disabled = cur === total - 1;
+}
+
+// ── Event listeners ──────────────────────────────────────
+prevBtn.addEventListener("click", () => goTo(cur - 1));
+nextBtn.addEventListener("click", () => goTo(cur + 1));
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") { e.preventDefault(); goTo(cur + 1); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); goTo(cur - 1); }
+});
+
+// ── Init ─────────────────────────────────────────────────
+buildSlides();
+buildDots();
+goTo(0);
+</script>
+</body>
+</html>

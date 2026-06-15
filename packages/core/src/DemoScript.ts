@@ -111,6 +111,16 @@ export interface DemoTheme {
   font?: string;
 }
 
+/** Template configuration for rendering a step without a screenshot. */
+export interface DemoTemplate {
+  /** Template type — selects which built-in template to render. */
+  type: "login" | "dashboard" | "form" | "table" | "terminal";
+  /** Data payload passed to the template renderer. Structure depends on `type`. */
+  data?: Record<string, unknown>;
+  /** Theme overrides for this template step. Merged with the script-level theme. */
+  theme?: DemoTheme;
+}
+
 /** A single step in a demo script. */
 export interface DemoStep {
   /** Unique identifier for this step. */
@@ -119,6 +129,9 @@ export interface DemoStep {
   duration?: number;
   /** Screenshot or image URL/base64 rendered via ScreenSlide. */
   screen?: string;
+  /** Template configuration for rendering a step without a screenshot.
+   *  When present and `screen` is absent, the player renders the template instead. */
+  template?: DemoTemplate;
   /** Pointer position and click state. */
   pointer?: DemoPointer;
   /** Interactive hotspot overlays. */
