@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BankFlow — Modern Banking, Simplified</title>
+  <style>
+    /* ── Reset & Base ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #2563EB;
+      --accent-light: #3b82f6;
+      --accent-glow: rgba(37, 99, 235, 0.25);
+      --bg: #0a0f1a;
+      --bg-card: #111827;
+      --bg-input: #1e293b;
+      --border: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --success: #22c55e;
+      --success-glow: rgba(34, 197, 94, 0.15);
+      --danger: #ef4444;
+      --radius: 12px;
+      --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Theater Container ───────────────────────────────────────── */
+    .theater {
+      position: relative;
+      width: 880px;
+      height: 560px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(37, 99, 235, 0.08), 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Step Slides ─────────────────────────────────────────────── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+
+    /* ── Top Bar ─────────────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .topbar-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .topbar-logo span { color: var(--text); }
+    .topbar-nav {
+      display: flex;
+      gap: 6px;
+    }
+    .topbar-nav-item {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all 0.25s ease;
+      cursor: default;
+    }
+    .topbar-nav-item.active {
+      background: var(--accent-glow);
+      color: var(--accent-light);
+      font-weight: 600;
+    }
+    .topbar-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ── Slide Content Area ──────────────────────────────────────── */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 40px;
+      gap: 20px;
+      position: relative;
+    }
+
+    /* ── Login Slide ─────────────────────────────────────────────── */
+    .login-card {
+      width: 380px;
+      background: var(--bg-input);
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid var(--border);
+    }
+    .login-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .login-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color 0.25s;
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent-light); }
+
+    /* ── Balance Slide ───────────────────────────────────────────── */
+    .balance-total {
+      text-align: center;
+    }
+    .balance-total .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .balance-total .amount {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--text), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .balance-total .change {
+      font-size: 13px;
+      color: var(--success);
+      margin-top: 4px;
+    }
+    .account-cards {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      max-width: 700px;
+    }
+    .account-card {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .account-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .account-card .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .account-card .name {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .account-card .value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    /* ── Transfer Slide ──────────────────────────────────────────── */
+    .transfer-form {
+      width: 440px;
+      background: var(--bg-input);
+      border-radius: var(--radius);
+      padding: 28px;
+      border: 1px solid var(--border);
+    }
+    .transfer-form h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .transfer-amount-display {
+      text-align: center;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .transfer-amount-display .currency {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .transfer-amount-display .value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent-light);
+    }
+    .transfer-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .transfer-row .form-group { flex: 1; margin-bottom: 0; }
+
+    /* ── Confirm Slide ───────────────────────────────────────────── */
+    .confirm-card {
+      width: 440px;
+      background: var(--bg-input);
+      border-radius: var(--radius);
+      padding: 28px;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+    .confirm-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .confirm-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .confirm-detail .label { color: var(--text-muted); }
+    .confirm-detail .value { font-weight: 600; }
+    .confirm-detail:last-of-type { border-bottom: none; }
+    .confirm-fee {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin: 16px 0;
+      padding: 10px;
+      background: var(--success-glow);
+      border-radius: 8px;
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .btn-confirm {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 8px;
+    }
+    .btn-confirm:hover { background: var(--accent-light); transform: scale(1.01); }
+
+    /* ── Success Slide ───────────────────────────────────────────── */
+    .success-content {
+      text-align: center;
+    }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--success-glow);
+      border: 2px solid var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+      animation: pulseSuccess 2s ease-in-out infinite;
+    }
+    @keyframes pulseSuccess {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3); }
+      50% { box-shadow: 0 0 0 16px rgba(34, 197, 94, 0); }
+    }
+    .success-content h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+    .success-content .ref {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .success-content .ref-value {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      color: var(--text);
+      background: var(--bg-input);
+      padding: 8px 16px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .success-content .eta {
+      font-size: 13px;
+      color: var(--success);
+    }
+    .success-details {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      justify-content: center;
+    }
+    .success-detail-item {
+      text-align: center;
+    }
+    .success-detail-item .val {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .success-detail-item .lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── CTA Slide ───────────────────────────────────────────────── */
+    .cta-content {
+      text-align: center;
+    }
+    .cta-content h2 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .cta-content .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .cta-benefits {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .cta-benefit {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .cta-benefit:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .cta-benefit .icon { font-size: 24px; margin-bottom: 8px; }
+    .cta-benefit .title { font-size: 14px; font-weight: 600; }
+    .cta-benefit .desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .btn-cta {
+      padding: 16px 48px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-cta:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 6px 30px var(--accent-glow); }
+
+    /* ── Hotspot Overlays ────────────────────────────────────────── */
+    .hotspot {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 10;
+      cursor: default;
+    }
+    .slide.active .hotspot {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    .hotspot::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      animation: hotspotPulse 2s ease-in-out infinite;
+    }
+    @keyframes hotspotPulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 0; transform: scale(1.8); }
+    }
+    .hotspot-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% - 32px));
+      background: var(--bg);
+      color: var(--accent-light);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      border: 1px solid var(--accent);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .hotspot:hover .hotspot-label,
+    .hotspot.always-show .hotspot-label {
+      opacity: 1;
+    }
+
+    /* ── Scripted Pointer ────────────────────────────────────────── */
+    .pointer-cursor {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      z-index: 100;
+      pointer-events: none;
+      transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .pointer-cursor svg {
+      width: 20px;
+      height: 20px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    .pointer-cursor.clicking svg {
+      transform: scale(0.85);
+      transition: transform 0.1s;
+    }
+
+    /* ── Caption Bar ─────────────────────────────────────────────── */
+    .caption-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 14px 24px;
+      background: linear-gradient(to top, rgba(10, 15, 26, 0.95), rgba(10, 15, 26, 0.7));
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      z-index: 20;
+    }
+    .caption-text {
+      font-size: 14px;
+      color: var(--text);
+      max-width: 600px;
+      line-height: 1.5;
+    }
+    .caption-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-muted);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-light);
+      background: var(--accent-glow);
+    }
+    .step-indicator {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      transition: all 0.3s;
+    }
+    .step-dot.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    /* ── Progress Bar ────────────────────────────────────────────── */
+    .progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      z-index: 30;
+      transition: width 0.3s ease;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 920px) {
+      .theater { width: 96vw; height: 70vh; }
+      .account-cards { flex-wrap: wrap; }
+      .login-card, .transfer-form, .confirm-card { width: 90%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="theater" id="theater">
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ── Slide 1: Secure Login ───────────────────────────────────── -->
+  <div class="slide" id="slide-0">
+    <div class="topbar">
+      <div class="topbar-logo">Bank<span>Flow</span></div>
+      <div class="topbar-nav">
+        <div class="topbar-nav-item active">Login</div>
+        <div class="topbar-nav-item">Features</div>
+        <div class="topbar-nav-item">Security</div>
+      </div>
+      <div class="topbar-avatar">AW</div>
+    </div>
+    <div class="slide-body">
+      <div class="login-card">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your accounts</p>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input class="form-input" type="text" value="aditya.w@email.com" readonly>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input class="form-input" type="password" value="••••••••••" readonly>
+        </div>
+        <button class="btn-primary">Sign In Securely</button>
+      </div>
+    </div>
+    <div class="hotspot" style="left:50%;top:42%" data-label="Email field"></div>
+    <div class="hotspot" style="left:50%;top:54%" data-label="Password field"></div>
+    <div class="hotspot always-show" style="left:50%;top:66%" data-label="Sign In"></div>
+  </div>
+
+  <!-- ── Slide 2: View Balance ───────────────────────────────────── -->
+  <div class="slide" id="slide-1">
+    <div class="topbar">
+      <div class="topbar-logo">Bank<span>Flow</span></div>
+      <div class="topbar-nav">
+        <div class="topbar-nav-item active">Dashboard</div>
+        <div class="topbar-nav-item">Transfers</div>
+        <div class="topbar-nav-item">Cards</div>
+        <div class="topbar-nav-item">Settings</div>
+      </div>
+      <div class="topbar-avatar">AW</div>
+    </div>
+    <div class="slide-body">
+      <div class="balance-total">
+        <div class="label">Total Balance</div>
+        <div class="amount">Rp 142,750,000</div>
+        <div class="change">+2.4% this month</div>
+      </div>
+      <div class="account-cards">
+        <div class="account-card">
+          <div class="icon" style="background:rgba(37,99,235,0.15);color:#3b82f6;">💰</div>
+          <div class="name">Savings</div>
+          <div class="value">Rp 85,200,000</div>
+        </div>
+        <div class="account-card">
+          <div class="icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">💳</div>
+          <div class="name">Checking</div>
+          <div class="value">Rp 32,550,000</div>
+        </div>
+        <div class="account-card">
+          <div class="icon" style="background:rgba(168,85,247,0.15);color:#a855f7;">📈</div>
+          <div class="name">Investments</div>
+          <div class="value">Rp 25,000,000</div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:35%;top:34%" data-label="Total balance"></div>
+    <div class="hotspot" style="left:25%;top:56%" data-label="Savings account"></div>
+    <div class="hotspot" style="left:55%;top:56%" data-label="Checking account"></div>
+    <div class="hotspot" style="left:75%;top:56%" data-label="Investment portfolio"></div>
+  </div>
+
+  <!-- ── Slide 3: Initiate Transfer ──────────────────────────────── -->
+  <div class="slide" id="slide-2">
+    <div class="topbar">
+      <div class="topbar-logo">Bank<span>Flow</span></div>
+      <div class="topbar-nav">
+        <div class="topbar-nav-item">Dashboard</div>
+        <div class="topbar-nav-item active">Transfers</div>
+        <div class="topbar-nav-item">Cards</div>
+        <div class="topbar-nav-item">Settings</div>
+      </div>
+      <div class="topbar-avatar">AW</div>
+    </div>
+    <div class="slide-body">
+      <div class="transfer-form">
+        <h3>Send Money</h3>
+        <div class="transfer-amount-display">
+          <div class="currency">Transfer Amount</div>
+          <div class="value">Rp 5,000,000</div>
+        </div>
+        <div class="transfer-row">
+          <div class="form-group">
+            <label>Recipient Name</label>
+            <input class="form-input" type="text" value="Siti Rahayu" readonly>
+          </div>
+        </div>
+        <div class="transfer-row">
+          <div class="form-group">
+            <label>Account Number</label>
+            <input class="form-input" type="text" value="8821-4567-8901" readonly>
+          </div>
+        </div>
+        <div class="transfer-row">
+          <div class="form-group">
+            <label>Destination Bank</label>
+            <input class="form-input" type="text" value="BCA" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <input class="form-input" type="text" value="Monthly family support" readonly>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:50%;top:40%" data-label="Transfer amount"></div>
+    <div class="hotspot" style="left:50%;top:53%" data-label="Recipient account"></div>
+    <div class="hotspot" style="left:50%;top:63%" data-label="Destination bank"></div>
+    <div class="hotspot" style="left:50%;top:75%" data-label="Transfer note"></div>
+  </div>
+
+  <!-- ── Slide 4: Confirm Transfer ───────────────────────────────── -->
+  <div class="slide" id="slide-3">
+    <div class="topbar">
+      <div class="topbar-logo">Bank<span>Flow</span></div>
+      <div class="topbar-nav">
+        <div class="topbar-nav-item">Dashboard</div>
+        <div class="topbar-nav-item active">Transfers</div>
+        <div class="topbar-nav-item">Cards</div>
+        <div class="topbar-nav-item">Settings</div>
+      </div>
+      <div class="topbar-avatar">AW</div>
+    </div>
+    <div class="slide-body">
+      <div class="confirm-card">
+        <h3>Confirm Transfer</h3>
+        <div class="confirm-detail">
+          <span class="label">Amount</span>
+          <span class="value">Rp 5,000,000</span>
+        </div>
+        <div class="confirm-detail">
+          <span class="label">To</span>
+          <span class="value">Siti Rahayu</span>
+        </div>
+        <div class="confirm-detail">
+          <span class="label">Bank</span>
+          <span class="value">BCA — 8821-4567-8901</span>
+        </div>
+        <div class="confirm-detail">
+          <span class="label">Note</span>
+          <span class="value">Monthly family support</span>
+        </div>
+        <div class="confirm-fee">
+          ✓ Zero transfer fees — free for all users
+        </div>
+        <button class="btn-confirm">Confirm & Send</button>
+      </div>
+    </div>
+    <div class="hotspot" style="left:50%;top:38%" data-label="Transfer details"></div>
+    <div class="hotspot always-show" style="left:50%;top:60%" data-label="No fees"></div>
+    <div class="hotspot always-show" style="left:50%;top:76%" data-label="Confirm & Send"></div>
+  </div>
+
+  <!-- ── Slide 5: Success Notification ───────────────────────────── -->
+  <div class="slide" id="slide-4">
+    <div class="topbar">
+      <div class="topbar-logo">Bank<span>Flow</span></div>
+      <div class="topbar-nav">
+        <div class="topbar-nav-item active">Dashboard</div>
+        <div class="topbar-nav-item">Transfers</div>
+        <div class="topbar-nav-item">Cards</div>
+        <div class="topbar-nav-item">Settings</div>
+      </div>
+      <div class="topbar-avatar">AW</div>
+    </div>
+    <div class="slide-body">
+      <div class="success-content">
+        <div class="success-icon">✓</div>
+        <h2>Transfer Successful!</h2>
+        <div class="ref">Reference Number</div>
+        <div class="ref-value">BF-20260615-84729</div>
+        <div class="eta">⚡ Estimated arrival: Instant</div>
+        <div class="success-details">
+          <div class="success-detail-item">
+            <div class="val" style="color:var(--accent-light)">Rp 5M</div>
+            <div class="lbl">Sent</div>
+          </div>
+          <div class="success-detail-item">
+            <div class="val" style="color:var(--success)">Rp 0</div>
+            <div class="lbl">Fee</div>
+          </div>
+          <div class="success-detail-item">
+            <div class="val" style="color:var(--text)">BCA</div>
+            <div class="lbl">Destination</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hotspot always-show" style="left:50%;top:32%" data-label="Transfer successful"></div>
+    <div class="hotspot" style="left:50%;top:54%" data-label="Reference number"></div>
+    <div class="hotspot" style="left:50%;top:66%" data-label="Estimated arrival: instant"></div>
+  </div>
+
+  <!-- ── Slide 6: CTA ────────────────────────────────────────────── -->
+  <div class="slide" id="slide-5">
+    <div class="topbar">
+      <div class="topbar-logo">Bank<span>Flow</span></div>
+      <div class="topbar-nav">
+        <div class="topbar-nav-item">Features</div>
+        <div class="topbar-nav-item">Security</div>
+        <div class="topbar-nav-item active">Get Started</div>
+      </div>
+      <div class="topbar-avatar" style="background:var(--text-dim);">?</div>
+    </div>
+    <div class="slide-body">
+      <div class="cta-content">
+        <h2>Bank Smarter Today</h2>
+        <div class="subtitle">Join 2 million+ users who trust BankFlow with their finances</div>
+        <div class="cta-benefits">
+          <div class="cta-benefit">
+            <div class="icon">🏦</div>
+            <div class="title">Zero Fees</div>
+            <div class="desc">No hidden charges, ever</div>
+          </div>
+          <div class="cta-benefit">
+            <div class="icon">📈</div>
+            <div class="title">4.5% APY</div>
+            <div class="desc">On savings accounts</div>
+          </div>
+          <div class="cta-benefit">
+            <div class="icon">🔐</div>
+            <div class="title">Bank-Grade</div>
+            <div class="desc">256-bit encryption</div>
+          </div>
+        </div>
+        <button class="btn-cta">Open Free Account</button>
+      </div>
+    </div>
+    <div class="hotspot" style="left:35%;top:48%" data-label="Zero fees"></div>
+    <div class="hotspot" style="left:60%;top:48%" data-label="4.5% APY savings"></div>
+  </div>
+
+  <!-- ── Scripted Pointer ────────────────────────────────────────── -->
+  <div class="pointer-cursor" id="pointer">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 3l14 8-6 2-2 6z" fill="white" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- ── Caption Bar ─────────────────────────────────────────────── -->
+  <div class="caption-bar">
+    <div class="caption-text" id="captionText"></div>
+    <div class="caption-nav">
+      <div class="step-indicator" id="stepIndicator"></div>
+      <button class="nav-btn" id="prevBtn" title="Previous">◀</button>
+      <button class="nav-btn" id="nextBtn" title="Next">▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DemoScript Data (inline, matches script.json schema) ────────────
+const DEMO_SCRIPT = {
+  id: "bankflow-fintech-demo",
+  title: "BankFlow — Modern Banking, Simplified",
+  steps: [
+    {
+      id: "secure-login",
+      duration: 6000,
+      pointer: { x: 0.50, y: 0.58 },
+      caption: "Secure login with 2FA authentication — your money, protected from the first click."
+    },
+    {
+      id: "view-balance",
+      duration: 6000,
+      pointer: { x: 0.35, y: 0.30 },
+      caption: "All your accounts at a glance — savings, checking, and investments in one dashboard."
+    },
+    {
+      id: "initiate-transfer",
+      duration: 6000,
+      pointer: { x: 0.50, y: 0.52 },
+      caption: "Transfer funds in seconds — fill the amount, pick a recipient, and you're almost done."
+    },
+    {
+      id: "confirm-transfer",
+      duration: 5000,
+      pointer: { x: 0.50, y: 0.70 },
+      caption: "Double-check before you send — full transparency on amount, fees, and recipient details."
+    },
+    {
+      id: "success-notification",
+      duration: 5000,
+      pointer: { x: 0.50, y: 0.30 },
+      caption: "Instant confirmation with reference number — your money arrives in seconds, not hours."
+    },
+    {
+      id: "open-account",
+      duration: 5000,
+      pointer: { x: 0.50, y: 0.65 },
+      caption: "Join 2 million+ users banking smarter with BankFlow — open your free account today."
+    }
+  ],
+  loop: true,
+  theme: { accent: "#2563EB", bg: "#0a0f1a" }
+};
+
+// ── Player State ──────────────────────────────────────────────────
+let currentStep = 0;
+let autoTimer = null;
+const totalSteps = DEMO_SCRIPT.steps.length;
+
+// ── DOM References ────────────────────────────────────────────────
+const slides = document.querySelectorAll('.slide');
+const captionEl = document.getElementById('captionText');
+const stepIndicatorEl = document.getElementById('stepIndicator');
+const progressBar = document.getElementById('progressBar');
+const pointerEl = document.getElementById('pointer');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const theater = document.getElementById('theater');
+
+// ── Build Step Indicator Dots ─────────────────────────────────────
+for (let i = 0; i < totalSteps; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => goToStep(i));
+  stepIndicatorEl.appendChild(dot);
+}
+
+// ── Move Pointer ──────────────────────────────────────────────────
+function movePointer(step) {
+  if (!step.pointer) return;
+  const theaterRect = theater.getBoundingClientRect();
+  const px = step.pointer.x * theaterRect.width;
+  const py = step.pointer.y * theaterRect.height;
+  pointerEl.style.left = px + 'px';
+  pointerEl.style.top = py + 'px';
+}
+
+// ── Simulate Click ────────────────────────────────────────────────
+function simulateClick() {
+  pointerEl.classList.add('clicking');
+  setTimeout(() => pointerEl.classList.remove('clicking'), 150);
+}
+
+// ── Go To Step ────────────────────────────────────────────────────
+function goToStep(index, direction) {
+  if (index < 0) index = DEMO_SCRIPT.loop ? totalSteps - 1 : 0;
+  if (index >= totalSteps) index = DEMO_SCRIPT.loop ? 0 : totalSteps - 1;
+
+  const prevStep = currentStep;
+  currentStep = index;
+  const step = DEMO_SCRIPT.steps[currentStep];
+
+  // Update slides
+  slides.forEach((slide, i) => {
+    slide.classList.remove('active', 'exit-left');
+    if (i === prevStep && i !== currentStep) {
+      slide.classList.add('exit-left');
+    }
+  });
+  // Small delay to let exit animation start
+  requestAnimationFrame(() => {
+    slides[currentStep].classList.add('active');
+  });
+
+  // Update caption
+  captionEl.textContent = step.caption || '';
+
+  // Update step indicator
+  const dots = stepIndicatorEl.querySelectorAll('.step-dot');
+  dots.forEach((dot, i) => dot.classList.toggle('active', i === currentStep));
+
+  // Update progress bar
+  progressBar.style.width = ((currentStep + 1) / totalSteps * 100) + '%';
+
+  // Move pointer (with click simulation for transition feel)
+  movePointer(step);
+  setTimeout(simulateClick, 600);
+
+  // Auto-advance
+  clearTimeout(autoTimer);
+  if (step.duration && step.duration > 0) {
+    autoTimer = setTimeout(() => goToStep(currentStep + 1), step.duration);
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────
+prevBtn.addEventListener('click', () => {
+  clearTimeout(autoTimer);
+  goToStep(currentStep - 1);
+});
+nextBtn.addEventListener('click', () => {
+  clearTimeout(autoTimer);
+  goToStep(currentStep + 1);
+});
+
+// ── Keyboard Navigation ───────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    clearTimeout(autoTimer);
+    goToStep(currentStep + 1);
+    e.preventDefault();
+  }
+  if (e.key === 'ArrowLeft') {
+    clearTimeout(autoTimer);
+    goToStep(currentStep - 1);
+    e.preventDefault();
+  }
+});
+
+// ── Initialize ────────────────────────────────────────────────────
+goToStep(0);
+</script>
+</body>
+</html>
