@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import type { DemoScript, DemoStep, DemoHotspot, DemoAnnotation, PointerState } from "@cue-vin/core";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import type { DemoScript, DemoStep, DemoHotspot, DemoAnnotation, DemoTemplate, PointerState } from "@cue-vin/core";
 import { ScreenSlide } from "@cue-vin/react";
 import { ScriptedPointer } from "@cue-vin/react";
 import { HotspotOverlay } from "@cue-vin/react";
 import { AnnotationLayer } from "@cue-vin/react";
 import { StepProgress } from "@cue-vin/react";
 import { ChapterNav } from "@cue-vin/react";
+import { renderTemplate } from "@cue-vin/templates";
+import type { TemplateConfig, TemplateTheme } from "@cue-vin/templates";
 
 /** Props for the CuePlayer component. */
 export interface CuePlayerProps {
@@ -49,12 +51,40 @@ function toPixelHotspots(
   }));
 }
 
+/**
+ * Render a DemoTemplate configuration into a self-contained HTML string
+ * using the @cue-vin/templates package.
+ *
+ * The step-level `template.theme` is merged with the script-level theme
+ * (step overrides script) before being passed to the template renderer.
+ */
+function renderStepTemplate(
+  tpl: DemoTemplate,
+  scriptTheme?: DemoScript["theme"],
+): string {
+  // Build the TemplateConfig from DemoTemplate.type + DemoTemplate.data
+  const config = {
+    type: tpl.type,
+    ...(tpl.data ?? {}),
+  } as TemplateConfig;
 
+  // Merge step-level template theme with script-level theme
+  const mergedTheme: TemplateTheme = {
+    ...(scriptTheme?.accent ? { accent: scriptTheme.accent } : {}),
+    ...(scriptTheme?.bg ? { bg: scriptTheme.bg } : {}),
+    ...(scriptTheme?.font ? { font: scriptTheme.font } : {}),
+    ...(tpl.theme?.accent ? { accent: tpl.theme.accent } : {}),
+    ...(tpl.theme?.bg ? { bg: tpl.theme.bg } : {}),
+    ...(tpl.theme?.font ? { font: tpl.theme.font } : {}),
+  };
+
+  return renderTemplate(config, mergedTheme);
+}
 
 /**
  * Standalone embeddable demo player that renders a DemoScript with
- * screenshot slides, pointer, hotspots, annotations, caption, progress,
- * and navigation controls.
+ * screenshot slides, templates, pointer, hotspots, annotations, caption,
+ * progress, and navigation controls.
  */
 export function CuePlayer({
   script,
@@ -163,6 +193,88 @@ export function CuePlayer({
   const accent = script.theme?.accent ?? "#C91C1C";
   const bg = script.theme?.bg ?? "#0a0a0a";
 
+  // Render template HTML if step.template is present and step.screen is absent
+  const templateHtml = useMemo(() => {
+    if (step?.screen || !step?.template) return null;
+    return renderStepTemplate(step.template, script.theme);
+  }, [step?.screen, step?.template, script.theme]);
+
+  // Decide what to render in the slide area:
+  // 1. step.screen → ScreenSlide with image
+  // 2. step.template → ScreenSlide with template HTML
+  // 3. neither → placeholder
+  const slideContent = step?.screen ? (
+    <ScreenSlide src={step.screen} width={width} height={height}>
+      {/* Pointer overlay */}
+      {pointerState && (
+        <ScriptedPointer state={pointerState} />
+      )}
+
+      {/* Hotspot overlay */}
+      {step.hotspots && step.hotspots.length > 0 && (
+        <HotspotOverlay
+          hotspots={toPixelHotspots(step.hotspots, width, height)}
+          containerWidth={width}
+          containerHeight={height}
+        />
+      )}
+
+      {/* Annotation overlay */}
+      {step.annotations && step.annotations.length > 0 && (
+        <AnnotationLayer
+          annotations={step.annotations}
+          containerWidth={width}
+          containerHeight={height}
+        />
+      )}
+    </ScreenSlide>
+  ) : templateHtml ? (
+    <div style={{ position: "relative", width, height, overflow: "hidden" }}>
+      {/* Template HTML content */}
+      <div
+        style={{ width: "100%", height: "100%", overflow: "hidden" }}
+        dangerouslySetInnerHTML={{ __html: templateHtml }}
+      />
+
+      {/* Pointer overlay */}
+      {pointerState && (
+        <ScriptedPointer state={pointerState} />
+      )}
+
+      {/* Hotspot overlay */}
+      {step.hotspots && step.hotspots.length > 0 && (
+        <HotspotOverlay
+          hotspots={toPixelHotspots(step.hotspots, width, height)}
+          containerWidth={width}
+          containerHeight={height}
+        />
+      )}
+
+      {/* Annotation overlay */}
+      {step.annotations && step.annotations.length > 0 && (
+        <AnnotationLayer
+          annotations={step.annotations}
+          containerWidth={width}
+          containerHeight={height}
+        />
+      )}
+    </div>
+  ) : (
+    <div
+      style={{
+        width,
+        height,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#6B7280",
+        fontSize: 14,
+      }}
+    >
+      No screen for this step
+    </div>
+  );
+
   return (
     <div
       style={{
@@ -177,46 +289,7 @@ export function CuePlayer({
       }}
     >
       {/* Slide area */}
-      {step?.screen ? (
-        <ScreenSlide src={step.screen} width={width} height={height}>
-          {/* Pointer overlay */}
-          {pointerState && (
-            <ScriptedPointer state={pointerState} />
-          )}
-
-          {/* Hotspot overlay */}
-          {step.hotspots && step.hotspots.length > 0 && (
-            <HotspotOverlay
-              hotspots={toPixelHotspots(step.hotspots, width, height)}
-              containerWidth={width}
-              containerHeight={height}
-            />
-          )}
-
-          {/* Annotation overlay */}
-          {step.annotations && step.annotations.length > 0 && (
-            <AnnotationLayer
-              annotations={step.annotations}
-              containerWidth={width}
-              containerHeight={height}
-            />
-          )}
-        </ScreenSlide>
-      ) : (
-        <div
-          style={{
-            width,
-            height,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#6B7280",
-            fontSize: 14,
-          }}
-        >
-          No screen for this step
-        </div>
-      )}
+      {slideContent}
 
       {/* Caption bar */}
       {step?.caption && (

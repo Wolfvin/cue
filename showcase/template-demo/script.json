@@ -1,0 +1,120 @@
+{
+  "id": "template-demo",
+  "title": "Template Demo — Build Demos Without Screenshots",
+  "steps": [
+    {
+      "id": "login",
+      "caption": "Login template — brand, fields, and submit button, all from data. No screenshot needed.",
+      "duration": 6000,
+      "template": {
+        "type": "login",
+        "data": {
+          "title": "Sign In",
+          "brand": "DemoApp",
+          "fields": [
+            { "name": "email", "type": "email", "placeholder": "you@demoapp.io" },
+            { "name": "password", "type": "password", "placeholder": "••••••••" }
+          ],
+          "submitLabel": "Sign In"
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.58, "clicking": false },
+      "hotspots": [
+        { "id": "h-login-brand", "x": 0.50, "y": 0.22, "label": "Brand", "alwaysShow": true },
+        { "id": "h-login-btn", "x": 0.50, "y": 0.70, "label": "Submit", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.28, "y": 0.18, "width": 0.44, "height": 0.62, "color": "#3b82f6", "cornerRadius": 12, "label": "Login Card" }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "caption": "Dashboard template — metrics, greeting, and grid layout. Just pass data, get a polished UI.",
+      "duration": 6000,
+      "template": {
+        "type": "dashboard",
+        "data": {
+          "title": "Dashboard",
+          "greeting": "Good morning, Andi",
+          "metrics": [
+            { "label": "Revenue", "value": "$42,500", "change": "+12.5%", "positive": true, "icon": "💰" },
+            { "label": "Users", "value": "1,234", "change": "+8.2%", "positive": true, "icon": "👥" },
+            { "label": "Orders", "value": "389", "change": "-2.1%", "positive": false, "icon": "📦" },
+            { "label": "Conversion", "value": "3.2%", "change": "+0.5%", "positive": true, "icon": "📈" }
+          ],
+          "columns": 2
+        }
+      },
+      "pointer": { "x": 0.35, "y": 0.40, "clicking": false },
+      "hotspots": [
+        { "id": "h-dash-greeting", "x": 0.30, "y": 0.20, "label": "Greeting", "alwaysShow": true },
+        { "id": "h-dash-metric", "x": 0.25, "y": 0.48, "label": "Revenue" },
+        { "id": "h-dash-metric2", "x": 0.70, "y": 0.48, "label": "Users" }
+      ],
+      "annotations": [
+        { "type": "text", "x": 0.50, "y": 0.08, "text": "Dashboard Template", "fontSize": 16, "color": "#94a3b8" }
+      ]
+    },
+    {
+      "id": "form",
+      "caption": "Form template — multi-field data entry with layout variants. Perfect for SaaS onboarding flows.",
+      "duration": 6000,
+      "template": {
+        "type": "form",
+        "data": {
+          "title": "Create Project",
+          "description": "Set up a new project in your workspace.",
+          "fields": [
+            { "name": "projectName", "label": "Project Name", "type": "text", "placeholder": "my-awesome-project", "required": true },
+            { "name": "environment", "label": "Environment", "type": "select", "options": ["Staging", "Production"], "required": true },
+            { "name": "description", "label": "Description", "type": "textarea", "placeholder": "What is this project about?" }
+          ],
+          "submitLabel": "Create Project"
+        }
+      },
+      "pointer": { "x": 0.50, "y": 0.50, "clicking": true },
+      "hotspots": [
+        { "id": "h-form-name", "x": 0.50, "y": 0.38, "label": "Project Name", "alwaysShow": true },
+        { "id": "h-form-env", "x": 0.50, "y": 0.55, "label": "Environment" },
+        { "id": "h-form-submit", "x": 0.50, "y": 0.85, "label": "Submit", "alwaysShow": true }
+      ],
+      "annotations": [
+        { "type": "arrow", "x1": 0.15, "y1": 0.38, "x2": 0.32, "y2": 0.38, "color": "#3b82f6", "label": "Required" }
+      ]
+    },
+    {
+      "id": "terminal",
+      "caption": "Terminal template — log lines, prompts, and color-coded output. Ideal for DevOps and CLI demos.",
+      "duration": 6000,
+      "template": {
+        "type": "terminal",
+        "data": {
+          "title": "Deploy",
+          "cwd": "~/projects/demoapp",
+          "lines": [
+            { "text": "npm run build", "type": "command" },
+            { "text": "Compiling TypeScript...", "type": "output" },
+            { "text": "✓ Build complete (2.1s)", "type": "success" },
+            { "text": "Deploying to production...", "type": "output" },
+            { "text": "✓ Deployed to https://demoapp.example.com", "type": "success" }
+          ]
+        }
+      },
+      "pointer": { "x": 0.30, "y": 0.40, "clicking": false },
+      "hotspots": [
+        { "id": "h-term-cmd", "x": 0.35, "y": 0.32, "label": "Command", "alwaysShow": true },
+        { "id": "h-term-success", "x": 0.45, "y": 0.55, "label": "Success", "alwaysShow": true },
+        { "id": "h-term-url", "x": 0.55, "y": 0.78, "label": "Deploy URL" }
+      ],
+      "annotations": [
+        { "type": "box", "x": 0.10, "y": 0.15, "width": 0.80, "height": 0.75, "color": "#00FF94", "cornerRadius": 8, "label": "Terminal" }
+      ]
+    }
+  ],
+  "loop": true,
+  "theme": {
+    "accent": "#3b82f6",
+    "bg": "#0a0a0a",
+    "font": "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif"
+  }
+}
