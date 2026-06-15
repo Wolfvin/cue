@@ -149,7 +149,13 @@ export function generate(options: GenerateOptions): DemoScript {
     theme,
   } = options;
 
-  const steps: DemoStep[] = features.map((feature) => {
+  const steps: DemoStep[] = features.map((feature, index) => {
+    if (typeof feature.name !== "string" || feature.name.trim() === "") {
+      throw new Error(
+        `Feature at index ${index} must have a "name" field (string). Received: ${JSON.stringify(feature)}`
+      );
+    }
+
     const stepSlug = slugify(feature.name);
 
     // Build the base step
