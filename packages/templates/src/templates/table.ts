@@ -45,9 +45,12 @@ export function renderTable(config: TableTemplateConfig, theme: ResolvedTheme): 
     const statusClass = row.status && row.status !== "default" ? ` tbl-row-${row.status}` : "";
     const cells: string[] = [];
     if (showRowNumbers) cells.push(`<td class="tbl-td tbl-td-num">${i + 1}</td>`);
-    row.cells.forEach((cell) => {
-      cells.push(`<td class="tbl-td">${esc(cell)}</td>`);
-    });
+    // Guard: skip row if cells is missing or not an array
+    if (Array.isArray(row.cells)) {
+      row.cells.forEach((cell) => {
+        cells.push(`<td class="tbl-td">${esc(String(cell))}</td>`);
+      });
+    }
     return `<tr class="tbl-row${statusClass}">${cells.join("")}</tr>`;
   });
 
