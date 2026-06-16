@@ -9,6 +9,7 @@
  * included before the player script, either inlined or via CDN.
  */
 
+import { createRequire } from "module";
 import { validateDemoScript } from "@cue-vin/core";
 import type { DemoScript } from "@cue-vin/core";
 
@@ -180,51 +181,44 @@ function sanitizeCssValue(str: string): string {
     .replace(/<script/gi, "");
 }
 
-/** Read the cue-utils IIFE bundle for inlining. Node.js only. */
+/** Read the cue-utils IIFE bundle for inlining. Node.js only.
+ * Uses createRequire for CJS interop in both ESM and CJS environments.
+ * @throws {Error} If not running in a Node.js environment (e.g. browser/edge).
+ */
 function readUtilsBundle(): string {
   try {
-    // @ts-ignore — Node.js only
-    const fs: typeof import("fs") = require("fs");
-    // @ts-ignore — Node.js only
-    const path: typeof import("path") = require("path");
-    let dir: string;
-    try {
-      dir = path.dirname(new URL(import.meta.url).pathname);
-    } catch {
-      // @ts-ignore
-      dir = __dirname;
-    }
-    return fs.readFileSync(path.resolve(dir, "cue-utils.iife.js"), "utf-8");
-  } catch {
-    console.warn("[cue] utilsJsInline requires a Node.js environment. Use utilsCdnUrl instead.");
-    return "";
+    const _require = createRequire(import.meta.url);
+    const nodeFs: typeof import("fs") = _require("fs");
+    const nodePath: typeof import("path") = _require("path");
+    const dir = nodePath.dirname(new URL(import.meta.url).pathname);
+    return nodeFs.readFileSync(nodePath.resolve(dir, "cue-utils.iife.js"), "utf-8");
+  } catch (err) {
+    throw new Error(
+      "[cue] utilsJsInline requires a Node.js environment with filesystem access. " +
+        "Set utilsJsInline: false and use utilsCdnUrl instead for browser/edge builds. " +
+        "Original error: " + (err instanceof Error ? err.message : String(err))
+    );
   }
 }
 
 /**
  * Read the IIFE bundle from dist/ for inlining.
- * Node.js only — uses dynamic require of fs/path.
+ * Uses createRequire for CJS interop in both ESM and CJS Node.js environments.
+ * @throws {Error} If not running in a Node.js environment (e.g. browser/edge).
  */
 function readPlayerBundle(): string {
   try {
-    // @ts-ignore — Node.js only
-    const fs: typeof import("fs") = require("fs");
-    // @ts-ignore — Node.js only
-    const path: typeof import("path") = require("path");
-    let dir: string;
-    try {
-      dir = path.dirname(new URL(import.meta.url).pathname);
-    } catch {
-      // @ts-ignore
-      dir = __dirname;
-    }
-    const distPath = path.resolve(dir, "cue-player.iife.js");
-    return fs.readFileSync(distPath, "utf-8");
-  } catch {
-    console.warn(
-      "[cue] playerJsInline requires a Node.js environment. " +
-        "Use cdnUrl instead for browser builds."
+    const _require = createRequire(import.meta.url);
+    const nodeFs: typeof import("fs") = _require("fs");
+    const nodePath: typeof import("path") = _require("path");
+    const dir = nodePath.dirname(new URL(import.meta.url).pathname);
+    const distPath = nodePath.resolve(dir, "cue-player.iife.js");
+    return nodeFs.readFileSync(distPath, "utf-8");
+  } catch (err) {
+    throw new Error(
+      "[cue] playerJsInline requires a Node.js environment with filesystem access. " +
+        "Set playerJsInline: false and use cdnUrl instead for browser/edge builds. " +
+        "Original error: " + (err instanceof Error ? err.message : String(err))
     );
-    return "";
   }
 }

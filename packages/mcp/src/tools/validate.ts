@@ -40,8 +40,6 @@ function collectValidationErrors(script: unknown): string[] {
   // steps array
   if (!Array.isArray(obj.steps)) {
     errors.push("'steps' is required and must be an array.");
-  } else if (obj.steps.length === 0) {
-    errors.push("'steps' must contain at least one step.");
   } else {
     obj.steps.forEach((step, i) => {
       if (typeof step !== "object" || step === null) {
