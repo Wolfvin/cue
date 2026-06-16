@@ -161,6 +161,9 @@ importers:
       '@cue-vin/react':
         specifier: workspace:*
         version: link:../react
+      '@cue-vin/templates':
+        specifier: workspace:*
+        version: link:../templates
       puppeteer:
         specifier: '>=20.0.0'
         version: 25.1.0

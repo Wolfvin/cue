@@ -18,8 +18,8 @@ export interface CuePlayerProps {
 }
 /**
  * Standalone embeddable demo player that renders a DemoScript with
- * screenshot slides, pointer, hotspots, annotations, caption, progress,
- * and navigation controls.
+ * screenshot slides, templates, pointer, hotspots, annotations, caption,
+ * progress, and navigation controls.
  */
 export declare function CuePlayer({ script, width, height, autoPlay, loop, onComplete, onStepChange, }: CuePlayerProps): import("react").JSX.Element;
 //# sourceMappingURL=CuePlayer.d.ts.map

@@ -1,35 +1,22 @@
-import { createElement as s } from "react";
-import m from "react-dom";
-import { CuePlayer as y } from "./index.js";
-function a(r) {
-  if (typeof r != "object" || r === null) return !1;
-  const e = r;
-  if (typeof e.id != "string" || typeof e.title != "string" || !Array.isArray(e.steps)) return !1;
-  for (const t of e.steps)
-    if (typeof t != "object" || t === null || typeof t.id != "string") return !1;
-  if (e.loop !== void 0 && typeof e.loop != "boolean") return !1;
-  if (e.theme !== void 0) {
-    if (typeof e.theme != "object" || e.theme === null) return !1;
-    const t = e.theme;
-    if (t.accent !== void 0 && typeof t.accent != "string" || t.bg !== void 0 && typeof t.bg != "string" || t.font !== void 0 && typeof t.font != "string") return !1;
-  }
-  return !0;
-}
-var i, n = m;
+import { createElement as i } from "react";
+import f from "react-dom";
+import { validateDemoScript as a } from "@cue-vin/core";
+import { CuePlayer as E } from "./index.js";
+var n, o = f;
 if (process.env.NODE_ENV === "production")
-  i = n.createRoot, n.hydrateRoot;
+  n = o.createRoot, o.hydrateRoot;
 else {
-  var d = n.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-  i = function(r, e) {
+  var d = o.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+  n = function(s, e) {
     d.usingClientEntryPoint = !0;
     try {
-      return n.createRoot(r, e);
+      return o.createRoot(s, e);
     } finally {
       d.usingClientEntryPoint = !1;
     }
   };
 }
-class v extends HTMLElement {
+class C extends HTMLElement {
   constructor() {
     super(...arguments), this.root = null, this.mounted = !1, this._goTo = null;
   }
@@ -41,13 +28,13 @@ class v extends HTMLElement {
     if (this.mounted) return;
     this.mounted = !0;
     const e = this.attachShadow({ mode: "open" }), t = document.createElement("div");
-    e.appendChild(t), this.root = i(t), this.loadAndRender();
+    e.appendChild(t), this.root = n(t), this.loadAndRender();
   }
   disconnectedCallback() {
     this.mounted = !1, this.root && (this.root.unmount(), this.root = null);
   }
-  attributeChangedCallback(e, t, o) {
-    t !== o && this.mounted && this.loadAndRender();
+  attributeChangedCallback(e, t, r) {
+    t !== r && this.mounted && this.loadAndRender();
   }
   /** Reload the demo from the current attributes. */
   reload() {
@@ -70,8 +57,8 @@ class v extends HTMLElement {
         this.renderError(`Failed to load demo: ${t.status}`);
         return;
       }
-      const o = await t.json();
-      a(o) ? this.renderPlayer(o) : this.renderError("Invalid DemoScript JSON");
+      const r = await t.json();
+      a(r) ? this.renderPlayer(r) : this.renderError("Invalid DemoScript JSON");
     } catch {
       this.renderError("Failed to load demo");
     }
@@ -86,10 +73,10 @@ class v extends HTMLElement {
   }
   renderPlayer(e) {
     if (!this.root) return;
-    const t = parseInt(this.getAttribute("width") ?? "840", 10), o = parseInt(this.getAttribute("height") ?? "520", 10), l = this.hasAttribute("autoplay"), h = this.hasAttribute("loop"), c = (f, p) => {
+    const t = parseInt(this.getAttribute("width") ?? "840", 10), r = parseInt(this.getAttribute("height") ?? "520", 10), h = this.hasAttribute("autoplay"), l = this.hasAttribute("loop"), c = (p, m) => {
       this.dispatchEvent(
         new CustomEvent("stepchange", {
-          detail: { step: f, total: p },
+          detail: { step: p, total: m },
           bubbles: !0
         })
       );
@@ -99,12 +86,12 @@ class v extends HTMLElement {
       );
     };
     this.root.render(
-      s(y, {
+      i(E, {
         script: e,
         width: t,
-        height: o,
-        autoPlay: l,
-        loop: h,
+        height: r,
+        autoPlay: h,
+        loop: l,
         onStepChange: c,
         onComplete: u
       })
@@ -112,7 +99,7 @@ class v extends HTMLElement {
   }
   renderError(e) {
     this.root && this.root.render(
-      s(
+      i(
         "div",
         {
           style: {
@@ -129,5 +116,5 @@ class v extends HTMLElement {
   }
 }
 export {
-  v as CueEmbed
+  C as CueEmbed
 };
