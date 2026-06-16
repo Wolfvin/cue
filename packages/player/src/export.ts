@@ -75,6 +75,16 @@ export function exportToHtml(options: ExportOptions): string {
     );
   }
 
+  // Validate width/height — prevent HTML attribute injection (#92)
+  const safeWidth = Math.floor(Number(width));
+  const safeHeight = Math.floor(Number(height));
+  if (!Number.isFinite(safeWidth) || safeWidth <= 0) {
+    throw new Error("exportToHtml: width must be a positive integer");
+  }
+  if (!Number.isFinite(safeHeight) || safeHeight <= 0) {
+    throw new Error("exportToHtml: height must be a positive integer");
+  }
+
   const pageTitle = title ?? script.title ?? "cue demo";
   // XSS: escape JSON for embedding in <script> tag — #74
   const scriptJson = escapeJsonForScript(JSON.stringify(script));
@@ -121,7 +131,7 @@ export function exportToHtml(options: ExportOptions): string {
   </style>
 </head>
 <body>
-  <cue-embed id="player" width="${width}" height="${height}" autoplay${script.loop ? ' loop' : ''}></cue-embed>
+  <cue-embed id="player" width="${safeWidth}" height="${safeHeight}" autoplay${script.loop ? ' loop' : ''}></cue-embed>
 
   <script>window.__CUE_SCRIPT__ = ${scriptJson};</script>
   ${utilsScriptTag}
