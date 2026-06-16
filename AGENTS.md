@@ -1,4 +1,4 @@
-# AGENTS.md — Panduan untuk AI Agent
+﻿# AGENTS.md â€” Panduan untuk AI Agent
 
 ## Kapan pakai cue
 
@@ -19,24 +19,24 @@ JANGAN pakai `cue` ketika:
 
 ```
 User minta apa?
-├─ "Auto demo yang jalan sendiri" → Recipe 1 (Auto-Demo Theater)
-├─ "Demo yang user bisa klik-klik" → Recipe 2 (Interactive Demo)
-├─ "Animasi di section yang sudah ada" → Recipe 3 (CSS Primitives)
-├─ "Punya screenshot file?" → Recipe 4 (Screenshot-Based Demo) — gunakan fileToDataUrl + screenshotToStep
-├─ "Mau embed di HTML / landing page?" → Recipe 5 (Embeddable Player) — gunakan initCue + <cue-embed>
-├─ "Perlu track analytics?" → Recipe 6 (Analytics Tracking) — gunakan CueAnalytics
-├─ "Capture app nyata jadi DemoScript?" → Recipe 7 (Record Browser Session) — gunakan cue-record CLI
-├─ "Generate demo dari deskripsi fitur?" → Recipe 8 (Generate DemoScript) — gunakan generate()
-├─ "Self-hosted analytics server?" → Recipe 9 (Analytics Server) — gunakan cue-analytics
-├─ "Konten untuk IG/TikTok/Reels?" → Recipe 10 (Promo Canvas) — gunakan IIFE + aspect-ratio container
-└─ "Gabungan" → Combine sesuai kebutuhan
+â”œâ”€ "Auto demo yang jalan sendiri" â†’ Recipe 1 (Auto-Demo Theater)
+â”œâ”€ "Demo yang user bisa klik-klik" â†’ Recipe 2 (Interactive Demo)
+â”œâ”€ "Animasi di section yang sudah ada" â†’ Recipe 3 (CSS Primitives)
+â”œâ”€ "Punya screenshot file?" â†’ Recipe 4 (Screenshot-Based Demo) â€” gunakan fileToDataUrl + screenshotToStep
+â”œâ”€ "Mau embed di HTML / landing page?" â†’ Recipe 5 (Embeddable Player) â€” gunakan initCue + <cue-embed>
+â”œâ”€ "Perlu track analytics?" â†’ Recipe 6 (Analytics Tracking) â€” gunakan CueAnalytics
+â”œâ”€ "Capture app nyata jadi DemoScript?" â†’ Recipe 7 (Record Browser Session) â€” gunakan cue-record CLI
+â”œâ”€ "Generate demo dari deskripsi fitur?" â†’ Recipe 8 (Generate DemoScript) â€” gunakan generate()
+â”œâ”€ "Self-hosted analytics server?" â†’ Recipe 9 (Analytics Server) â€” gunakan cue-analytics
+â”œâ”€ "Konten untuk IG/TikTok/Reels?" â†’ Recipe 10 (Promo Canvas) â€” gunakan IIFE + aspect-ratio container
+â””â”€ "Gabungan" â†’ Combine sesuai kebutuhan
 ```
 
 ## Quick Start for AI Agents
 
 Pilih jalur berdasarkan kebutuhan:
 
-### Path A: Zero-Install (IIFE) — **Recommended untuk demo cepat**
+### Path A: Zero-Install (IIFE) â€” **Recommended untuk demo cepat**
 
 **Gunakan ketika:** Kamu butuh demo yang jalan di satu HTML file tanpa npm, tanpa build step, tanpa React. Cocok untuk one-file demo, email embed, landing page embed, atau promo canvas.
 
@@ -48,7 +48,7 @@ Pilih jalur berdasarkan kebutuhan:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>cue Demo — Zero Install</title>
+  <title>cue Demo â€” Zero Install</title>
 </head>
 <body style="margin:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;min-height:100vh">
 
@@ -103,12 +103,12 @@ Pilih jalur berdasarkan kebutuhan:
 ```
 
 **Keuntungan:**
-- Zero npm install — hanya satu HTML file
+- Zero npm install â€” hanya satu HTML file
 - `window.Cue` global tersedia untuk programmatic control
 - `<cue-embed>` menerima DemoScript via `data` attribute (bridge script menghubungkan `window.__CUE_SCRIPT__`)
 - Bisa di-host di GitHub Pages, S3, atau mana saja
 
-**Juga tersedia — cue-utils.iife.js (2.6 kB):**
+**Juga tersedia â€” cue-utils.iife.js (2.6 kB):**
 Jika kamu hanya butuh `Timeline` + `Pointer` tanpa full player:
 ```html
 <script src="https://unpkg.com/@cue-vin/player@latest/dist/cue-utils.iife.js"></script>
@@ -121,7 +121,7 @@ Jika kamu hanya butuh `Timeline` + `Pointer` tanpa full player:
 </script>
 ```
 
-### Path B: Full SDK (React) — **Untuk integrasi dalam Next.js app**
+### Path B: Full SDK (React) â€” **Untuk integrasi dalam Next.js app**
 
 **Gunakan ketika:** Kamu membangun Next.js app dan perlu komponen React (`DemoTheater`, `ScriptedPointer`, `AppWindow`, hooks, dll).
 
@@ -152,7 +152,7 @@ import "@cue-vin/css/cue.css";
 **Prinsip:** DemoTheater mengunci canvas ke fixed size, ScriptedPointer digerakkan oleh `Pointer` dari `@cue-vin/core`, StateMachine mengatur scene, Timeline mengatur timing.
 
 ```tsx
-// page.tsx — Auto-Demo Theater
+// page.tsx â€” Auto-Demo Theater
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -183,7 +183,7 @@ export default function AutoDemoPage() {
 
     const tl = new Timeline({ loop: true, loopDelay: 2000 });
 
-    // Scene idle → upload
+    // Scene idle â†’ upload
     tl.add(1000, () => sm.goTo("idle"));
     tl.add(1500, () => pointer.moveTo(300, 250, 600));
     tl.add(800, () => pointer.click());
@@ -216,7 +216,7 @@ export default function AutoDemoPage() {
     <div style={{ width: "100vw", height: "100vh", background: "#0f172a" }}>
       <DemoTheater width={960} height={540} background="#ffffff">
         <AppWindow
-          title="demo-app — " + sceneLabel
+          title="demo-app â€” " + sceneLabel
           sidebar={
             <div style={{ fontSize: 13, color: "#6b7280", display: "flex", flexDirection: "column", gap: 8 }}>
               {SCENES.map((s) => (
@@ -258,7 +258,7 @@ export default function AutoDemoPage() {
 **Prinsip:** Tidak ada Timeline/Pointer otomatis. User klik tombol untuk advance scene. StateMachine tetap dipakai untuk track state, tapi transisi manual via `next()`.
 
 ```tsx
-// page.tsx — Interactive Demo
+// page.tsx â€” Interactive Demo
 "use client";
 
 import { useState, useCallback } from "react";
@@ -375,7 +375,7 @@ export default function InteractiveDemoPage() {
 **Prinsip:** Import `cue.css`, tambah class ke elemen yang ada. Tidak perlu install `@cue-vin/react` atau `@cue-vin/core`.
 
 ```html
-<!-- index.html — CSS Primitives Only -->
+<!-- index.html â€” CSS Primitives Only -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -434,7 +434,7 @@ export default function InteractiveDemoPage() {
 ### React version (useScrollReveal + CSS classes)
 
 ```tsx
-// ScrollRevealSection.tsx — Drop into existing React page
+// ScrollRevealSection.tsx â€” Drop into existing React page
 "use client";
 
 import { useScrollReveal, useStagger } from "@cue-vin/react";
@@ -479,14 +479,14 @@ export function ScrollRevealSection() {
 
 ```
 DemoTheater artboard:
-┌──────────────────────────────────────┐
-│ (0,0)                          (W,0) │
-│                                      │
-│   x → bertambah ke kanan             │
-│   y → bertambah ke bawah             │
-│                                      │
-│ (0,H)                          (W,H) │
-└──────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ (0,0)                          (W,0) â”‚
+â”‚                                      â”‚
+â”‚   x â†’ bertambah ke kanan             â”‚
+â”‚   y â†’ bertambah ke bawah             â”‚
+â”‚                                      â”‚
+â”‚ (0,H)                          (W,H) â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
 Default DemoTheater: W=1280, H=720
 
@@ -494,13 +494,13 @@ Region koordinat penting:
   AppWindow titlebar: y = 0..36
   Sidebar area:       x = 0..220, y = 36..720
   Content area:       x = 220..1280, y = 36..720
-  Center content:     x ≈ 700, y ≈ 360
+  Center content:     x â‰ˆ 700, y â‰ˆ 360
 
 Tips posisi pointer:
-  - "Klik tombol":    x ≈ 350..600, y ≈ 280..350
-  - "Klik sidebar":   x ≈ 60..180, y ≈ 80..400
-  - "Klik titlebar":  y ≈ 12..24, x ≈ 200..600
-  - "Area bawah":     y ≈ 450..650
+  - "Klik tombol":    x â‰ˆ 350..600, y â‰ˆ 280..350
+  - "Klik sidebar":   x â‰ˆ 60..180, y â‰ˆ 80..400
+  - "Klik titlebar":  y â‰ˆ 12..24, x â‰ˆ 200..600
+  - "Area bawah":     y â‰ˆ 450..650
 ```
 
 ## Timing Cheat Sheet
@@ -516,42 +516,42 @@ Tips posisi pointer:
 | IntersectionObs   | Scroll-triggered reveals                 | Event     | disconnect()   |
 
 Durasi standar:
-  Fast:     150ms  — hover, micro-feedback
-  Normal:   300ms  — enter animations, transitions
-  Slow:     500ms  — scale-in, bounce, complex moves
-  Glacial:  800ms  — full-page transitions, hero animations
+  Fast:     150ms  â€” hover, micro-feedback
+  Normal:   300ms  â€” enter animations, transitions
+  Slow:     500ms  â€” scale-in, bounce, complex moves
+  Glacial:  800ms  â€” full-page transitions, hero animations
 
 Easing standar:
-  --cue-ease-out:     cubic-bezier(0.16, 1, 0.3, 1)    ← default untuk hampir semua
-  --cue-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1) ← overshoot, bounce feel
-  --cue-ease-bounce:  cubic-bezier(0.68, -0.6, 0.32, 1.6) ← extreme bounce
-  --cue-ease-in-out:  cubic-bezier(0.83, 0, 0.17, 1)    ← smooth两端
+  --cue-ease-out:     cubic-bezier(0.16, 1, 0.3, 1)    â† default untuk hampir semua
+  --cue-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1) â† overshoot, bounce feel
+  --cue-ease-bounce:  cubic-bezier(0.68, -0.6, 0.32, 1.6) â† extreme bounce
+  --cue-ease-in-out:  cubic-bezier(0.83, 0, 0.17, 1)    â† smoothä¸¤ç«¯
 ```
 
 ## Pantangan (hal yang TIDAK boleh dilakukan)
 
-1. **JANGAN** animasikan `width`/`height` — pakai `transform: scale()` atau `max-width`/`max-height` transition
-2. **JANGAN** pakai `setInterval` untuk animasi — selalu `requestAnimationFrame` atau CSS
+1. **JANGAN** animasikan `width`/`height` â€” pakai `transform: scale()` atau `max-width`/`max-height` transition
+2. **JANGAN** pakai `setInterval` untuk animasi â€” selalu `requestAnimationFrame` atau CSS
 3. **JANGAN** lupa cleanup: `dispose()` untuk Timeline/Pointer, `disconnect()` untuk observer
-4. **JANGAN** hardcode timing — pakai CSS custom properties dari `cue.css`
-5. **JANGAN** pakai `!important` — cue classes di-design untuk bisa di-override
-6. **JANGAN** mix Recipe 1 dan 2 dalam satu DemoTheater — pilih auto ATAU interactive
-7. **JANGAN** set `pointer-events: auto` pada ScriptedPointer — itu overlay, bukan interactive element
-8. **JANGAN** gunakan `useCountUp` untuk target < 10 — terlihat aneh, pakai fade-in saja
-9. **JANGAN** pakai `cue-stagger` tanpa `cue-enter` — stagger hanya mengatur delay, bukan animasi
+4. **JANGAN** hardcode timing â€” pakai CSS custom properties dari `cue.css`
+5. **JANGAN** pakai `!important` â€” cue classes di-design untuk bisa di-override
+6. **JANGAN** mix Recipe 1 dan 2 dalam satu DemoTheater â€” pilih auto ATAU interactive
+7. **JANGAN** set `pointer-events: auto` pada ScriptedPointer â€” itu overlay, bukan interactive element
+8. **JANGAN** gunakan `useCountUp` untuk target < 10 â€” terlihat aneh, pakai fade-in saja
+9. **JANGAN** pakai `cue-stagger` tanpa `cue-enter` â€” stagger hanya mengatur delay, bukan animasi
 10. **JANGAN** lupa `will-change: transform` pada elemen yang animasi berat (tapi remove setelah selesai)
 
 ## Contoh Output Lengkap
 
 ### Recipe 1 Output: File `app/page.tsx`
-→ Lihat kode lengkap di section Recipe 1 di atas. Copy-paste langsung ke Next.js App Router page.
+â†’ Lihat kode lengkap di section Recipe 1 di atas. Copy-paste langsung ke Next.js App Router page.
 
 ### Recipe 2 Output: File `app/page.tsx`
-→ Lihat kode lengkap di section Recipe 2 di atas. Copy-paste langsung ke Next.js App Router page.
+â†’ Lihat kode lengkap di section Recipe 2 di atas. Copy-paste langsung ke Next.js App Router page.
 
 ### Recipe 3 Output: File HTML atau React component
-→ Untuk HTML murni: copy dari Recipe 3 HTML version.
-→ Untuk React: copy `ScrollRevealSection` component dan import ke page manapun.
+â†’ Untuk HTML murni: copy dari Recipe 3 HTML version.
+â†’ Untuk React: copy `ScrollRevealSection` component dan import ke page manapun.
 
 ---
 
@@ -562,7 +562,7 @@ Easing standar:
 ```ts
 import { Timeline, Pointer, StateMachine, ScrollTrigger } from "@cue-vin/core";
 
-// Timeline — chain setTimeout with cleanup
+// Timeline â€” chain setTimeout with cleanup
 const tl = new Timeline({ loop: true, loopDelay: 2000, onComplete: () => {} });
 tl.add(1000, () => console.log("1s"));
 tl.add(500, () => console.log("1.5s"));
@@ -571,23 +571,23 @@ tl.stop();   // pause
 tl.reset();  // reset + stop
 tl.dispose(); // cleanup
 
-// Pointer — scripted cursor
+// Pointer â€” scripted cursor
 const ptr = new Pointer({ startX: 100, startY: 100, onChange: (state) => {} });
 ptr.moveTo(300, 200, 600);           // move with 600ms duration
 ptr.click();                          // simulate click (150ms hold)
 ptr.play([{ x: 300, y: 200 }, { x: 500, y: 300, click: true }]);
 ptr.dispose();
 
-// StateMachine — scene transitions
+// StateMachine â€” scene transitions
 const sm = new StateMachine({ loop: true, onTransition: (e) => {} });
 sm.addScenes([{ id: "idle" }, { id: "active" }, { id: "done" }]);
-sm.start();    // → idle
-sm.next();     // → active
+sm.start();    // â†’ idle
+sm.next();     // â†’ active
 sm.goTo("done");
-sm.prev();     // → active
+sm.prev();     // â†’ active
 sm.reset();
 
-// ScrollTrigger — IntersectionObserver
+// ScrollTrigger â€” IntersectionObserver
 const st = new ScrollTrigger({ target: "#hero", threshold: 0.2, onEnter: () => {} });
 st.observe();
 st.disconnect();
@@ -602,23 +602,23 @@ import {
   useEnter, useCountUp, useStagger, useScrollReveal,
 } from "@cue-vin/react";
 
-// DemoTheater — fixed-size artboard with responsive scale
+// DemoTheater â€” fixed-size artboard with responsive scale
 <DemoTheater width={960} height={540} background="#fff">
   {children}
 </DemoTheater>
 
-// ScriptedPointer — SVG cursor
+// ScriptedPointer â€” SVG cursor
 <ScriptedPointer state={pointerState} size={24} color="#1a1a1a" />
 
-// AppWindow — mock app chrome
+// AppWindow â€” mock app chrome
 <AppWindow title="My App" sidebar={<nav />} sidebarWidth={220} showTitlebar>
   <main />
 </AppWindow>
 
-// FilePickerOverlay — file picker mock
+// FilePickerOverlay â€” file picker mock
 <FilePickerOverlay files={[{ id: "1", name: "doc.pdf", type: "doc" }]} onSelect={(ids) => {}} multiple />
 
-// ExcelPopup — spreadsheet mock
+// ExcelPopup â€” spreadsheet mock
 <ExcelPopup data={[[{ value: "A1" }, { value: "B1" }]]} title="Sheet1" />
 
 // Hooks
@@ -633,7 +633,7 @@ const [scrollRef, isVisible] = useScrollReveal({ threshold: 0.2, once: true });
 ```css
 @import "@cue-vin/css/cue.css";
 
-/* Enter animations — add to element on mount */
+/* Enter animations â€” add to element on mount */
 .cue-enter              /* slide-up */
 .cue-enter-fade         /* fade-in */
 .cue-enter-scale        /* scale-in */
@@ -670,7 +670,7 @@ const [scrollRef, isVisible] = useScrollReveal({ threshold: 0.2, once: true });
 **Prinsip:** Setiap screenshot jadi satu `DemoStep` dalam `DemoScript`. Hotspot dan caption ditambahkan di atas screenshot via `ScreenSlide` + `HotspotOverlay` + `AnnotationLayer`. Pointer bisa di-interpolate antar step.
 
 ```tsx
-// page.tsx — Screenshot-Based Demo
+// page.tsx â€” Screenshot-Based Demo
 "use client";
 
 import { useState, useEffect } from "react";
@@ -685,7 +685,7 @@ import {
 } from "@cue-vin/core";
 import "@cue-vin/css/cue.css";
 
-// ── Helper: convert File to data URL (browser-side) ──
+// â”€â”€ Helper: convert File to data URL (browser-side) â”€â”€
 async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -695,7 +695,7 @@ async function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-// ── Helper: build a DemoStep from a screenshot ──
+// â”€â”€ Helper: build a DemoStep from a screenshot â”€â”€
 function screenshotToStep(params: {
   id: string;
   screenUrl: string;
@@ -710,8 +710,8 @@ function screenshotToStep(params: {
     caption: params.caption,
     hotspots: params.hotspots?.map((h) => ({
       id: h.id,
-      x: h.x,    // fraction 0–1 of slide width
-      y: h.y,    // fraction 0–1 of slide height
+      x: h.x,    // fraction 0â€“1 of slide width
+      y: h.y,    // fraction 0â€“1 of slide height
       label: h.label,
       alwaysShow: h.alwaysShow,
     })),
@@ -720,11 +720,11 @@ function screenshotToStep(params: {
   };
 }
 
-// ── Helper: interpolate pointer between two steps ──
+// â”€â”€ Helper: interpolate pointer between two steps â”€â”€
 function interpolatePointer(
   from: { x: number; y: number },
   to: { x: number; y: number },
-  t: number // 0–1
+  t: number // 0â€“1
 ): { x: number; y: number } {
   return {
     x: from.x + (to.x - from.x) * t,
@@ -732,10 +732,10 @@ function interpolatePointer(
   };
 }
 
-// ── Demo Script (agent generates this) ──
+// â”€â”€ Demo Script (agent generates this) â”€â”€
 const DEMO_SCRIPT: DemoScript = {
   id: "product-tour",
-  title: "Product Tour — 3 Steps",
+  title: "Product Tour â€” 3 Steps",
   steps: [
     screenshotToStep({
       id: "step-1",
@@ -836,8 +836,8 @@ export default function ScreenshotDemoPage() {
           onNext={controller.next}
           isPrevDisabled={controller.isFirst && !DEMO_SCRIPT.loop}
           isNextDisabled={controller.isLast && !DEMO_SCRIPT.loop}
-          prevLabel="← Back"
-          nextLabel="Next →"
+          prevLabel="â† Back"
+          nextLabel="Next â†’"
         />
       </div>
     </div>
@@ -847,12 +847,12 @@ export default function ScreenshotDemoPage() {
 
 ## Recipe 5: Embeddable Demo Player (HowdyGo style)
 
-**Gunakan ketika:** Agent generate DemoScript dan perlu embed di landing page — bisa di HTML biasa (web component) atau di React app.
+**Gunakan ketika:** Agent generate DemoScript dan perlu embed di landing page â€” bisa di HTML biasa (web component) atau di React app.
 
 ### Cara A: Web Component via `<cue-embed>` (HTML snippet)
 
 ```html
-<!-- index.html — Embed demo in any HTML page -->
+<!-- index.html â€” Embed demo in any HTML page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -860,13 +860,13 @@ export default function ScreenshotDemoPage() {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cue Embed Demo</title>
   <!-- Load cue player from CDN-style script -->
-  <script type="module" src="https://cdn.cue.dev/player/cue-embed.js"></script>
+  <script type="module" src="https://unpkg.com/@cue-vin/player@latest/dist/cue-player.iife.js"></script>
 </head>
 <body style="margin: 0; background: #0a0a0a;">
   <div style="max-width: 900px; margin: 40px auto; padding: 0 24px;">
     <h1 style="color: #f5f5f5; font-family: 'DM Sans', sans-serif;">See it in action</h1>
 
-    <!-- Embed the demo — point to a DemoScript JSON -->
+    <!-- Embed the demo â€” point to a DemoScript JSON -->
     <cue-embed
       src="/demos/product-tour.json"
       width="840"
@@ -884,7 +884,7 @@ export default function ScreenshotDemoPage() {
   <!-- Or initialize programmatically -->
   <script type="module">
     // initCue is the programmatic entry point
-    // import { initCue } from "https://cdn.cue.dev/player/cue-embed.js";
+    // import { initCue } from "https://unpkg.com/@cue-vin/player@latest/dist/cue-player.iife.js";
 
     // const player = initCue({
     //   container: document.getElementById("my-demo"),
@@ -903,7 +903,7 @@ export default function ScreenshotDemoPage() {
 ### Cara B: React `<CuePlayer>` import
 
 ```tsx
-// page.tsx — Embed demo in React/Next.js
+// page.tsx â€” Embed demo in React/Next.js
 "use client";
 
 import { useRef, useState, useEffect } from "react";
@@ -956,7 +956,7 @@ export function CuePlayer({
   if (!script) return <div style={{ color: "#9ca3af" }}>Loading demo...</div>;
 
   const loop = loopOverride ?? script.loop ?? false;
-  // (In production, CuePlayer would be a full implementation — this is the pattern)
+  // (In production, CuePlayer would be a full implementation â€” this is the pattern)
   return (
     <CuePlayerInner script={script} loop={loop} width={width} height={height} onStepChange={onStepChange} />
   );
@@ -1001,7 +1001,7 @@ function CuePlayerInner({ script, loop, width, height, onStepChange }: {
   );
 }
 
-// ── Usage: drop into any page ──
+// â”€â”€ Usage: drop into any page â”€â”€
 // import { CuePlayer } from "./CuePlayer";
 // <CuePlayer script={demoScript} loop autoPlay width={840} height={520} />
 ```
@@ -1011,7 +1011,7 @@ function CuePlayerInner({ script, loop, width, height, onStepChange }: {
 **Gunakan ketika:** Agent perlu track demo views, step completions, dan user interactions. Dua mode: POST ke endpoint, atau callback ke custom handler.
 
 ```ts
-// lib/cue-analytics.ts — Analytics module (add to @cue-vin/core or use standalone)
+// lib/cue-analytics.ts â€” Analytics module (add to @cue-vin/core or use standalone)
 
 /** Analytics event types emitted by the demo player. */
 type CueEventType =
@@ -1036,7 +1036,7 @@ interface CueSummary {
   demoId: string;
   totalSteps: number;
   stepsViewed: number;
-  completionRate: number;   // 0–1
+  completionRate: number;   // 0â€“1
   duration: number;         // ms since first event
   events: CueEvent[];
 }
@@ -1127,7 +1127,7 @@ class CueAnalytics {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(event),
     }).catch(() => {
-      // Silently fail — analytics should never break the demo
+      // Silently fail â€” analytics should never break the demo
     });
   }
 }
@@ -1135,7 +1135,7 @@ class CueAnalytics {
 export { CueAnalytics, type CueEvent, type CueEventType, type CueSummary, type CueAnalyticsOptions };
 ```
 
-### Usage: Mode A — POST endpoint
+### Usage: Mode A â€” POST endpoint
 
 ```ts
 const analytics = new CueAnalytics({
@@ -1166,7 +1166,7 @@ console.log(summary);
 // }
 ```
 
-### Usage: Mode B — onEvent callback
+### Usage: Mode B â€” onEvent callback
 
 ```ts
 const analytics = new CueAnalytics({
@@ -1193,7 +1193,7 @@ const summary = analytics.getSummary();
 //   demoId: string;
 //   totalSteps: number;
 //   stepsViewed: number;
-//   completionRate: number;   // 0–1
+//   completionRate: number;   // 0â€“1
 //   duration: number;         // ms
 //   events: CueEvent[];
 // }
@@ -1202,7 +1202,7 @@ const summary = analytics.getSummary();
 ### Integration with React demo
 
 ```tsx
-// Add analytics to any Recipe — example with Recipe 4
+// Add analytics to any Recipe â€” example with Recipe 4
 const analyticsRef = useRef<CueAnalytics | null>(null);
 
 useEffect(() => {
@@ -1226,13 +1226,13 @@ const handleStepChange = (stepIndex: number) => {
 
 ---
 
-## Recipe 7: Record Browser Session → DemoScript (cue-record CLI)
+## Recipe 7: Record Browser Session â†’ DemoScript (cue-record CLI)
 
-**Gunakan ketika:** Agent punya URL app yang bisa dibuka Playwright dan ingin capture real browser session menjadi DemoScript JSON dengan screenshot nyata. Cocok untuk "record app live → jadi demo".
+**Gunakan ketika:** Agent punya URL app yang bisa dibuka Playwright dan ingin capture real browser session menjadi DemoScript JSON dengan screenshot nyata. Cocok untuk "record app live â†’ jadi demo".
 
 **Prinsip:** `cue-record` CLI membaca file `actions.json` berisi array `CaptureAction`, menjalankan tiap action di Playwright headless browser, capture screenshot + pointer position + hotspot positions, lalu menghasilkan DemoScript JSON siap pakai.
 
-### Step 1 — Buat actions.json
+### Step 1 â€” Buat actions.json
 
 ```json
 [
@@ -1247,7 +1247,7 @@ const handleStepChange = (stepIndex: number) => {
   },
   {
     "type": "screenshot",
-    "caption": "Dashboard overview — see your key metrics at a glance",
+    "caption": "Dashboard overview â€” see your key metrics at a glance",
     "hotspots": [
       { "label": "Revenue chart", "selector": "#revenue-card", "alwaysShow": true },
       { "label": "User activity", "selector": "#activity-feed" }
@@ -1260,7 +1260,7 @@ const handleStepChange = (stepIndex: number) => {
   },
   {
     "type": "screenshot",
-    "caption": "Upload area — drag and drop or browse your files",
+    "caption": "Upload area â€” drag and drop or browse your files",
     "hotspots": [
       { "label": "Drop zone", "selector": ".drop-zone", "alwaysShow": true }
     ]
@@ -1287,7 +1287,7 @@ const handleStepChange = (stepIndex: number) => {
 ]
 ```
 
-### Step 2 — Jalankan recorder
+### Step 2 â€” Jalankan recorder
 
 ```bash
 # Install Playwright browser (hanya sekali)
@@ -1300,7 +1300,7 @@ npx cue-record --script actions.json --output demo.json --screenshots ./shots
 npx cue-record --script actions.json --output demo.json --screenshots ./shots --width 1440 --height 900
 ```
 
-### Step 3 — Output
+### Step 3 â€” Output
 
 File `demo.json` berisi DemoScript yang valid dan bisa langsung di-feed ke CuePlayer:
 
@@ -1319,7 +1319,7 @@ File `demo.json` berisi DemoScript yang valid dan bisa langsung di-feed ke CuePl
       "id": "step-1",
       "screen": "shots/step-001.png",
       "pointer": { "x": 0.5, "y": 0.5, "clicking": false },
-      "caption": "Dashboard overview — see your key metrics at a glance",
+      "caption": "Dashboard overview â€” see your key metrics at a glance",
       "hotspots": [
         { "id": "h-1-0", "x": 0.25, "y": 0.30, "label": "Revenue chart", "alwaysShow": true },
         { "id": "h-1-1", "x": 0.70, "y": 0.40, "label": "User activity" }
@@ -1336,18 +1336,18 @@ File `demo.json` berisi DemoScript yang valid dan bisa langsung di-feed ke CuePl
 }
 ```
 
-**Kapan pakai:** Saat punya URL app yang bisa dibuka Playwright dan ingin demo dengan screenshot real — bukan mock UI. Output DemoScript bisa langsung dipakai Recipe 4 (Screenshot-Based Demo) atau Recipe 5 (Embeddable Player).
+**Kapan pakai:** Saat punya URL app yang bisa dibuka Playwright dan ingin demo dengan screenshot real â€” bukan mock UI. Output DemoScript bisa langsung dipakai Recipe 4 (Screenshot-Based Demo) atau Recipe 5 (Embeddable Player).
 
 ---
 
 ## Recipe 8: Generate DemoScript dari Deskripsi Fitur (generate())
 
-**Gunakan ketika:** Agent ingin membuat demo dari deskripsi fitur tanpa screenshot real. Cocok untuk "describe fitur → auto-generate DemoScript siap pakai". Tidak memanggil LLM — pure heuristic/template based.
+**Gunakan ketika:** Agent ingin membuat demo dari deskripsi fitur tanpa screenshot real. Cocok untuk "describe fitur â†’ auto-generate DemoScript siap pakai". Tidak memanggil LLM â€” pure heuristic/template based.
 
 **Prinsip:** Fungsi `generate()` dari `@cue-vin/core` menerima structured input (id, title, array of features) dan menghasilkan valid DemoScript. Setiap feature jadi satu DemoStep. Steps dengan CTA tidak auto-advance (duration undefined), step tanpa CTA menggunakan `defaultDuration`.
 
 ```ts
-// generate-demo.ts — Generate DemoScript from feature descriptions
+// generate-demo.ts â€” Generate DemoScript from feature descriptions
 import { generate, validateDemoScript } from "@cue-vin/core";
 import { writeFileSync } from "node:fs";
 
@@ -1441,7 +1441,7 @@ console.log(`Generated demo: ${script.id} with ${script.steps.length} steps`);
 
 ### Helper: slugify()
 
-Fungsi `slugify()` diexport bersama `generate()` — berguna jika agent perlu generate step id sendiri:
+Fungsi `slugify()` diexport bersama `generate()` â€” berguna jika agent perlu generate step id sendiri:
 
 ```ts
 import { slugify } from "@cue-vin/core";
@@ -1451,13 +1451,13 @@ slugify("API Integration");   // "api-integration"
 slugify("2FA Login!");        // "2fa-login"
 ```
 
-**Kapan pakai:** Saat tidak punya screenshot real atau URL app — generate demo sintetis dari deskripsi fitur. Bisa di-combine dengan Recipe 7 (Record) jika sebagian fitur punya screenshot dan sebagian tidak. Output DemoScript bisa langsung dipakai Recipe 4 atau Recipe 5.
+**Kapan pakai:** Saat tidak punya screenshot real atau URL app â€” generate demo sintetis dari deskripsi fitur. Bisa di-combine dengan Recipe 7 (Record) jika sebagian fitur punya screenshot dan sebagian tidak. Output DemoScript bisa langsung dipakai Recipe 4 atau Recipe 5.
 
 ---
 
-## Recipe 9: Analytics Server — Track + Query (cue-analytics)
+## Recipe 9: Analytics Server â€” Track + Query (cue-analytics)
 
-**Gunakan ketika:** Agent ingin tahu siapa nonton demo, sampai mana viewer melihat, dan hotspot mana yang diklik. Self-hosted analytics server — zero external dependencies, data disimpan lokal di NDJSON.
+**Gunakan ketika:** Agent ingin tahu siapa nonton demo, sampai mana viewer melihat, dan hotspot mana yang diklik. Self-hosted analytics server â€” zero external dependencies, data disimpan lokal di NDJSON.
 
 **Prinsip:** `cue-analytics` server menyediakan 3 endpoint: `POST /event` untuk menerima events dari CuePlayer, `GET /stats/:demoId` untuk query aggregate stats, dan `GET /health` untuk health check. Data disimpan append-only di NDJSON file.
 
@@ -1556,19 +1556,19 @@ curl http://localhost:3001/health
 ```
 
 **Interpretasi untuk agent:**
-- `totalViews: 42` → 42 unique sessions menonton demo ini
-- `completionRate: 0.71` → 71% viewers menyelesaikan sampai akhir (event "complete")
-- `avgStepsReached: 3.2` → rata-rata viewer sampai step 3 dari 4 total
-- `stepDropoff: [42, 38, 35, 30]` → 42 viewers di step 0, 38 di step 1, 35 di step 2, 30 di step 3 — dropoff terbesar di step 0→1, mungkin perlu perbaikan caption atau CTA
-- `hotspotClicks` → hotspot "upload-data-hotspot-0" diklik 18 kali, paling populer — area ini menarik perhatian viewer
+- `totalViews: 42` â†’ 42 unique sessions menonton demo ini
+- `completionRate: 0.71` â†’ 71% viewers menyelesaikan sampai akhir (event "complete")
+- `avgStepsReached: 3.2` â†’ rata-rata viewer sampai step 3 dari 4 total
+- `stepDropoff: [42, 38, 35, 30]` â†’ 42 viewers di step 0, 38 di step 1, 35 di step 2, 30 di step 3 â€” dropoff terbesar di step 0â†’1, mungkin perlu perbaikan caption atau CTA
+- `hotspotClicks` â†’ hotspot "upload-data-hotspot-0" diklik 18 kali, paling populer â€” area ini menarik perhatian viewer
 
-**Kapan pakai:** Selalu — analytics gratis dan self-hosted. Setelah demo di-deploy, jalankan `cue-analytics` dan set `analyticsEndpoint` di CuePlayer. Review stats secara berkala untuk optimasi demo (caption, CTA placement, step ordering).
+**Kapan pakai:** Selalu â€” analytics gratis dan self-hosted. Setelah demo di-deploy, jalankan `cue-analytics` dan set `analyticsEndpoint` di CuePlayer. Review stats secara berkala untuk optimasi demo (caption, CTA placement, step ordering).
 
 ---
 
 ## Recipe 10: Square/Vertical Promo Canvas (IG, TikTok, Reels)
 
-**Gunakan ketika:** User minta konten visual untuk social media — Instagram post (1080x1080), Reels/TikTok (1080x1920), atau Story (1080x1920). Cue sebagai "demo theater" SDK sangat natural untuk konten visual dengan aspect ratio 1:1 atau 9:16.
+**Gunakan ketika:** User minta konten visual untuk social media â€” Instagram post (1080x1080), Reels/TikTok (1080x1920), atau Story (1080x1920). Cue sebagai "demo theater" SDK sangat natural untuk konten visual dengan aspect ratio 1:1 atau 9:16.
 
 **Prinsip:** Gunakan Path A (IIFE) untuk zero-install, set DemoScript theme dan viewport, bungkus `<cue-embed>` dalam container dengan fixed aspect ratio menggunakan CSS `container-type: size` + `aspect-ratio`.
 
@@ -1576,12 +1576,12 @@ curl http://localhost:3001/health
 
 | Platform | Size | Aspect Ratio | Contoh Use Case |
 |----------|------|--------------|-----------------|
-| Instagram Post | 1080×1080 | 1:1 | Product showcase, feature highlight |
-| Instagram Reels | 1080×1920 | 9:16 | App demo, step-by-step tutorial |
-| TikTok | 1080×1920 | 9:16 | Product demo, walkthrough |
-| IG Story | 1080×1920 | 9:16 | Promo, limited-time offer |
-| YouTube Shorts | 1080×1920 | 9:16 | Quick tip, feature reveal |
-| LinkedIn Post | 1200×1200 | 1:1 | Professional product demo |
+| Instagram Post | 1080Ã—1080 | 1:1 | Product showcase, feature highlight |
+| Instagram Reels | 1080Ã—1920 | 9:16 | App demo, step-by-step tutorial |
+| TikTok | 1080Ã—1920 | 9:16 | Product demo, walkthrough |
+| IG Story | 1080Ã—1920 | 9:16 | Promo, limited-time offer |
+| YouTube Shorts | 1080Ã—1920 | 9:16 | Quick tip, feature reveal |
+| LinkedIn Post | 1200Ã—1200 | 1:1 | Professional product demo |
 
 ### Contoh minimal: 1:1 Square Canvas (Instagram Post)
 
@@ -1591,7 +1591,7 @@ curl http://localhost:3001/health
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Promo Canvas — 1:1 Square</title>
+  <title>Promo Canvas â€” 1:1 Square</title>
   <style>
     /* Container locks the player to 1:1 aspect ratio */
     .promo-canvas {
@@ -1623,7 +1623,7 @@ curl http://localhost:3001/health
         steps: [
           {
             id: "hook",
-            caption: "Your problem → solved",
+            caption: "Your problem â†’ solved",
             duration: 3000,
             pointer: { x: 0.5, y: 0.3 },
             annotations: [
@@ -1671,7 +1671,7 @@ curl http://localhost:3001/health
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Promo Canvas — 9:16 Vertical</title>
+  <title>Promo Canvas â€” 9:16 Vertical</title>
   <style>
     .promo-canvas {
       container-type: size;
@@ -1721,7 +1721,7 @@ curl http://localhost:3001/health
           },
           {
             id: "download",
-            caption: "Download now — it's free",
+            caption: "Download now â€” it's free",
             cta: { type: "button", label: "Download App", href: "#" }
           }
         ],
@@ -1745,13 +1745,13 @@ curl http://localhost:3001/health
 
 ### Tips untuk Promo Canvas
 
-1. **Step count:** 3–5 step optimal untuk attention span social media (under 15 detik total)
-2. **Durasi:** 2500–3500ms per step — cukup lama untuk dibaca, cukup cepat untuk tidak boring
-3. **Caption:** Pendek dan punchy — bukan paragraf, tapi tagline
-4. **Pointer:** Gunakan untuk direct attention — gerak ke elemen kunci sebelum hotspot muncul
-5. **CTA:** Selalu di step terakhir — jangan buat user scroll untuk menemukan action button
+1. **Step count:** 3â€“5 step optimal untuk attention span social media (under 15 detik total)
+2. **Durasi:** 2500â€“3500ms per step â€” cukup lama untuk dibaca, cukup cepat untuk tidak boring
+3. **Caption:** Pendek dan punchy â€” bukan paragraf, tapi tagline
+4. **Pointer:** Gunakan untuk direct attention â€” gerak ke elemen kunci sebelum hotspot muncul
+5. **CTA:** Selalu di step terakhir â€” jangan buat user scroll untuk menemukan action button
 6. **Aspect ratio CSS:** Gunakan `container-type: size` + `aspect-ratio` untuk lock ratio tanpa JS
-7. **Font size:** Untuk 1080px canvas, gunakan `fontSize: 24–36` pada annotations agar readable
+7. **Font size:** Untuk 1080px canvas, gunakan `fontSize: 24â€“36` pada annotations agar readable
 
 ### Export ke Video
 
@@ -1762,17 +1762,17 @@ Untuk mengubah promo canvas menjadi video file:
 
 ```bash
 # Export frames (jalankan di Node.js dengan puppeteer)
-# Setiap step → step-0.png, step-1.png, dst.
+# Setiap step â†’ step-0.png, step-1.png, dst.
 
 # Combine menjadi 15fps video, 3 detik per frame
 ffmpeg -framerate 1/3 -i step-%d.png -c:v libx264 -pix_fmt yuv420p -r 15 promo.mp4
 ```
 
-**Note:** `exportToPng()` membutuhkan puppeteer (Node.js) — tidak bisa dijalankan di browser. Untuk browser-only export, gunakan screenshot per step secara manual atau integrasikan dengan html2canvas.
+**Note:** `exportToPng()` membutuhkan puppeteer (Node.js) â€” tidak bisa dijalankan di browser. Untuk browser-only export, gunakan screenshot per step secara manual atau integrasikan dengan html2canvas.
 
 ---
 
-## Quick Reference — All Exports (Phase 1 + 2 + 3 + 4)
+## Quick Reference â€” All Exports (Phase 1 + 2 + 3 + 4)
 
 ### @cue-vin/core
 
@@ -1795,7 +1795,7 @@ ffmpeg -framerate 1/3 -i step-%d.png -c:v libx264 -pix_fmt yuv420p -r 15 promo.m
 | `DemoStep` | Type | 2 | Single step in a demo script |
 | `DemoHotspot` | Type | 2 | Hotspot overlay on a demo step |
 | `DemoAnnotation` | Type | 2 | Annotation overlay on a demo step |
-| `DemoPointer` | Type | 2 | Pointer position in a demo step (fraction 0–1) |
+| `DemoPointer` | Type | 2 | Pointer position in a demo step (fraction 0â€“1) |
 | `DemoTheme` | Type | 2 | Visual theme for demo script |
 | `validateDemoScript` | Fn | 2 | Validate unknown value as DemoScript |
 | `getDemoStep` | Fn | 2 | Get DemoStep by index |
@@ -1880,7 +1880,7 @@ ffmpeg -framerate 1/3 -i step-%d.png -c:v libx264 -pix_fmt yuv420p -r 15 promo.m
 | `.cue-hover-lift` | Class | 1 | translateY(-4px) + shadow |
 | `.cue-hover-scale` | Class | 1 | scale(1.05) |
 | `.cue-hover-glow` | Class | 1 | blue glow shadow |
-| `.cue-stagger-1`–`.cue-stagger-8` | Class | 1 | Animation delay 50ms–400ms |
+| `.cue-stagger-1`â€“`.cue-stagger-8` | Class | 1 | Animation delay 50msâ€“400ms |
 | `.cue-spinner` | Class | 1 | Infinite spin |
 | `.cue-glow` | Class | 1 | Pulse glow |
 | `.cue-pulse` | Class | 1 | Opacity pulse |
