@@ -162,6 +162,73 @@ describe("generate()", () => {
 
     expect(script.theme).toBeUndefined();
   });
+
+  // ── Input validation (Closes #67, #68, #69) ────────────────────────────
+
+  it("throws when id is missing", () => {
+    expect(() =>
+      generate({ title: "Demo", features: [] } as any)
+    ).toThrow(/non-empty string.*'id'/i);
+  });
+
+  it("throws when id is empty string", () => {
+    expect(() =>
+      generate({ id: "", title: "Demo", features: [] })
+    ).toThrow(/non-empty string.*'id'/i);
+  });
+
+  it("throws when id is whitespace-only", () => {
+    expect(() =>
+      generate({ id: "   ", title: "Demo", features: [] })
+    ).toThrow(/non-empty string.*'id'/i);
+  });
+
+  it("throws when title is missing", () => {
+    expect(() =>
+      generate({ id: "demo", features: [] } as any)
+    ).toThrow(/non-empty string.*'title'/i);
+  });
+
+  it("throws when title is empty string", () => {
+    expect(() =>
+      generate({ id: "demo", title: "", features: [] })
+    ).toThrow(/non-empty string.*'title'/i);
+  });
+
+  it("throws when features is missing (not TypeError)", () => {
+    expect(() =>
+      generate({ id: "demo", title: "Demo" } as any)
+    ).not.toThrow(TypeError);
+    expect(() =>
+      generate({ id: "demo", title: "Demo" } as any)
+    ).toThrow(/features.*array/i);
+  });
+
+  it("throws when features is not an array", () => {
+    expect(() =>
+      generate({ id: "demo", title: "Demo", features: "bad" } as any)
+    ).toThrow(/features.*array/i);
+  });
+
+  it("throws when feature.name slugifies to empty string", () => {
+    expect(() =>
+      generate({
+        id: "demo",
+        title: "Demo",
+        features: [{ name: "---", description: "desc" }],
+      })
+    ).toThrow(/empty step id.*slugification/i);
+  });
+
+  it("includes original feature name in slugify error", () => {
+    expect(() =>
+      generate({
+        id: "demo",
+        title: "Demo",
+        features: [{ name: "!!!", description: "desc" }],
+      })
+    ).toThrow(/!!!/);
+  });
 });
 
 describe("slugify()", () => {
