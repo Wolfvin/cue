@@ -1,1 +1,66 @@
-{"name":"@cue-vin/player","version":"0.1.3","type":"module","description":"Standalone embeddable demo player for cue SDK","main":"./dist/cue-player.iife.js","module":"./dist/index.js","types":"./dist/index.d.ts","exports":{".": {"types":"./dist/index.d.ts","import":"./dist/index.js","require":"./dist/cue-player.iife.js"},"./node":{"types":"./dist/node.d.ts","import":"./dist/node.js"}},"files":["dist","README.md","dist/cue-utils.iife.js"],"scripts":{"build":"vite build && vite build --config vite.config.es.ts && vite build --config vite.config.utils.ts && tsc --emitDeclarationOnly && rm -f dist/player.html","build:utils":"vite build --config vite.config.utils.ts","dev":"vite build --watch","typecheck":"tsc --noEmit","clean":"rm -rf dist"},"dependencies":{"@cue-vin/core":"workspace:*","@cue-vin/react":"workspace:*","@cue-vin/templates":"workspace:*"},"peerDependencies":{"react":">=18.0.0","react-dom":">=18.0.0","puppeteer":">=20.0.0"},"peerDependenciesMeta":{"puppeteer":{"optional":true}},"devDependencies":{"@types/react":"^18.0.0","@types/react-dom":"^18.0.0","react":"^18.0.0","react-dom":"^18.0.0","typescript":"^5.0.0","vite":"^5.0.0","@vitejs/plugin-react":"^4.0.0"},"license":"MIT"}
+{
+  "name": "@cue-vin/player",
+  "version": "0.1.3",
+  "type": "module",
+  "description": "Standalone embeddable demo player for cue SDK",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs",
+      "default": "./dist/node.cjs"
+    },
+    "./iife": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/cue-player.iife.js",
+      "require": "./dist/cue-player.iife.js",
+      "default": "./dist/cue-player.iife.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "dist/cue-utils.iife.js"
+  ],
+  "scripts": {
+    "build": "vite build && vite build --config vite.config.es.ts && vite build --config vite.config.cjs.ts && vite build --config vite.config.utils.ts && tsc --emitDeclarationOnly && rm -f dist/player.html",
+    "build:utils": "vite build --config vite.config.utils.ts",
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cue-vin/core": "workspace:*",
+    "@cue-vin/react": "workspace:*",
+    "@cue-vin/templates": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "puppeteer": ">=20.0.0"
+  },
+  "peerDependenciesMeta": {
+    "puppeteer": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  },
+  "license": "MIT"
+}
