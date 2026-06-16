@@ -149,6 +149,28 @@ export function generate(options: GenerateOptions): DemoScript {
     theme,
   } = options;
 
+  // ── Input validation (Closes #67, #68) ──────────────────────────────────
+  if (typeof id !== "string" || id.trim() === "") {
+    throw new Error(
+      "[cue] generate() requires a non-empty string for 'id'. " +
+        `Received: ${JSON.stringify(id)}`
+    );
+  }
+
+  if (typeof title !== "string" || title.trim() === "") {
+    throw new Error(
+      "[cue] generate() requires a non-empty string for 'title'. " +
+        `Received: ${JSON.stringify(title)}`
+    );
+  }
+
+  if (!Array.isArray(features)) {
+    throw new Error(
+      "[cue] generate() requires 'features' to be an array. " +
+        `Received: ${typeof features}`
+    );
+  }
+
   const steps: DemoStep[] = features.map((feature, index) => {
     if (typeof feature.name !== "string" || feature.name.trim() === "") {
       throw new Error(
@@ -157,6 +179,14 @@ export function generate(options: GenerateOptions): DemoScript {
     }
 
     const stepSlug = slugify(feature.name);
+
+    // Closes #69: reject feature names that slugify to empty string
+    if (stepSlug === "") {
+      throw new Error(
+        `[cue] Feature at index ${index} produces an empty step id after slugification. ` +
+          `Name: ${JSON.stringify(feature.name)}`
+      );
+    }
 
     // Build the base step
     const step: DemoStep = {
