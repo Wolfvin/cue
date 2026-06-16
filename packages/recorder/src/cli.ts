@@ -29,6 +29,23 @@ function parseArgs(argv: string[]): CliArgs {
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
+      case "--help":
+      case "-h":
+        console.log(`cue-record — Capture browser interactions as a DemoScript
+
+Usage:
+  cue-record --script <path> --output <path> [options]
+
+Required:
+  --script <path>      Path to JSON file containing CaptureAction array
+  --output <path>      Path to write the output DemoScript JSON
+
+Options:
+  --screenshots <dir>  Directory for screenshot files (default: ./screenshots)
+  --width <number>     Viewport width in pixels (default: 1280)
+  --height <number>    Viewport height in pixels (default: 800)
+  --help, -h           Show this help message and exit`);
+        process.exit(0);
       case "--script":
         args.script = argv[++i];
         break;

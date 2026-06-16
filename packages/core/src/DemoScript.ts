@@ -175,8 +175,8 @@ export function validateDemoScript(script: unknown): script is DemoScript {
   if (typeof obj.id !== "string" || obj.id.trim().length === 0) return false;
   if (typeof obj.title !== "string") return false;
 
-  // steps must be an array of objects with at least an `id` string
-  if (!Array.isArray(obj.steps)) return false;
+  // steps must be a non-empty array of objects with at least an `id` string
+  if (!Array.isArray(obj.steps) || obj.steps.length === 0) return false;
   const validAnnotationTypes = new Set(["arrow", "box", "text"]);
   for (const step of obj.steps) {
     if (typeof step !== "object" || step === null) return false;
@@ -191,6 +191,15 @@ export function validateDemoScript(script: unknown): script is DemoScript {
         if (typeof ann !== "object" || ann === null || Array.isArray(ann)) return false;
         const annObj = ann as Record<string, unknown>;
         if (typeof annObj.type !== "string" || !validAnnotationTypes.has(annObj.type)) return false;
+
+        // Validate required fields per annotation type
+        if (annObj.type === "arrow") {
+          if (typeof annObj.x1 !== "number" || typeof annObj.y1 !== "number" || typeof annObj.x2 !== "number" || typeof annObj.y2 !== "number") return false;
+        } else if (annObj.type === "box") {
+          if (typeof annObj.x !== "number" || typeof annObj.y !== "number" || typeof annObj.width !== "number" || typeof annObj.height !== "number") return false;
+        } else if (annObj.type === "text") {
+          if (typeof annObj.text !== "string") return false;
+        }
       }
     }
   }

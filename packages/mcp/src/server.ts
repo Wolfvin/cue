@@ -15,11 +15,18 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { createRequire } from "node:module";
 
 import { generateToolSchema, handleGenerate } from "./tools/generate.js";
 import { exportHtmlToolSchema, handleExportHtml } from "./tools/export.js";
 import { validateToolSchema, handleValidate } from "./tools/validate.js";
 import { statsToolSchema, handleGetStats } from "./tools/stats.js";
+
+/** Read version from package.json at runtime so it stays in sync automatically.
+ *  createRequire() produces a CJS-style require() that resolves relative
+ *  to this file — works correctly after tsup bundles to CJS. */
+const require = createRequire(import.meta.url);
+const pkgVersion: string = require("../package.json").version;
 
 /**
  * Create and configure the MCP server with all cue tools registered.
@@ -27,7 +34,7 @@ import { statsToolSchema, handleGetStats } from "./tools/stats.js";
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "@cue-vin/mcp",
-    version: "0.1.0",
+    version: pkgVersion,
   });
 
   // ─── Tool 1: cue_generate ────────────────────────────────────────────────
