@@ -171,6 +171,12 @@ export function generate(options: GenerateOptions): DemoScript {
     );
   }
 
+  if (features.length === 0) {
+    throw new Error(
+      "generate: features must be a non-empty array — provide at least one feature to generate demo steps"
+    );
+  }
+
   const steps: DemoStep[] = features.map((feature, index) => {
     if (typeof feature.name !== "string" || feature.name.trim() === "") {
       throw new Error(

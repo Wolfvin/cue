@@ -7,12 +7,11 @@ describe("generate()", () => {
     const script = generate({
       id: "my-demo",
       title: "My Demo",
-      features: [],
+      features: [{ name: "Feature A", description: "Desc A" }],
     });
 
     expect(script.id).toBe("my-demo");
     expect(script.title).toBe("My Demo");
-    expect(script.steps).toEqual([]);
     expect(script.loop).toBe(false);
   });
 
@@ -146,7 +145,7 @@ describe("generate()", () => {
     const script = generate({
       id: "test",
       title: "Test",
-      features: [],
+      features: [{ name: "Feature A", description: "Desc A" }],
       theme: { accent: "#3b82f6", bg: "#0a0a0a" },
     });
 
@@ -157,7 +156,7 @@ describe("generate()", () => {
     const script = generate({
       id: "test",
       title: "Test",
-      features: [],
+      features: [{ name: "Feature A", description: "Desc A" }],
     });
 
     expect(script.theme).toBeUndefined();
@@ -208,6 +207,14 @@ describe("generate()", () => {
     expect(() =>
       generate({ id: "demo", title: "Demo", features: "bad" } as any)
     ).toThrow(/features.*array/i);
+  });
+
+  it("throws when features is an empty array (closes #66)", () => {
+    expect(() =>
+      generate({ id: "demo", title: "Demo", features: [] })
+    ).toThrow(
+      "generate: features must be a non-empty array — provide at least one feature to generate demo steps"
+    );
   });
 
   it("throws when feature.name slugifies to empty string", () => {
