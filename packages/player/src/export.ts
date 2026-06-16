@@ -47,9 +47,9 @@ export function exportToHtml(options: ExportOptions): string {
   } = options;
 
   const pageTitle = title ?? script.title ?? "cue demo";
-  const scriptJson = JSON.stringify(script);
-  const bg = script.theme?.bg ?? "#0a0a0a";
-  const font = script.theme?.font ?? "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif";
+  const scriptJson = escapeJsonForScript(JSON.stringify(script));
+  const bg = sanitizeCssValue(script.theme?.bg ?? "#0a0a0a");
+  const font = sanitizeCssValue(script.theme?.font ?? "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif");
 
   // Build the player <script> tag — inline or CDN
   let playerScriptTag: string;
@@ -70,7 +70,7 @@ export function exportToHtml(options: ExportOptions): string {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
     body {
-      background: ${escapeHtml(bg)};
+      background: ${bg};
       display: flex;
       align-items: center;
       justify-content: center;
@@ -105,6 +105,35 @@ function escapeHtml(str: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+/**
+ * Escape JSON for safe embedding inside an HTML `<script>` tag.
+ *
+ * `JSON.stringify()` does NOT escape `</script>` — if a string value
+ * contains that literal, it will close the `<script>` tag early, enabling
+ * XSS. The standard fix is to replace `</script` (case-insensitive) with
+ * `<\/script`, which is equivalent in JavaScript string context but cannot
+ * break out of the HTML tag.
+ */
+function escapeJsonForScript(json: string): string {
+  return json.replace(/<\/script/gi, "<\\/script");
+}
+
+/**
+ * Sanitize a CSS property value to prevent CSS injection.
+ *
+ * When user-controlled strings are interpolated into a `<style>` block,
+ * characters like `;`, `{`, `}` and `</style>` can break out of the
+ * current property and inject arbitrary CSS rules. This function strips
+ * those dangerous characters, leaving only characters safe inside a CSS
+ * property value context.
+ */
+function sanitizeCssValue(str: string): string {
+  return str
+    .replace(/[;{}]/g, "")
+    .replace(/<\/style/gi, "")
+    .replace(/<script/gi, "");
 }
 
 /**
