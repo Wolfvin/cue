@@ -19,7 +19,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "cue": {
       "command": "npx",
-      "args": ["cue-mcp"]
+      "args": ["-y", "@cue-vin/mcp"]
     }
   }
 }
