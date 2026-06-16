@@ -55,7 +55,7 @@ export function renderLogin(config: LoginTemplateConfig, theme: ResolvedTheme): 
 
   const footerHtml = footerLinks.length > 0
     ? `<div class="login-footer">${footerLinks.map(
-        (l) => `<a href="${l.href ?? "#"}" class="login-link">${esc(l.label)}</a>`
+        (l) => `<a href="${safeHref(l.href)}" class="login-link">${esc(l.label)}</a>`
       ).join("<span class=\"login-divider\">·</span>")}</div>`
     : "";
 
@@ -96,7 +96,7 @@ function renderField(f: TemplateField, t: ResolvedTheme): string {
 
   return `<div class="login-field">
   <label class="login-label" for="field-${esc(f.name)}">${esc(label)}</label>
-  <input id="field-${esc(f.name)}" class="login-input" type="${inputType}" placeholder="${esc(placeholder)}" value="${esc(value)}"${required}>
+  <input id="field-${esc(f.name)}" class="login-input" type="${esc(inputType)}" placeholder="${esc(placeholder)}" value="${esc(value)}"${required}>
 </div>`;
 }
 
@@ -108,6 +108,16 @@ function esc(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+/** Sanitize href — block javascript:/data:/vbscript: and escape for attribute context. */
+function safeHref(href: string | undefined): string {
+  if (!href) return "#";
+  const lower = href.trim().toLowerCase();
+  if (lower.startsWith("javascript:") || lower.startsWith("data:") || lower.startsWith("vbscript:")) {
+    return "#";
+  }
+  return esc(href);
 }
 
 /** Capitalize the first letter. */

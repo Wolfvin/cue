@@ -81,7 +81,7 @@ function renderFormField(f: TemplateField): string {
 
   return `<div class="form-field">
   <label class="form-label" for="field-${esc(f.name)}">${esc(label)}</label>
-  <input id="field-${esc(f.name)}" class="form-input" type="${inputType}" placeholder="${esc(placeholder)}" value="${esc(value)}"${required}>
+  <input id="field-${esc(f.name)}" class="form-input" type="${esc(inputType)}" placeholder="${esc(placeholder)}" value="${esc(value)}"${required}>
 </div>`;
 }
 
