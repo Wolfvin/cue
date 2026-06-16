@@ -46,6 +46,17 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function escapeJsonForScript(json: string): string {
+  return json.replace(/<\/script/gi, "<\\/script");
+}
+
+function sanitizeCssValue(str: string): string {
+  return str
+    .replace(/[;{}]/g, "")
+    .replace(/<\/style/gi, "")
+    .replace(/<script/gi, "");
+}
+
 /**
  * Generate a self-contained HTML string from a DemoScript.
  * This is the Node.js-compatible equivalent of @cue-vin/player's exportToHtml().
@@ -57,11 +68,12 @@ function generateHtml(
   height = 520
 ): string {
   const pageTitle = title ?? script.title ?? "cue demo";
-  const scriptJson = JSON.stringify(script);
-  const bg = script.theme?.bg ?? "#0a0a0a";
-  const font =
+  const scriptJson = escapeJsonForScript(JSON.stringify(script));
+  const bg = sanitizeCssValue(script.theme?.bg ?? "#0a0a0a");
+  const font = sanitizeCssValue(
     script.theme?.font ??
-    "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif";
+    "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+  );
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -73,18 +85,19 @@ function generateHtml(
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
     body {
-      background: ${escapeHtml(bg)};
+      background: ${bg};
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: ${escapeHtml(font)};
+      font-family: ${font};
     }
   </style>
 </head>
 <body>
-  <cue-embed id="player" width="${width}" height="${height}"></cue-embed>
+  <cue-embed id="player" width="${width}" height="${height}" autoplay${script.loop ? ' loop' : ''}></cue-embed>
 
   <script>window.__CUE_SCRIPT__ = ${scriptJson};</script>
+  <script src="https://unpkg.com/@cue-vin/player/dist/cue-utils.iife.js"><\/script>
   <script src="${escapeHtml(DEFAULT_CDN_URL)}"><\/script>
 
   <script>
