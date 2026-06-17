@@ -129,6 +129,35 @@
   }
 }
 
+@keyframes cue-cinematic-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.92);
+    filter: blur(8px);
+  }
+  30% {
+    opacity: 0.4;
+    transform: translateY(20px) scale(0.96);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(8px) scale(0.99);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes cue-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* ── Enter Utilities ───────────────────────────────────────────────────── */
 
 .cue-enter {
@@ -290,4 +319,46 @@
 /* Click feedback — scale down slightly to simulate press */
 .cue-pointer-clicking {
   transform: scale(0.85);
+}
+
+/* ── Cinematic Entrance (Issue #109) ───────────────────────────────────── */
+/*
+   Multi-stage rise: opacity + translateY + scale + blur, all interpolated
+   across 0% → 30% → 60% → 100%. The long 2.2s duration with a strong
+   ease-out curve produces a theatrical "materialising" effect suitable
+   for hero elements and demo curtain-openers.
+*/
+.cue-cinematic {
+  animation: cue-cinematic-rise 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Marquee Component (Issue #111) ────────────────────────────────────── */
+/*
+   Infinite horizontal scroller. The track is paused by default and plays
+   on hover, which makes the marquee unobtrusive on dense pages and
+   accessible (no constant motion for screen-reader / reduced-motion users
+   who don't hover). The mask fades both edges so content appears/disappears
+   smoothly instead of clipping hard at the container edge.
+
+   Usage: user duplicates the track content twice inside .cue-marquee-track
+   (CSS cannot clone DOM). The keyframe translates the track by -50%, which
+   equals exactly one copy width when content is duplicated, producing a
+   seamless loop. Override duration with --cue-marquee-duration.
+*/
+.cue-marquee {
+  display: flex;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.cue-marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  animation: cue-marquee var(--cue-marquee-duration, 30s) linear infinite;
+  animation-play-state: paused;
+}
+
+.cue-marquee:hover .cue-marquee-track {
+  animation-play-state: running;
 }
