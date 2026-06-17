@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { DemoScript, DemoStep, DemoHotspot, DemoAnnotation, DemoTemplate, PointerState } from "@cue-vin/core";
 import { ScreenSlide } from "@cue-vin/react";
 import { ScriptedPointer } from "@cue-vin/react";
@@ -8,6 +9,79 @@ import { StepProgress } from "@cue-vin/react";
 import { ChapterNav } from "@cue-vin/react";
 import { renderTemplate } from "@cue-vin/templates";
 import type { TemplateConfig, TemplateTheme } from "@cue-vin/templates";
+
+/**
+ * Inline CSS for the .cue-step-enter / -enter-active / -exit / -exit-active
+ * utilities. Kept in sync with packages/css/src/cue.css so the CuePlayer is
+ * self-contained and does not need to depend on @cue-vin/css at runtime.
+ *
+ * Direction is driven by the --cue-step-direction CSS variable
+ * (1 = forward / next, -1 = backward / prev) — same convention as the
+ * utility classes in @cue-vin/css.
+ */
+const STEP_TRANSITION_CSS = `
+.cue-step-enter {
+  opacity: 0;
+  transform: translate3d(calc(var(--cue-step-direction, 1) * var(--cue-step-offset, 28px)), 0, 0);
+  transition: opacity var(--cue-step-duration, 400ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+              transform var(--cue-step-duration, 400ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  will-change: opacity, transform;
+}
+.cue-step-enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.cue-step-exit {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity var(--cue-step-duration, 400ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+              transform var(--cue-step-duration, 400ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  will-change: opacity, transform;
+}
+.cue-step-exit-active {
+  opacity: 0;
+  transform: translate3d(calc(var(--cue-step-direction, 1) * var(--cue-step-offset, 28px) * -1), 0, 0);
+}
+`;
+
+/**
+ * Wraps a step's slide content and applies the .cue-step-enter →
+ * .cue-step-enter-active animation on mount. Key this component by the
+ * step index to trigger a fresh enter animation on every step change.
+ *
+ * Exit animation (.cue-step-exit / -exit-active) is not driven here —
+ * those utility classes are available in @cue-vin/css for consumers that
+ * need to animate outgoing slides.
+ */
+function StepEnter({
+  direction,
+  children,
+}: {
+  direction: number;
+  children: ReactNode;
+}) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    // requestAnimationFrame so the browser paints the initial .cue-step-enter
+    // state (opacity: 0, offset) before we transition to the active state.
+    const raf = requestAnimationFrame(() => setActive(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div
+      className={
+        active ? "cue-step-enter cue-step-enter-active" : "cue-step-enter"
+      }
+      style={
+        { "--cue-step-direction": direction } as CSSProperties
+      }
+    >
+      {children}
+    </div>
+  );
+}
 
 /** Props for the CuePlayer component. */
 export interface CuePlayerProps {
@@ -96,7 +170,14 @@ export function CuePlayer({
   onStepChange,
 }: CuePlayerProps) {
   const total = script.steps.length;
+  // Track step transition direction (1 = forward / next, -1 = backward / prev).
+  // Stored in state (not a ref) so it stays stable across the intermediate
+  // re-renders triggered by other effects (e.g. setPointerState in the
+  // pointer animation effect). Refs updated in useEffect would be stale
+  // by the time those intermediate re-renders compute stepDirection, causing
+  // the direction to flip back to 1 (current === prev).
   const [current, setCurrent] = useState(0);
+  const [stepDirection, setStepDirection] = useState(1);
   const [pointerState, setPointerState] = useState<PointerState | null>(null);
   const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -152,8 +233,11 @@ export function CuePlayer({
     if (autoPlay && step?.duration) {
       autoTimerRef.current = setTimeout(() => {
         if (current < total - 1) {
+          setStepDirection(1);
           setCurrent((c) => c + 1);
         } else if (loop) {
+          // Looping forward: last → 0  should still feel like "forward".
+          setStepDirection(1);
           setCurrent(0);
         } else {
           onComplete?.();
@@ -170,8 +254,11 @@ export function CuePlayer({
 
   const goNext = useCallback(() => {
     if (current < total - 1) {
+      setStepDirection(1);
       setCurrent((c) => c + 1);
     } else if (loop) {
+      // Looping forward: last → 0  should still feel like "forward".
+      setStepDirection(1);
       setCurrent(0);
     } else {
       onComplete?.();
@@ -180,8 +267,11 @@ export function CuePlayer({
 
   const goPrev = useCallback(() => {
     if (current > 0) {
+      setStepDirection(-1);
       setCurrent((c) => c - 1);
     } else if (loop) {
+      // Looping backward: 0 → last  should feel like "backward".
+      setStepDirection(-1);
       setCurrent(total - 1);
     }
   }, [current, total, loop]);
@@ -288,8 +378,12 @@ export function CuePlayer({
         width: "fit-content",
       }}
     >
-      {/* Slide area */}
-      {slideContent}
+      {/* Slide area — wrapped in StepEnter for directional enter animation
+          on every step change. The `key={current}` forces a remount so the
+          enter animation re-triggers each time the step index changes. */}
+      <StepEnter key={current} direction={stepDirection}>
+        {slideContent}
+      </StepEnter>
 
       {/* Caption bar */}
       {step?.caption && (
@@ -325,8 +419,11 @@ export function CuePlayer({
         />
       </div>
 
-      {/* Inject accent color as CSS variable for child components */}
-      <style>{`:root { --cue-accent: ${accent}; }`}</style>
+      {/* Inject accent color as CSS variable for child components, plus
+          the step-transition CSS so CuePlayer is self-contained without
+          requiring @cue-vin/css as a runtime dependency. */}
+      <style>{`:root { --cue-accent: ${accent}; }
+${STEP_TRANSITION_CSS}`}</style>
     </div>
   );
 }
