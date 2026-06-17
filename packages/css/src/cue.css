@@ -325,7 +325,7 @@
 /*
    Multi-stage rise: opacity + translateY + scale + blur, all interpolated
    across 0% → 30% → 60% → 100%. The long 2.2s duration with a strong
-   ease-out curve produces a theatrical "materialising" effect suitable
+   ease-out curve produces a theatrical 'materialising' effect suitable
    for hero elements and demo curtain-openers.
 */
 .cue-cinematic {
@@ -361,4 +361,123 @@
 
 .cue-marquee:hover .cue-marquee-track {
   animation-play-state: running;
+}
+
+/* ========================================================================
+   Issue #107 — CSS Variable-Driven Animation Utilities
+   Single @keyframes per utility; infinite variants via CSS var override.
+   Override on the element or any ancestor:
+     --fx-x, --fx-y       translate distance (default 24px / 0)
+     --fx-duration        animation duration (default 300ms)
+     --fx-ease            timing function (default cubic-bezier(0.16, 1, 0.3, 1))
+     --fx-scale           start scale (default 1)
+   ======================================================================== */
+
+@keyframes fx-slide-in {
+  from {
+    opacity: 0;
+    transform: translate(var(--fx-x, 24px), var(--fx-y, 0))
+               scale(var(--fx-scale, 1));
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes fx-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(var(--fx-scale, 1));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--fx-y, 24px)) scale(var(--fx-scale, 1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fx-slide-in {
+  animation: fx-slide-in var(--fx-duration, 300ms)
+             var(--fx-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+.fx-fade-in {
+  animation: fx-fade-in var(--fx-duration, 300ms)
+             var(--fx-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+.fx-rise {
+  animation: fx-rise var(--fx-duration, 300ms)
+             var(--fx-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+/* ========================================================================
+   Issue #108 — Ambient Loops with group-hover play-state
+   ======================================================================== */
+
+.cue-ambient {
+  animation-play-state: paused;
+}
+
+.cue-group:hover .cue-ambient,
+.cue-group:focus-within .cue-ambient {
+  animation-play-state: running;
+}
+
+/* ========================================================================
+   Issue #104 — prefers-reduced-motion (MUST be last)
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .cue-spinner,
+  .cue-glow,
+  .cue-pulse,
+  .cue-shake {
+    animation: none !important;
+  }
+
+  .cue-enter,
+  .cue-enter-fade,
+  .cue-enter-scale,
+  .cue-enter-slide-down,
+  .cue-enter-slide-left,
+  .cue-enter-slide-right,
+  .cue-enter-bounce {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .fx-slide-in,
+  .fx-fade-in,
+  .fx-rise {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-cinematic {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-marquee-track {
+    animation-play-state: paused !important;
+  }
+
+  .cue-pointer {
+    transition: none !important;
+  }
+
+  .cue-ambient,
+  .cue-group:hover .cue-ambient,
+  .cue-group:focus-within .cue-ambient {
+    animation-play-state: paused !important;
+  }
 }
