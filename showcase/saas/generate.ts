@@ -163,7 +163,7 @@ function buildHtmlFallback(
   const font =
     script.theme?.font ??
     "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif";
-  const cdnUrl = "https://unpkg.com/@cue-vin/player@0.1.2/dist/cue-player.iife.js";
+  const cdnUrl = "https://unpkg.com/@cue-vin/player@latest/dist/cue-player.iife.js";
 
   return `<!DOCTYPE html>
 <html lang="en">
