@@ -1,0 +1,1094 @@
+{
+  "$schema": "https://cue-vin/css/manifest.schema.json",
+  "$comment": "Technique catalogue for @cue-vin/css. Every entry maps 1:1 to a class that exists in ./cue.css. The vibe/avoid-when/pairs/never-pair fields are the taste layer — they tell AI agents which technique fits which product mood, not just what the class does mechanically. Categories: entrance | ambient | transition | layout | marquee | utility.",
+  "cue-enter": {
+    "class": "cue-enter",
+    "category": "entrance",
+    "vibe": [
+      "premium",
+      "neutral",
+      "professional",
+      "saas",
+      "modern"
+    ],
+    "avoid-when": [
+      "playful",
+      "dramatic",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-stagger-1",
+      "cue-stagger-2",
+      "cue-stagger-3",
+      "cue-hover-lift",
+      "fx-fade-in"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce",
+      "cue-step-enter",
+      "fx-rise",
+      "fx-slide-in"
+    ],
+    "timing": "var(--cue-duration-normal, 300ms)",
+    "css-vars": [
+      "--cue-duration-normal",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-enter-fade": {
+    "class": "cue-enter-fade",
+    "category": "entrance",
+    "vibe": [
+      "minimal",
+      "neutral",
+      "enterprise",
+      "calm",
+      "corporate-flat"
+    ],
+    "avoid-when": [
+      "dramatic",
+      "playful",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-stagger-1",
+      "cue-stagger-2",
+      "cue-stagger-3",
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce",
+      "cue-enter-scale"
+    ],
+    "timing": "var(--cue-duration-normal, 300ms)",
+    "css-vars": [
+      "--cue-duration-normal",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-enter-scale": {
+    "class": "cue-enter-scale",
+    "category": "entrance",
+    "vibe": [
+      "modern",
+      "confident",
+      "premium",
+      "saas",
+      "product-launch"
+    ],
+    "avoid-when": [
+      "playful",
+      "casual",
+      "enterprise-flat"
+    ],
+    "pairs": [
+      "cue-hover-lift",
+      "cue-hover-scale",
+      "cue-stagger-2",
+      "cue-stagger-3"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce",
+      "cue-enter-fade",
+      "fx-rise"
+    ],
+    "timing": "var(--cue-duration-slow, 500ms)",
+    "css-vars": [
+      "--cue-duration-slow",
+      "--cue-ease-spring"
+    ]
+  },
+  "cue-enter-slide-down": {
+    "class": "cue-enter-slide-down",
+    "category": "entrance",
+    "vibe": [
+      "system",
+      "notification",
+      "saas",
+      "dropdown"
+    ],
+    "avoid-when": [
+      "dramatic",
+      "playful",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-stagger-1",
+      "cue-hover-lift",
+      "cue-step-enter"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--cue-duration-normal, 300ms)",
+    "css-vars": [
+      "--cue-duration-normal",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-enter-slide-left": {
+    "class": "cue-enter-slide-left",
+    "category": "entrance",
+    "vibe": [
+      "saas",
+      "dashboard",
+      "side-panel",
+      "forward-nav"
+    ],
+    "avoid-when": [
+      "playful",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-enter-slide-right",
+      "cue-step-enter",
+      "cue-stagger-2"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--cue-duration-normal, 300ms)",
+    "css-vars": [
+      "--cue-duration-normal",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-enter-slide-right": {
+    "class": "cue-enter-slide-right",
+    "category": "entrance",
+    "vibe": [
+      "saas",
+      "dashboard",
+      "side-panel",
+      "back-nav"
+    ],
+    "avoid-when": [
+      "playful",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-enter-slide-left",
+      "cue-step-enter",
+      "cue-stagger-2"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--cue-duration-normal, 300ms)",
+    "css-vars": [
+      "--cue-duration-normal",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-enter-bounce": {
+    "class": "cue-enter-bounce",
+    "category": "entrance",
+    "vibe": [
+      "playful",
+      "consumer",
+      "mobile-app",
+      "gamified",
+      "onboarding"
+    ],
+    "avoid-when": [
+      "premium",
+      "dramatic",
+      "enterprise",
+      "corporate-flat",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-stagger-2",
+      "cue-stagger-3",
+      "cue-hover-scale"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "cue-enter-slide-down",
+      "cue-enter-slide-left",
+      "cue-enter-slide-right",
+      "cue-shake",
+      "fx-fade-in",
+      "fx-rise",
+      "fx-slide-in"
+    ],
+    "timing": "var(--cue-duration-slow, 500ms)",
+    "css-vars": [
+      "--cue-duration-slow",
+      "--cue-ease-spring"
+    ]
+  },
+  "cue-cinematic": {
+    "class": "cue-cinematic",
+    "category": "entrance",
+    "vibe": [
+      "premium",
+      "dramatic",
+      "apple-like",
+      "hero",
+      "cinematic",
+      "launch"
+    ],
+    "avoid-when": [
+      "playful",
+      "consumer",
+      "corporate-flat",
+      "enterprise",
+      "casual",
+      "dashboard"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-enter",
+      "cue-enter-bounce",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "cue-enter-slide-down",
+      "cue-enter-slide-left",
+      "cue-enter-slide-right",
+      "cue-glow",
+      "cue-marquee",
+      "cue-pulse",
+      "cue-shake",
+      "cue-spinner",
+      "cue-step-enter",
+      "fx-fade-in",
+      "fx-rise",
+      "fx-slide-in"
+    ],
+    "timing": "2.2s",
+    "css-vars": []
+  },
+  "cue-pulse": {
+    "class": "cue-pulse",
+    "category": "ambient",
+    "vibe": [
+      "live",
+      "active",
+      "loading",
+      "thinking",
+      "broadcasting"
+    ],
+    "avoid-when": [
+      "calm",
+      "static",
+      "premium-hero",
+      "cinematic"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-glow",
+      "cue-shake",
+      "cue-spinner"
+    ],
+    "timing": "2s infinite",
+    "css-vars": []
+  },
+  "cue-glow": {
+    "class": "cue-glow",
+    "category": "ambient",
+    "vibe": [
+      "ai",
+      "magical",
+      "futuristic",
+      "premium-cta",
+      "glowing"
+    ],
+    "avoid-when": [
+      "corporate-flat",
+      "minimal",
+      "enterprise",
+      "calm"
+    ],
+    "pairs": [
+      "cue-hover-glow",
+      "cue-ambient",
+      "cue-group"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-pulse",
+      "cue-shake",
+      "cue-spinner"
+    ],
+    "timing": "2s infinite",
+    "css-vars": [
+      "--cue-color-glow"
+    ]
+  },
+  "cue-spinner": {
+    "class": "cue-spinner",
+    "category": "ambient",
+    "vibe": [
+      "loading",
+      "processing",
+      "technical",
+      "neutral",
+      "system"
+    ],
+    "avoid-when": [
+      "dramatic",
+      "premium-hero",
+      "cinematic",
+      "playful"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-glow",
+      "cue-pulse"
+    ],
+    "timing": "0.8s linear infinite",
+    "css-vars": []
+  },
+  "cue-shake": {
+    "class": "cue-shake",
+    "category": "utility",
+    "vibe": [
+      "error",
+      "warning",
+      "feedback",
+      "attention",
+      "form-validation"
+    ],
+    "avoid-when": [
+      "premium",
+      "calm",
+      "minimal",
+      "cinematic",
+      "playful"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce",
+      "cue-glow",
+      "cue-marquee",
+      "cue-pulse"
+    ],
+    "timing": "0.6s",
+    "css-vars": []
+  },
+  "fx-slide-in": {
+    "class": "fx-slide-in",
+    "category": "entrance",
+    "vibe": [
+      "configurable",
+      "developer-tooling",
+      "modern",
+      "saas"
+    ],
+    "avoid-when": [
+      "dramatic",
+      "cinematic",
+      "playful"
+    ],
+    "pairs": [
+      "fx-fade-in",
+      "fx-rise",
+      "cue-stagger-1",
+      "cue-stagger-2"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter",
+      "cue-enter-bounce",
+      "cue-step-enter"
+    ],
+    "timing": "var(--fx-duration, 300ms)",
+    "css-vars": [
+      "--fx-x",
+      "--fx-y",
+      "--fx-scale",
+      "--fx-duration",
+      "--fx-ease"
+    ]
+  },
+  "fx-fade-in": {
+    "class": "fx-fade-in",
+    "category": "entrance",
+    "vibe": [
+      "configurable",
+      "minimal",
+      "developer-tooling",
+      "neutral"
+    ],
+    "avoid-when": [
+      "dramatic",
+      "playful",
+      "cinematic"
+    ],
+    "pairs": [
+      "fx-slide-in",
+      "fx-rise",
+      "cue-stagger-1",
+      "cue-stagger-2"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--fx-duration, 300ms)",
+    "css-vars": [
+      "--fx-scale",
+      "--fx-duration",
+      "--fx-ease"
+    ]
+  },
+  "fx-rise": {
+    "class": "fx-rise",
+    "category": "entrance",
+    "vibe": [
+      "configurable",
+      "premium-modern",
+      "saas",
+      "editorial"
+    ],
+    "avoid-when": [
+      "playful",
+      "dramatic",
+      "cinematic"
+    ],
+    "pairs": [
+      "fx-fade-in",
+      "fx-slide-in",
+      "cue-stagger-1",
+      "cue-stagger-2"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter",
+      "cue-enter-bounce",
+      "cue-enter-scale"
+    ],
+    "timing": "var(--fx-duration, 300ms)",
+    "css-vars": [
+      "--fx-y",
+      "--fx-scale",
+      "--fx-duration",
+      "--fx-ease"
+    ]
+  },
+  "cue-ambient": {
+    "class": "cue-ambient",
+    "category": "utility",
+    "vibe": [
+      "interactive",
+      "premium",
+      "hover-driven",
+      "subtle"
+    ],
+    "avoid-when": [
+      "autoplay",
+      "always-on",
+      "mobile-touch"
+    ],
+    "pairs": [
+      "cue-group",
+      "cue-glow",
+      "cue-pulse",
+      "cue-spinner"
+    ],
+    "never-pair": [],
+    "timing": "n/a (play-state modifier)",
+    "css-vars": []
+  },
+  "cue-group": {
+    "class": "cue-group",
+    "category": "utility",
+    "vibe": [
+      "interactive",
+      "card-grid",
+      "premium",
+      "hover-driven"
+    ],
+    "avoid-when": [
+      "mobile-touch",
+      "static-landing"
+    ],
+    "pairs": [
+      "cue-ambient",
+      "cue-glow",
+      "cue-pulse",
+      "cue-spinner"
+    ],
+    "never-pair": [],
+    "timing": "n/a (wrapper marker — no own styles, only activates .cue-ambient on :hover/:focus-within)",
+    "css-vars": []
+  },
+  "cue-marquee": {
+    "class": "cue-marquee",
+    "category": "marquee",
+    "vibe": [
+      "marketing",
+      "social-proof",
+      "testimonial",
+      "logos",
+      "ticker"
+    ],
+    "avoid-when": [
+      "enterprise-data",
+      "technical",
+      "calm",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-marquee-track"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-shake"
+    ],
+    "timing": "n/a (container — masks edges with linear-gradient)",
+    "css-vars": []
+  },
+  "cue-marquee-track": {
+    "class": "cue-marquee-track",
+    "category": "marquee",
+    "vibe": [
+      "marketing",
+      "social-proof",
+      "testimonial",
+      "logos",
+      "ticker"
+    ],
+    "avoid-when": [
+      "enterprise-data",
+      "technical",
+      "calm"
+    ],
+    "pairs": [
+      "cue-marquee"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-marquee-duration, 30s) linear infinite (paused unless hovered)",
+    "css-vars": [
+      "--cue-marquee-duration"
+    ]
+  },
+  "cue-step-enter": {
+    "class": "cue-step-enter",
+    "category": "transition",
+    "vibe": [
+      "demo",
+      "tutorial",
+      "presentation",
+      "slideshow",
+      "walkthrough"
+    ],
+    "avoid-when": [
+      "single-page",
+      "static",
+      "cinematic"
+    ],
+    "pairs": [
+      "cue-step-enter-active",
+      "cue-step-exit",
+      "cue-step-exit-active"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter",
+      "fx-slide-in"
+    ],
+    "timing": "var(--cue-step-duration, 400ms)",
+    "css-vars": [
+      "--cue-step-direction",
+      "--cue-step-offset",
+      "--cue-step-duration",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-step-enter-active": {
+    "class": "cue-step-enter-active",
+    "category": "transition",
+    "vibe": [
+      "demo",
+      "tutorial",
+      "presentation",
+      "slideshow"
+    ],
+    "avoid-when": [
+      "single-page",
+      "static"
+    ],
+    "pairs": [
+      "cue-step-enter",
+      "cue-step-exit",
+      "cue-step-exit-active"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-step-duration, 400ms)",
+    "css-vars": [
+      "--cue-step-direction",
+      "--cue-step-offset",
+      "--cue-step-duration",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-step-exit": {
+    "class": "cue-step-exit",
+    "category": "transition",
+    "vibe": [
+      "demo",
+      "tutorial",
+      "presentation",
+      "slideshow"
+    ],
+    "avoid-when": [
+      "single-page",
+      "static"
+    ],
+    "pairs": [
+      "cue-step-enter",
+      "cue-step-enter-active",
+      "cue-step-exit-active"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-step-duration, 400ms)",
+    "css-vars": [
+      "--cue-step-direction",
+      "--cue-step-offset",
+      "--cue-step-duration",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-step-exit-active": {
+    "class": "cue-step-exit-active",
+    "category": "transition",
+    "vibe": [
+      "demo",
+      "tutorial",
+      "presentation",
+      "slideshow"
+    ],
+    "avoid-when": [
+      "single-page",
+      "static"
+    ],
+    "pairs": [
+      "cue-step-enter",
+      "cue-step-enter-active",
+      "cue-step-exit"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-step-duration, 400ms)",
+    "css-vars": [
+      "--cue-step-direction",
+      "--cue-step-offset",
+      "--cue-step-duration",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-pointer": {
+    "class": "cue-pointer",
+    "category": "utility",
+    "vibe": [
+      "demo",
+      "tutorial",
+      "walkthrough",
+      "ai-agent",
+      "product-tour"
+    ],
+    "avoid-when": [
+      "static-landing",
+      "enterprise-report",
+      "print"
+    ],
+    "pairs": [
+      "cue-pointer-clicking",
+      "cue-canvas",
+      "cue-canvas-center",
+      "cue-step-enter"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-normal, 300ms) for movement; var(--cue-duration-fast, 150ms) for transform",
+    "css-vars": [
+      "--cue-cursor-url",
+      "--cue-duration-normal",
+      "--cue-duration-fast",
+      "--cue-ease-out",
+      "--cue-ease-spring"
+    ]
+  },
+  "cue-pointer-clicking": {
+    "class": "cue-pointer-clicking",
+    "category": "utility",
+    "vibe": [
+      "demo",
+      "tutorial",
+      "walkthrough",
+      "feedback"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-pointer"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-fast, 150ms)",
+    "css-vars": [
+      "--cue-duration-fast",
+      "--cue-ease-spring"
+    ]
+  },
+  "cue-hover-lift": {
+    "class": "cue-hover-lift",
+    "category": "transition",
+    "vibe": [
+      "interactive",
+      "premium",
+      "saas",
+      "card-grid",
+      "modern"
+    ],
+    "avoid-when": [
+      "flat-design",
+      "mobile-touch",
+      "enterprise-flat"
+    ],
+    "pairs": [
+      "cue-hover-scale",
+      "cue-enter",
+      "cue-enter-scale",
+      "cue-stagger-2"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-fast, 150ms)",
+    "css-vars": [
+      "--cue-duration-fast",
+      "--cue-ease-spring",
+      "--cue-ease-out"
+    ]
+  },
+  "cue-hover-scale": {
+    "class": "cue-hover-scale",
+    "category": "transition",
+    "vibe": [
+      "interactive",
+      "modern",
+      "playful-premium",
+      "consumer"
+    ],
+    "avoid-when": [
+      "enterprise-flat",
+      "minimal"
+    ],
+    "pairs": [
+      "cue-hover-lift",
+      "cue-enter-scale",
+      "cue-stagger-2"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-fast, 150ms)",
+    "css-vars": [
+      "--cue-duration-fast",
+      "--cue-ease-spring"
+    ]
+  },
+  "cue-hover-glow": {
+    "class": "cue-hover-glow",
+    "category": "transition",
+    "vibe": [
+      "ai",
+      "magical",
+      "futuristic",
+      "premium-cta"
+    ],
+    "avoid-when": [
+      "corporate-flat",
+      "minimal",
+      "enterprise"
+    ],
+    "pairs": [
+      "cue-glow",
+      "cue-enter-scale",
+      "cue-ambient"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-normal, 300ms)",
+    "css-vars": [
+      "--cue-duration-normal",
+      "--cue-ease-out",
+      "--cue-color-glow"
+    ]
+  },
+  "cue-stagger-1": {
+    "class": "cue-stagger-1",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise",
+      "cue-enter-slide-down",
+      "cue-enter-slide-left",
+      "cue-enter-slide-right"
+    ],
+    "never-pair": [],
+    "timing": "50ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-2": {
+    "class": "cue-stagger-2",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise",
+      "cue-enter-bounce"
+    ],
+    "never-pair": [],
+    "timing": "100ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-3": {
+    "class": "cue-stagger-3",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise",
+      "cue-enter-bounce"
+    ],
+    "never-pair": [],
+    "timing": "150ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-4": {
+    "class": "cue-stagger-4",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise"
+    ],
+    "never-pair": [],
+    "timing": "200ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-5": {
+    "class": "cue-stagger-5",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise"
+    ],
+    "never-pair": [],
+    "timing": "250ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-6": {
+    "class": "cue-stagger-6",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise"
+    ],
+    "never-pair": [],
+    "timing": "300ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-7": {
+    "class": "cue-stagger-7",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise"
+    ],
+    "never-pair": [],
+    "timing": "350ms delay",
+    "css-vars": []
+  },
+  "cue-stagger-8": {
+    "class": "cue-stagger-8",
+    "category": "utility",
+    "vibe": [
+      "rhythmic",
+      "premium",
+      "modern",
+      "list-reveal"
+    ],
+    "avoid-when": [
+      "single-element"
+    ],
+    "pairs": [
+      "cue-enter",
+      "cue-enter-fade",
+      "cue-enter-scale",
+      "fx-slide-in",
+      "fx-fade-in",
+      "fx-rise"
+    ],
+    "never-pair": [],
+    "timing": "400ms delay",
+    "css-vars": []
+  },
+  "cue-hidden": {
+    "class": "cue-hidden",
+    "category": "utility",
+    "vibe": [
+      "neutral",
+      "utility",
+      "state-toggle"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-visible"
+    ],
+    "never-pair": [],
+    "timing": "n/a (instant state)",
+    "css-vars": []
+  },
+  "cue-visible": {
+    "class": "cue-visible",
+    "category": "utility",
+    "vibe": [
+      "neutral",
+      "utility",
+      "state-toggle"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-hidden"
+    ],
+    "never-pair": [],
+    "timing": "n/a (instant state)",
+    "css-vars": []
+  },
+  "cue-canvas": {
+    "class": "cue-canvas",
+    "category": "layout",
+    "vibe": [
+      "demo",
+      "social",
+      "responsive",
+      "showcase",
+      "embed"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-canvas-center",
+      "cue-pointer"
+    ],
+    "never-pair": [],
+    "timing": "n/a (layout container — uses container-type: size)",
+    "css-vars": []
+  },
+  "cue-canvas-center": {
+    "class": "cue-canvas-center",
+    "category": "layout",
+    "vibe": [
+      "demo",
+      "showcase",
+      "premium",
+      "fullscreen-embed"
+    ],
+    "avoid-when": [
+      "inline-content"
+    ],
+    "pairs": [
+      "cue-canvas"
+    ],
+    "never-pair": [],
+    "timing": "n/a (layout wrapper)",
+    "css-vars": [
+      "--cue-canvas-center-bg"
+    ]
+  }
+}
