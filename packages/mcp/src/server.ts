@@ -11,6 +11,7 @@
  *   2. cue_export_html — Export a DemoScript to a self-contained HTML file
  *   3. cue_validate    — Validate a DemoScript JSON object
  *   4. cue_get_stats   — Query analytics stats for a demo
+ *   5. cue_style       — Recommend curated cue techniques based on user intent
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -21,6 +22,7 @@ import { generateToolSchema, handleGenerate } from "./tools/generate.js";
 import { exportHtmlToolSchema, handleExportHtml } from "./tools/export.js";
 import { validateToolSchema, handleValidate } from "./tools/validate.js";
 import { statsToolSchema, handleGetStats } from "./tools/stats.js";
+import { styleToolSchema, handleStyle } from "./tools/style.js";
 
 /** Read version from package.json at runtime so it stays in sync automatically.
  *  createRequire() produces a CJS-style require() that resolves relative
@@ -74,6 +76,16 @@ export function createServer(): McpServer {
     statsToolSchema,
     async (args) => {
       return handleGetStats(args as Record<string, unknown>);
+    }
+  );
+
+  // ─── Tool 5: cue_style ───────────────────────────────────────────────────
+  server.tool(
+    "cue_style",
+    "Recommend a curated set of cue techniques based on a user's intent (vibe / goal) and optional context. Provide a short description like \"premium landing page like Apple\", \"playful mobile app\", or \"enterprise dashboard\". Returns a JSON object with the chosen preset, techniques to use, techniques to avoid, recommended CSS variables, and a rationale. Always returns valid JSON and falls back to the saas-launch preset when no specific intent is matched.",
+    styleToolSchema,
+    async (args) => {
+      return handleStyle(args as Record<string, unknown>);
     }
   );
 
