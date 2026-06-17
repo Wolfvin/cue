@@ -541,6 +541,51 @@ Easing standar:
 9. **JANGAN** pakai `cue-stagger` tanpa `cue-enter` â€” stagger hanya mengatur delay, bukan animasi
 10. **JANGAN** lupa `will-change: transform` pada elemen yang animasi berat (tapi remove setelah selesai)
 
+## Taste Guide — Avoiding Generic Output
+
+This section is about taste — the difference between output that feels intentional and output that feels like every other template. Before choosing techniques, read these rules. They are guard rails, not suggestions.
+
+### 1. Intent → Preset Mapping
+
+Always call `cue_style(intent, context)` before choosing techniques manually. The table below maps common user intent keywords to the correct preset and its avoid list.
+
+| When the user says... | Preset | Avoid |
+|---|---|---|
+| "premium", "clean", "like Apple", "SaaS" | saas-launch | bounce, shake, spinner |
+| "enterprise", "B2B", "dashboard", "professional" | enterprise | all infinite loops, cinematic, marquee |
+| "playful", "indie", "bold", "startup" | indie-hacker | cinematic, rise |
+| "portfolio", "creative", "personal" | portfolio | bounce, shake, spinner, marquee |
+
+### 2. Generic Red Flags
+
+These are signs that the output will look generic — avoid them at all costs:
+
+- Every element uses the same entrance animation
+- Mixing `cue-bounce` with `cue-cinematic` on the same page
+- Infinite animations (`pulse`, `glow`) on more than 1 element per section
+- All animation durations are identical (everything at 300ms = robotic)
+- No hierarchy — hero, body, and CTA all get the same treatment
+
+### 3. Timing Rules
+
+- **Entrance animations:** max 800ms. Anything longer feels like loading, not design.
+- **cue-cinematic:** reserved for hero sections or "wow" moments — max 1 per page.
+- **Infinite loops** (`pulse`, `glow`): max 1 per section, only for CTAs or elements that need attention.
+- **Marquee:** min 20s duration, never faster than 15s — too fast feels anxious.
+- **Step transitions:** 300–500ms. Below 200ms is imperceptible and feels like no transition at all.
+
+### 4. Correct Layering Technique
+
+- ✅ **Allowed:** `cue-cinematic` hero + `fx-slide-in` for cards + `cue-ambient` for CTA
+- ❌ **Forbidden:** `cue-cinematic` + `cue-bounce` + `cue-shake` on the same page
+- **Rule of thumb:** max 3 different techniques per page. More than that = chaos.
+
+### 5. Quick Reference: Use `cue_style` First
+
+Always call `cue_style(intent, context)` before choosing techniques manually. `cue_style` returns a preset + avoid list — this is a guard rail, not a suggestion. If you ignore it, your output will look generic.
+
+---
+
 ## Contoh Output Lengkap
 
 ### Recipe 1 Output: File `app/page.tsx`
