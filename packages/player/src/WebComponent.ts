@@ -9,25 +9,37 @@ export class CueEmbed extends HTMLElement {
   private root: Root | null = null;
   private mounted = false;
   private _goTo: ((n: number) => void) | null = null;
+  private intersectionObserver: IntersectionObserver | null = null;
 
   /** Observed attributes for reactive updates. */
   static get observedAttributes(): string[] {
-    return ["src", "data", "width", "height", "autoplay", "loop"];
+    return ["src", "data", "width", "height", "autoplay", "loop", "lazy"];
   }
 
   connectedCallback(): void {
     if (this.mounted) return;
-    this.mounted = true;
 
-    const shadow = this.attachShadow({ mode: "open" });
-    const container = document.createElement("div");
-    shadow.appendChild(container);
+    // Lazy mount: defer player initialization until the element is within
+    // 200px of the viewport. This avoids loading the player (and its demo
+    // data) for embeds that are far below the fold.
+    //
+    // Backward compatibility: when the `lazy` attribute is NOT present, the
+    // behavior is identical to before — mount synchronously inside
+    // connectedCallback.
+    if (this.hasAttribute("lazy") && typeof IntersectionObserver !== "undefined") {
+      this.setupLazyMount();
+      return;
+    }
 
-    this.root = createRoot(container);
-    this.loadAndRender();
+    this.mountPlayer();
   }
 
   disconnectedCallback(): void {
+    // Clean up the IntersectionObserver if lazy mount was pending.
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
     this.mounted = false;
     if (this.root) {
       this.root.unmount();
@@ -59,6 +71,48 @@ export class CueEmbed extends HTMLElement {
   }
 
   // ─── Internal ────────────────────────────────────────────────────────────
+
+  /**
+   * Set up an IntersectionObserver that mounts the player the first time the
+   * element comes within `rootMargin` of the viewport. Once triggered the
+   * observer is disconnected — we only lazy-mount once.
+   *
+   * Falls back to immediate mounting if IntersectionObserver is unavailable
+   * (e.g. very old browsers, or jsdom without polyfill).
+   */
+  private setupLazyMount(): void {
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            // Disconnect first to avoid re-entering if mountPlayer throws.
+            this.intersectionObserver?.disconnect();
+            this.intersectionObserver = null;
+            this.mountPlayer();
+            break;
+          }
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    this.intersectionObserver.observe(this);
+  }
+
+  /**
+   * Attach the shadow DOM, create the React root, and trigger the first
+   * render. Idempotent — guarded by `this.mounted`.
+   */
+  private mountPlayer(): void {
+    if (this.mounted) return;
+    this.mounted = true;
+
+    const shadow = this.attachShadow({ mode: "open" });
+    const container = document.createElement("div");
+    shadow.appendChild(container);
+
+    this.root = createRoot(container);
+    this.loadAndRender();
+  }
 
   private loadAndRender(): void {
     const src = this.getAttribute("src");

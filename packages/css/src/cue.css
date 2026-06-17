@@ -159,6 +159,64 @@
   animation: cue-bounce-in var(--cue-duration-slow) var(--cue-ease-spring) both;
 }
 
+/* ── Step Transition Utilities ─────────────────────────────────────────── */
+/*
+   Directional enter/exit transitions for demo step changes.
+   Inspired by the .slide / .slide.active / .slide.exit-left pattern in
+   showcase/saas/index.html, promoted to first-class utilities so any
+   consumer (React component, vanilla HTML, or custom element) can use them.
+
+   Direction is controlled via the --cue-step-direction CSS variable:
+     1  (default) — forward  (next step): enter from right, exit to left
+     -1           — backward (prev step): enter from left,  exit to right
+
+   Typical usage (React Transition Group-style):
+     1. Apply .cue-step-enter to the incoming element (initial state).
+     2. On the next frame, add .cue-step-enter-active to animate to the
+        final state.
+     3. For the outgoing element: apply .cue-step-exit, then on the next
+        frame add .cue-step-exit-active.
+     4. Remove the outgoing element after the transition duration.
+
+   The offset distance and duration can be overridden by the consumer via
+   the --cue-step-offset and --cue-step-duration custom properties.
+*/
+
+:root {
+  --cue-step-offset: 28px;
+  --cue-step-duration: 400ms;
+}
+
+/* Incoming step — initial state (offset, invisible). */
+.cue-step-enter {
+  opacity: 0;
+  transform: translate3d(calc(var(--cue-step-direction, 1) * var(--cue-step-offset)), 0, 0);
+  transition: opacity var(--cue-step-duration) var(--cue-ease-out),
+              transform var(--cue-step-duration) var(--cue-ease-out);
+  will-change: opacity, transform;
+}
+
+/* Incoming step — final state (no offset, visible). */
+.cue-step-enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Outgoing step — initial state (visible, no offset). */
+.cue-step-exit {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity var(--cue-step-duration) var(--cue-ease-out),
+              transform var(--cue-step-duration) var(--cue-ease-out);
+  will-change: opacity, transform;
+}
+
+/* Outgoing step — final state (offset in the opposite direction, invisible). */
+.cue-step-exit-active {
+  opacity: 0;
+  transform: translate3d(calc(var(--cue-step-direction, 1) * var(--cue-step-offset) * -1), 0, 0);
+}
+
 /* ── Hover Utilities ───────────────────────────────────────────────────── */
 
 .cue-hover-lift {
