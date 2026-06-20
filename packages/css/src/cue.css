@@ -12,6 +12,15 @@
   --cue-ease-in-out: cubic-bezier(0.83, 0, 0.17, 1);
   --cue-ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
 
+  /* Extended easing tokens (Issue #391 — design-system easing family)
+     Complements the four core easings above with gentler variants
+     and additional named curves. Reference via var(--cue-ease-*). */
+  --cue-ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --cue-ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cue-ease-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --cue-ease-linear: linear;
+  --cue-ease-snappy: cubic-bezier(0.191, 0.703, 0.704, 0.952);
+
   /* Durations */
   --cue-duration-fast: 150ms;
   --cue-duration-normal: 300ms;
@@ -2628,6 +2637,620 @@
 
 
 /* ========================================================================
+   Issue #351 — cue-dropdown-clip
+   NOTE: issue #351 proposed the name `cue-dropdown-reveal`, but that
+   class already exists on main (issues #256 / #317 use a grid-template-rows
+   / scaleY approach). To avoid collision we use `cue-dropdown-clip` for
+   this Stripe-style clip-path inset variant. Different mechanism, distinct
+   class. Structure-first/visual-second rhythm: clip-path & max-height
+   complete in 200ms, opacity/transform/height take 300ms. The -60px
+   horizontal bleed ensures rounded bottom corners don't clip mid-reveal.
+   Driven by [data-status="open"] on root.
+   ======================================================================== */
+
+.cue-dropdown-clip {
+  --cue-dropdown-clip-duration-fast: 0.2s;
+  --cue-dropdown-clip-duration-slow: 0.3s;
+  --cue-dropdown-clip-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --cue-dropdown-clip-radius: 12px;
+  --cue-dropdown-clip-bleed: -60px;
+}
+
+.cue-dropdown-clip__panel {
+  opacity: 0;
+  clip-path: inset(
+    0 var(--cue-dropdown-clip-bleed) 100% var(--cue-dropdown-clip-bleed)
+    round 0 0 var(--cue-dropdown-clip-radius) var(--cue-dropdown-clip-radius)
+  );
+  transition-property: clip-path, max-height, opacity, transform, height;
+  transition-duration:
+    var(--cue-dropdown-clip-duration-fast),
+    var(--cue-dropdown-clip-duration-fast),
+    var(--cue-dropdown-clip-duration-slow),
+    var(--cue-dropdown-clip-duration-slow),
+    var(--cue-dropdown-clip-duration-slow);
+  transition-timing-function: var(--cue-dropdown-clip-ease);
+}
+
+.cue-dropdown-clip[data-status="open"] .cue-dropdown-clip__panel {
+  opacity: 1;
+  clip-path: inset(
+    0 var(--cue-dropdown-clip-bleed) var(--cue-dropdown-clip-bleed) var(--cue-dropdown-clip-bleed)
+    round 0 0 var(--cue-dropdown-clip-radius) var(--cue-dropdown-clip-radius)
+  );
+}
+
+.cue-dropdown-clip__overlay {
+  opacity: 0;
+  transition: opacity var(--cue-dropdown-clip-duration-slow) var(--cue-dropdown-clip-ease);
+}
+
+.cue-dropdown-clip[data-status="open"] .cue-dropdown-clip__overlay {
+  opacity: 1;
+}
+
+/* ========================================================================
+   Issue #378 — cue-hero-stagger
+   CSS-var-indexed stagger: consumer sets `--index: N` per element via
+   inline style, CSS computes delay via `calc(var(--index) * step)`.
+   Solves three limitations of `cue-stagger-1..8`: unbounded N,
+   configurable step, configurable start delay. Uses individual `scale`
+   property (CSS Transforms L2) for cheaper recomputation than transform.
+   ======================================================================== */
+
+@keyframes cue-hero-stagger-run {
+  0% {
+    opacity: 0;
+    scale: var(--cue-hero-stagger-from-scale, 0);
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.cue-hero-stagger {
+  opacity: 0;
+  scale: var(--cue-hero-stagger-from-scale, 0);
+  animation: cue-hero-stagger-run
+             var(--cue-hero-stagger-duration, 0.3s)
+             var(--cue-hero-stagger-ease, var(--cue-ease-snappy))
+             forwards;
+  animation-delay: calc(
+    var(--cue-hero-stagger-start, 0s) +
+    var(--index, 0) * var(--cue-hero-stagger-step, 0.1s)
+  );
+  will-change: opacity, scale;
+}
+
+/* Fallback for browsers without individual `scale` property */
+@supports not (scale: 1) {
+  @keyframes cue-hero-stagger-run {
+    0%   { opacity: 0; transform: scale(var(--cue-hero-stagger-from-scale, 0)); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .cue-hero-stagger {
+    transform: scale(var(--cue-hero-stagger-from-scale, 0));
+  }
+}
+
+/* ========================================================================
+   Issue #380 — cue-loader-dash
+   Material-style circular indeterminate loader via dual parallel
+   animations: parent SVG rotates (2s linear infinite), child SVG circle
+   dash morphs (1.5s ease-in-out infinite). Out-of-sync durations create
+   ever-changing visuals. `transform-box: fill-box` is critical for
+   correct transform-origin on SVG primitives.
+   ======================================================================== */
+
+@keyframes cue-loader-dash-rotate {
+  to { transform: rotate(1turn); }
+}
+
+@keyframes cue-loader-dash-morph {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: var(--cue-loader-dash-peak, 89), 200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: var(--cue-loader-dash-peak, 89), 200;
+    stroke-dashoffset: -124;
+  }
+}
+
+.cue-loader-dash {
+  animation: cue-loader-dash-rotate
+             var(--cue-loader-dash-rotate-duration, 2s)
+             linear
+             infinite;
+  will-change: transform;
+}
+
+.cue-loader-dash-circle {
+  stroke-dasharray: 150, 200;
+  stroke-dashoffset: -10;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: cue-loader-dash-morph
+             var(--cue-loader-dash-morph-duration, 1.5s)
+             ease-in-out
+             infinite;
+  will-change: stroke-dasharray, stroke-dashoffset;
+}
+
+/* ========================================================================
+   Issue #383 — cue-arrow-draw-3key
+   Multi-stage choreographed SVG arrow draw with three parallel
+   @keyframes — stem draws 0→50%, head draws 23%→36% (overlaps stem),
+   whole arrow moves 0→37%. All 2.5s ease-in-out infinite. Dead time
+   (37%→100%) holds final state so loops don't feel frantic.
+   ======================================================================== */
+
+@keyframes cue-arrow-draw-3key-stem {
+  0%   { stroke-dashoffset: var(--cue-arrow-stem-length, 200); }
+  50%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes cue-arrow-draw-3key-head {
+  0%   { stroke-dashoffset: var(--cue-arrow-head-length, 30); }
+  23%  { stroke-dashoffset: var(--cue-arrow-head-length, 30); }
+  36%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes cue-arrow-draw-3key-move {
+  0%   { transform: translate(var(--cue-arrow-move-x, -25px), var(--cue-arrow-move-y, 15px)); }
+  37%  { transform: translate(0); }
+  100% { transform: translate(0); }
+}
+
+.cue-arrow-draw-3key {
+  animation: cue-arrow-draw-3key-move
+             var(--cue-arrow-duration, 2.5s)
+             ease-in-out
+             infinite;
+  will-change: transform;
+}
+
+.cue-arrow-draw-3key-stem {
+  stroke-dasharray: var(--cue-arrow-stem-length, 200);
+  stroke-dashoffset: var(--cue-arrow-stem-length, 200);
+  animation: cue-arrow-draw-3key-stem
+             var(--cue-arrow-duration, 2.5s)
+             ease-in-out
+             infinite;
+  will-change: stroke-dashoffset;
+}
+
+.cue-arrow-draw-3key-head {
+  stroke-dasharray: var(--cue-arrow-head-length, 30);
+  stroke-dashoffset: var(--cue-arrow-head-length, 30);
+  animation: cue-arrow-draw-3key-head
+             var(--cue-arrow-duration, 2.5s)
+             ease-in-out
+             infinite;
+  will-change: stroke-dashoffset;
+}
+
+/* ========================================================================
+   Issue #387 — cue-mask-wipe
+   Diagonal mask wipe reveal via @property-registered CSS variable
+   (--cue-mask-wipe-position). Modern CSS Houdini technique — animates
+   the variable, not transform/opacity. mask-image recomputes each
+   frame as variable interpolates from -100% to 120%. Gradient edge
+   (soft transition) instead of hard clip-path edge. One-shot, not
+   looping. Pair with IntersectionObserver or .is-visible trigger.
+   ======================================================================== */
+
+@property --cue-mask-wipe-position {
+  syntax: '<percentage>';
+  initial-value: -100%;
+  inherits: false;
+}
+
+@keyframes cue-mask-wipe {
+  0%   { --cue-mask-wipe-position: -100%; }
+  100% { --cue-mask-wipe-position: 120%; }
+}
+
+.cue-mask-wipe {
+  overflow: hidden;
+  --cue-mask-wipe-position: -100%;
+  -webkit-mask-image: linear-gradient(
+    var(--cue-mask-wipe-angle, 160deg),
+    black var(--cue-mask-wipe-position),
+    transparent calc(var(--cue-mask-wipe-position) + var(--cue-mask-wipe-fade-width, 80%)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    var(--cue-mask-wipe-angle, 160deg),
+    black var(--cue-mask-wipe-position),
+    transparent calc(var(--cue-mask-wipe-position) + var(--cue-mask-wipe-fade-width, 80%)),
+    transparent
+  );
+  animation: cue-mask-wipe
+             var(--cue-mask-wipe-duration, 1.5s)
+             var(--cue-mask-wipe-ease, var(--cue-ease-quart))
+             forwards;
+}
+
+/* Reverse variant (hide instead of reveal) */
+.cue-mask-wipe--hide {
+  animation-direction: reverse;
+  --cue-mask-wipe-position: 120%;
+}
+
+/* ========================================================================
+   Issue #388 — cue-equalizer
+   7-bar audio-equalizer loader with mirrored V-shape durations
+   (center slowest: 0.6/0.7/0.8/0.9/0.8/0.7/0.6s) and asymmetric
+   scaleY peaks (bar 4 overshoots to 1.3, bar 7 only reaches 0.5).
+   transform-origin: center so bars "breathe" from middle. Premium
+   alternative to cue-spinner for loading states with horizontal space.
+   ======================================================================== */
+
+@keyframes cue-equalizer-bar-1 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(0.6); }
+}
+@keyframes cue-equalizer-bar-2 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(0.8); }
+}
+@keyframes cue-equalizer-bar-3 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(1); }
+}
+@keyframes cue-equalizer-bar-4 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(1.3); }
+}
+@keyframes cue-equalizer-bar-5 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(1.2); }
+}
+@keyframes cue-equalizer-bar-6 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(1.1); }
+}
+@keyframes cue-equalizer-bar-7 {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(0.5); }
+}
+
+.cue-equalizer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cue-equalizer-gap, 3px);
+  height: var(--cue-equalizer-height, 20px);
+}
+
+.cue-equalizer > * {
+  width: var(--cue-equalizer-bar-width, 3px);
+  height: 100%;
+  background-color: var(--cue-equalizer-color, currentColor);
+  border-radius: var(--cue-equalizer-radius, 9999px);
+  transform-origin: center;
+  transform: scaleY(var(--cue-equalizer-baseline, 0.25));
+  animation-duration: var(--cue-equalizer-duration, 0.8s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Per-bar duration + peak height via :nth-child — V-shape + asymmetric */
+.cue-equalizer > *:nth-child(1) { --cue-equalizer-duration: 0.6s; animation-name: cue-equalizer-bar-1; }
+.cue-equalizer > *:nth-child(2) { --cue-equalizer-duration: 0.7s; animation-name: cue-equalizer-bar-2; }
+.cue-equalizer > *:nth-child(3) { --cue-equalizer-duration: 0.8s; animation-name: cue-equalizer-bar-3; }
+.cue-equalizer > *:nth-child(4) { --cue-equalizer-duration: 0.9s; animation-name: cue-equalizer-bar-4; }
+.cue-equalizer > *:nth-child(5) { --cue-equalizer-duration: 0.8s; animation-name: cue-equalizer-bar-5; }
+.cue-equalizer > *:nth-child(6) { --cue-equalizer-duration: 0.7s; animation-name: cue-equalizer-bar-6; }
+.cue-equalizer > *:nth-child(7) { --cue-equalizer-duration: 0.6s; animation-name: cue-equalizer-bar-7; }
+
+/* 3-bar compact variant (mobile-friendly) */
+.cue-equalizer--3 > *:nth-child(n+4) { display: none; }
+.cue-equalizer--3 > *:nth-child(1) { --cue-equalizer-duration: 0.7s; }
+.cue-equalizer--3 > *:nth-child(2) { --cue-equalizer-duration: 0.9s; }
+.cue-equalizer--3 > *:nth-child(3) { --cue-equalizer-duration: 0.7s; }
+
+/* Pause via class or hover */
+.cue-equalizer.is-paused > *,
+.cue-equalizer:hover > * {
+  animation-play-state: paused;
+}
+
+/* ========================================================================
+   Issue #389 — cue-gradient-border
+   Gradient border via 2-layer mask composite (content-box + border-box,
+   XOR via mask-composite: exclude). Modern technique that follows
+   border-radius perfectly — solves the long-standing limitation of
+   `border-image` which stays square. Single pseudo-element, no extra
+   DOM. Themeable via --cue-gradient-border-size and -gradient vars.
+   ======================================================================== */
+
+.cue-gradient-border {
+  position: relative;
+  --cue-gradient-border-size: 1px;
+  --cue-gradient-border-gradient: linear-gradient(
+    178.8deg,
+    rgba(255, 255, 255, 0.25) 10.85%,
+    rgba(20, 20, 20, 0.46) 24.36%,
+    rgba(50, 50, 50, 0.46) 73.67%,
+    rgba(255, 255, 255, 0.46) 90.68%
+  );
+}
+
+.cue-gradient-border::before {
+  content: '';
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+  padding: var(--cue-gradient-border-size, 1px);
+  background: var(--cue-gradient-border-gradient);
+  mask: linear-gradient(black, black) content-box, linear-gradient(black, black);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: 1;
+}
+
+/* ========================================================================
+   Issue #390 — cue-noise-overlay
+   Procedural noise texture via SVG feTurbulence filter applied to
+   ::after pseudo-element. Crisp at any zoom, no image asset, seamless
+   tiling (stitchTiles: stitch). Requires companion SVG filter def
+   with id="cue-noise-filter" in the document — see PR description.
+   Default opacity 0.1 = premium "barely there" film grain.
+   ======================================================================== */
+
+.cue-noise-overlay {
+  position: relative;
+}
+
+.cue-noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  filter: url(#cue-noise-filter);
+  opacity: var(--cue-noise-opacity, 0.1);
+  pointer-events: none;
+  z-index: var(--cue-noise-z-index, 1);
+  mix-blend-mode: var(--cue-noise-blend, normal);
+}
+
+/* ========================================================================
+   Issue #391 — cue-ease-tokens
+   Marker class that re-declares all cue easing tokens on a subtree.
+   Tokens themselves live in :root (see top of file); this class lets
+   consumers scope them to a subtree or override per-instance. Pure
+   utility — no animation behavior on its own.
+   ======================================================================== */
+
+.cue-ease-tokens {
+  --cue-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cue-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cue-ease-in-out: cubic-bezier(0.83, 0, 0.17, 1);
+  --cue-ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --cue-ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --cue-ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cue-ease-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --cue-ease-linear: linear;
+  --cue-ease-snappy: cubic-bezier(0.191, 0.703, 0.704, 0.952);
+}
+
+/* ========================================================================
+   Issue #392 — cue-aurora-dots
+   3-color blurred dot cluster that rotates slowly when active.
+   Single element + 2 box-shadows (efficient DOM) for inverted-triangle
+   arrangement. Heavy blur (8px → 6px when active) makes dots form an
+   aura. Asymmetric rotation: rotate 5s, pause 5s (not constant spin).
+   Hidden by default; revealed by `.is-active` or parent [data-state="active"].
+   ======================================================================== */
+
+@keyframes cue-aurora-rotate {
+  0%   { transform: rotate(0deg); }
+  50%  { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cue-aurora-dots {
+  position: absolute;
+  width: var(--cue-aurora-dot-size, 14px);
+  height: var(--cue-aurora-dot-size, 14px);
+  border-radius: 999px;
+  background: var(--cue-aurora-color-1, #e75ece);
+  box-shadow:
+    calc(var(--cue-aurora-offset-x, 10px) * -1) calc(var(--cue-aurora-offset-y, -6px) * -1) 0 var(--cue-aurora-color-2, #3487f1),
+    var(--cue-aurora-offset-x, 10px) calc(var(--cue-aurora-offset-y, -6px) * -1) 0 var(--cue-aurora-color-3, #fc6345);
+  filter: blur(var(--cue-aurora-blur, 8px));
+  transform-origin: center;
+  transition: filter 0.1s ease, opacity 0.5s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cue-aurora-dots.is-active,
+[data-state="active"] .cue-aurora-dots {
+  opacity: var(--cue-aurora-active-opacity, 0.7);
+  filter: blur(var(--cue-aurora-active-blur, 6px));
+  animation: cue-aurora-rotate
+             var(--cue-aurora-duration, 10s)
+             linear
+             infinite;
+}
+
+/* ========================================================================
+   Issue #393 — cue-glass-button
+   3D glassmorphic physical button via 5-layer inset box-shadow +
+   backdrop-filter. Multi-directional lighting (top + bottom highlights,
+   edge darkening, outer drop shadow) simulates real glass on a surface.
+   Includes :hover (deeper shadow) and :active (flatten + 1px press)
+   states. Themeable via --cue-glass-* CSS variables.
+   ======================================================================== */
+
+.cue-glass-button {
+  position: relative;
+  border-radius: var(--cue-glass-radius, 999px);
+  background: var(--cue-glass-bg, #787878);
+  transition: all var(--cue-glass-duration, 0.3s) ease;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  box-shadow:
+    inset 0px calc(var(--cue-glass-highlight-offset, -2px) * -1)
+      var(--cue-glass-highlight-blur, 4px)
+      rgba(255, 255, 255, var(--cue-glass-highlight-opacity, 0.5)),
+    inset 0px 0px var(--cue-glass-sheen-blur, 2px)
+      rgba(255, 255, 255, var(--cue-glass-sheen-opacity, 1)),
+    inset 0px var(--cue-glass-highlight-offset, 2px)
+      var(--cue-glass-highlight-blur, 4px)
+      rgba(255, 255, 255, calc(var(--cue-glass-highlight-opacity, 0.5) * 0.5)),
+    inset 0px calc(var(--cue-glass-edge-offset, 0.5px) * -1)
+      var(--cue-glass-edge-blur, 1px)
+      rgba(0, 0, 0, var(--cue-glass-edge-opacity, 0.5)),
+    0 var(--cue-glass-shadow-y, 2px)
+      var(--cue-glass-shadow-blur, 8px)
+      rgba(0, 0, 0, var(--cue-glass-shadow-opacity, 0.4));
+  backdrop-filter: blur(var(--cue-glass-backdrop-blur, 0.75px));
+  -webkit-backdrop-filter: blur(var(--cue-glass-backdrop-blur, 0.75px));
+}
+
+.cue-glass-button:hover {
+  background: var(--cue-glass-bg-hover, #888888);
+  box-shadow:
+    inset 0px calc(var(--cue-glass-highlight-offset, -2px) * -1)
+      var(--cue-glass-highlight-blur, 4px)
+      rgba(255, 255, 255, var(--cue-glass-highlight-opacity, 0.5)),
+    inset 0px 0px var(--cue-glass-sheen-blur, 2px)
+      rgba(255, 255, 255, var(--cue-glass-sheen-opacity, 1)),
+    inset 0px var(--cue-glass-highlight-offset, 2px)
+      var(--cue-glass-highlight-blur, 4px)
+      rgba(255, 255, 255, calc(var(--cue-glass-highlight-opacity, 0.5) * 0.5)),
+    inset 0px calc(var(--cue-glass-edge-offset, 0.5px) * -1)
+      var(--cue-glass-edge-blur, 1px)
+      rgba(0, 0, 0, var(--cue-glass-edge-opacity, 0.5)),
+    0 calc(var(--cue-glass-shadow-y, 2px) * 1.5)
+      calc(var(--cue-glass-shadow-blur, 8px) * 1.5)
+      rgba(0, 0, 0, var(--cue-glass-shadow-opacity, 0.4));
+}
+
+.cue-glass-button:active {
+  box-shadow:
+    inset 0px 0px var(--cue-glass-sheen-blur, 2px)
+      rgba(255, 255, 255, var(--cue-glass-sheen-opacity, 1)),
+    inset 0px 0px var(--cue-glass-edge-blur, 1px)
+      rgba(0, 0, 0, var(--cue-glass-edge-opacity, 0.5)),
+    0 0 0 transparent;
+  transform: translateY(1px);
+}
+
+/* ========================================================================
+   Issue #394 — cue-scroll-fade
+   Scrollable container with mask-image edge fade + cross-browser
+   scrollbar hiding. Content fades at edges instead of hard clipping,
+   inviting the user to scroll. Hides scrollbar in Firefox
+   (scrollbar-width), IE/legacy Edge (-ms-overflow-style), and Chrome/
+   Safari (::-webkit-scrollbar). Default horizontal; pair with
+   .cue-scroll-fade--vertical for vertical lists.
+   ======================================================================== */
+
+.cue-scroll-fade {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-x: auto;
+  min-width: 0;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black var(--cue-scroll-fade-left, 3%),
+    black var(--cue-scroll-fade-right, 90%),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black var(--cue-scroll-fade-left, 3%),
+    black var(--cue-scroll-fade-right, 90%),
+    transparent 100%
+  );
+}
+
+.cue-scroll-fade::-webkit-scrollbar {
+  display: none;
+}
+
+.cue-scroll-fade--vertical {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black var(--cue-scroll-fade-top, 3%),
+    black var(--cue-scroll-fade-bottom, 90%),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black var(--cue-scroll-fade-top, 3%),
+    black var(--cue-scroll-fade-bottom, 90%),
+    transparent 100%
+  );
+}
+
+/* ========================================================================
+   Issue #419 — cue-state-transition
+   Compound opacity+transform+visibility transition with staggered
+   `visibility` delay. The `visibility 0s [delay]` pattern is the
+   correct way to animate visibility without JS timers: showing =
+   visibility changes instantly; hiding = visibility delays until
+   fade completes. Solves the "invisible but clickable" bug of
+   opacity-only animations and the "cannot animate" bug of display:none.
+   Three speed tiers: -sm (200ms, badges/dots), base (300ms, tooltips),
+   -lg (400ms, full-screen panels).
+   ======================================================================== */
+
+.cue-state-transition {
+  opacity: 0;
+  visibility: hidden;
+  transform: var(--cue-state-transform-hide, translateY(var(--cue-state-offset, 10px)));
+  transition: opacity var(--cue-state-duration, 300ms) var(--cue-ease-out),
+              transform var(--cue-state-duration, 300ms) var(--cue-ease-out),
+              visibility 0s var(--cue-state-duration, 300ms);
+}
+
+.cue-state-transition.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: var(--cue-state-transform-show, none);
+  transition: opacity var(--cue-state-duration, 300ms) var(--cue-ease-out),
+              transform var(--cue-state-duration, 300ms) var(--cue-ease-out),
+              visibility 0s 0s;
+}
+
+.cue-state-transition-sm {
+  --cue-state-duration: 200ms;
+  --cue-state-offset: 6px;
+}
+
+.cue-state-transition-lg {
+  --cue-state-duration: 400ms;
+  --cue-state-offset: 16px;
+}
+
+/* ========================================================================
    Issue #104 — prefers-reduced-motion (MUST be last)
    ======================================================================== */
 
@@ -2947,6 +3570,79 @@
 
   .cue-toast-enter {
     animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  /* Issue #351 — dropdown-clip transitions collapse to instant */
+  .cue-dropdown-clip__panel,
+  .cue-dropdown-clip__overlay {
+    transition-duration: 0s !important;
+  }
+
+  /* Issue #378 — hero-stagger shows immediately */
+  .cue-hero-stagger {
+    animation: none !important;
+    opacity: 1 !important;
+    scale: 1 !important;
+    transform: none !important;
+  }
+
+  /* Issue #380 — loader-dash freezes; parent rotation + child morph off */
+  .cue-loader-dash,
+  .cue-loader-dash-circle {
+    animation: none !important;
+  }
+
+  /* Issue #383 — arrow-draw-3key shows fully drawn, no movement */
+  .cue-arrow-draw-3key,
+  .cue-arrow-draw-3key-stem,
+  .cue-arrow-draw-3key-head {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    transform: none !important;
+  }
+
+  /* Issue #387 — mask-wipe reveals content instantly */
+  .cue-mask-wipe {
+    animation: none !important;
+    --cue-mask-wipe-position: 120% !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  /* Issue #388 — equalizer shows static mid-height bars */
+  .cue-equalizer > * {
+    animation: none !important;
+    transform: scaleY(0.5) !important;
+  }
+
+  /* Issue #391 — easing tokens snap to step-end */
+  :root {
+    --cue-ease-in: step-end !important;
+    --cue-ease-out: step-end !important;
+    --cue-ease-in-out: step-end !important;
+    --cue-ease-spring: step-end !important;
+    --cue-ease-bounce: step-end !important;
+    --cue-ease-expo-out: step-end !important;
+    --cue-ease-quart: step-end !important;
+    --cue-ease-snappy: step-end !important;
+  }
+
+  /* Issue #392 — aurora-dots shows static (no rotation) */
+  .cue-aurora-dots.is-active,
+  [data-state="active"] .cue-aurora-dots {
+    animation: none !important;
+  }
+
+  /* Issue #393 — glass-button transitions off */
+  .cue-glass-button {
+    transition: none !important;
+  }
+
+  /* Issue #419 — state-transition collapses to instant visibility swap */
+  .cue-state-transition,
+  .cue-state-transition.is-visible {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
   }
 
 }
