@@ -7632,5 +7632,563 @@
     "css-vars": [
       "--cue-has-overflow"
     ]
+  },
+  "cue-conic-scan": {
+    "class": "cue-conic-scan",
+    "category": "ambient",
+    "vibe": [
+      "premium",
+      "scanning",
+      "radar",
+      "processing",
+      "intentional"
+    ],
+    "avoid-when": [
+      "static decorative",
+      "small UI < 48px",
+      "complex backgrounds"
+    ],
+    "pairs": [
+      "cue-pulse"
+    ],
+    "never-pair": [
+      "cue-spinner",
+      "cue-glow"
+    ],
+    "timing": "var(--cue-conic-scan-duration, 4s) linear forwards — 5-stop non-linear @property angle keyframe",
+    "css-vars": [
+      "--cue-conic-scan-color",
+      "--cue-conic-scan-duration",
+      "--cue-conic-scan-angle"
+    ]
+  },
+  "cue-conic-scan-loop": {
+    "class": "cue-conic-scan-loop",
+    "category": "ambient",
+    "vibe": [
+      "scanning",
+      "looping"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-conic-scan"
+    ],
+    "never-pair": [],
+    "timing": "Infinite loop variant",
+    "css-vars": []
+  },
+  "cue-conic-scan-fast": {
+    "class": "cue-conic-scan-fast",
+    "category": "ambient",
+    "vibe": [
+      "active-processing"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-conic-scan"
+    ],
+    "never-pair": [],
+    "timing": "1.5s — fast active processing",
+    "css-vars": [
+      "--cue-conic-scan-duration"
+    ]
+  },
+  "cue-conic-scan-ambient": {
+    "class": "cue-conic-scan-ambient",
+    "category": "ambient",
+    "vibe": [
+      "ambient-idle"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-conic-scan"
+    ],
+    "never-pair": [],
+    "timing": "12s — slow ambient idle",
+    "css-vars": [
+      "--cue-conic-scan-duration"
+    ]
+  },
+  "cue-speech-bubble": {
+    "class": "cue-speech-bubble",
+    "category": "entrance",
+    "vibe": [
+      "playful",
+      "chat",
+      "entrance",
+      "directional"
+    ],
+    "avoid-when": [
+      "enterprise",
+      "static"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-speech-bubble-duration, 300ms) ease-out forwards — translateY + scale overshoot + directional translateX",
+    "css-vars": [
+      "--cue-speech-bubble-duration",
+      "--cue-speech-bubble-dir"
+    ]
+  },
+  "cue-shared-underline": {
+    "class": "cue-shared-underline",
+    "category": "transition",
+    "vibe": [
+      "navigation",
+      "morph",
+      "shared-layout",
+      "framer-style",
+      "premium",
+      "interactive"
+    ],
+    "avoid-when": [
+      "static-nav",
+      "no-js",
+      "data-dense"
+    ],
+    "pairs": [
+      "cue-shared-underline-item"
+    ],
+    "never-pair": [
+      "cue-marquee",
+      "cue-cinematic",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-shared-underline-duration, 0.4s) cubic-bezier(0.34, 1.56, 0.64, 1) — spring morph",
+    "css-vars": [
+      "--cue-shared-underline-x",
+      "--cue-shared-underline-width",
+      "--cue-shared-underline-height",
+      "--cue-shared-underline-color",
+      "--cue-shared-underline-gap",
+      "--cue-shared-underline-duration"
+    ]
+  },
+  "cue-shared-underline-item": {
+    "class": "cue-shared-underline-item",
+    "category": "utility",
+    "vibe": [
+      "navigation"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-shared-underline"
+    ],
+    "never-pair": [],
+    "timing": "n/a (child — z-index: 2 above underline)",
+    "css-vars": []
+  },
+  "cue-jump-bounce": {
+    "class": "cue-jump-bounce",
+    "category": "transition",
+    "vibe": [
+      "playful",
+      "character",
+      "energetic",
+      "intentional",
+      "mascot"
+    ],
+    "avoid-when": [
+      "enterprise-flat",
+      "minimal",
+      "corporate-flat",
+      "documentation"
+    ],
+    "pairs": [
+      "cue-sprite",
+      "cue-breathe-scale"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-jump-duration, 0.4s) ease-out — 4-stop double-bounce via margin-top",
+    "css-vars": [
+      "--cue-jump-peak",
+      "--cue-jump-duration",
+      "--cue-jump-ease",
+      "--cue-jump-iteration",
+      "--cue-jump-fill-mode"
+    ]
+  },
+  "cue-jump-bounce--transform": {
+    "class": "cue-jump-bounce--transform",
+    "category": "transition",
+    "vibe": [
+      "character",
+      "gpu-friendly"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-jump-bounce"
+    ],
+    "never-pair": [],
+    "timing": "Same as cue-jump-bounce but uses transform: translateY (GPU-composited, no layout reflow)",
+    "css-vars": []
+  },
+  "cue-jump-bounce--large": {
+    "class": "cue-jump-bounce--large",
+    "category": "transition",
+    "vibe": [
+      "dramatic"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-jump-bounce"
+    ],
+    "never-pair": [],
+    "timing": "-48px peak, 0.6s duration",
+    "css-vars": [
+      "--cue-jump-peak",
+      "--cue-jump-duration"
+    ]
+  },
+  "cue-jump-bounce--small": {
+    "class": "cue-jump-bounce--small",
+    "category": "transition",
+    "vibe": [
+      "subtle"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-jump-bounce"
+    ],
+    "never-pair": [],
+    "timing": "-12px peak, 0.3s duration",
+    "css-vars": [
+      "--cue-jump-peak",
+      "--cue-jump-duration"
+    ]
+  },
+  "cue-jump-bounce--triple": {
+    "class": "cue-jump-bounce--triple",
+    "category": "transition",
+    "vibe": [
+      "extra-playful"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-jump-bounce"
+    ],
+    "never-pair": [],
+    "timing": "7-stop triple bounce with decreasing amplitude",
+    "css-vars": []
+  },
+  "cue-jump-bounce--loop": {
+    "class": "cue-jump-bounce--loop",
+    "category": "ambient",
+    "vibe": [
+      "ambient-bouncing"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-jump-bounce"
+    ],
+    "never-pair": [],
+    "timing": "1.2s ease-in-out infinite — ambient idle bounce",
+    "css-vars": [
+      "--cue-jump-iteration",
+      "--cue-jump-duration",
+      "--cue-jump-ease"
+    ]
+  },
+  "cue-scroll-var-parallax": {
+    "class": "cue-scroll-var-parallax",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "cinematic",
+      "agency",
+      "showcase",
+      "storytelling"
+    ],
+    "avoid-when": [
+      "static-landing",
+      "minimal",
+      "enterprise-data"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-blend-difference"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-enter-bounce"
+    ],
+    "timing": "Pure CSS calc() — JS writes --cue-progress 0→1, CSS does all parallax math",
+    "css-vars": [
+      "--cue-progress",
+      "--cue-parallax-distance",
+      "--cue-overlay-opacity",
+      "--cue-overlay-color",
+      "--cue-progress-start",
+      "--cue-progress-end",
+      "--cue-mapped-progress"
+    ]
+  },
+  "cue-blend-difference": {
+    "class": "cue-blend-difference",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "agency",
+      "cinematic",
+      "modern"
+    ],
+    "avoid-when": [
+      "enterprise-flat",
+      "colorful-brand",
+      "low-contrast-sections"
+    ],
+    "pairs": [
+      "cue-scroll-var-parallax",
+      "cue-cinematic"
+    ],
+    "never-pair": [],
+    "timing": "n/a (static — mix-blend-mode: difference + color: #fff)",
+    "css-vars": [
+      "--cue-blend-fallback-color"
+    ]
+  },
+  "cue-blend-difference--invert": {
+    "class": "cue-blend-difference--invert",
+    "category": "utility",
+    "vibe": [
+      "inverted"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-blend-difference"
+    ],
+    "never-pair": [],
+    "timing": "n/a (variant — color: #000 instead of #fff)",
+    "css-vars": []
+  },
+  "cue-scan-clip": {
+    "class": "cue-scan-clip",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "scanning",
+      "layered",
+      "synchronized"
+    ],
+    "avoid-when": [
+      "simple-reveal"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-scan-clip-duration, 1.5s) ease-in-out infinite — 3-layer synchronized clip-path + translate",
+    "css-vars": [
+      "--cue-scan-clip-duration",
+      "--cue-scan-clip-offset"
+    ]
+  },
+  "cue-jiggle": {
+    "class": "cue-jiggle",
+    "category": "utility",
+    "vibe": [
+      "error",
+      "feedback",
+      "energetic",
+      "playful"
+    ],
+    "avoid-when": [
+      "calm",
+      "premium",
+      "cinematic"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-jiggle-duration, 0.4s) ease-in-out — 10-stop alternating direction with decreasing amplitude",
+    "css-vars": [
+      "--cue-jiggle-amp",
+      "--cue-jiggle-duration"
+    ]
+  },
+  "cue-spin-3d": {
+    "class": "cue-spin-3d",
+    "category": "ambient",
+    "vibe": [
+      "3d",
+      "premium",
+      "showcase"
+    ],
+    "avoid-when": [
+      "flat-design",
+      "data-dense"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-spinner"
+    ],
+    "timing": "var(--cue-spin-3d-duration, 1s) ease-in-out infinite — rotateY 0→180deg with scale peak at midpoint",
+    "css-vars": [
+      "--cue-spin-3d-perspective",
+      "--cue-spin-3d-duration"
+    ]
+  },
+  "cue-pulse-border": {
+    "class": "cue-pulse-border",
+    "category": "ambient",
+    "vibe": [
+      "pulse",
+      "border",
+      "feedback",
+      "asymmetric"
+    ],
+    "avoid-when": [
+      "calm",
+      "static"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-pulse",
+      "cue-glow"
+    ],
+    "timing": "var(--cue-pulse-border-duration, 2s) ease-in-out infinite — border-color + box-shadow dual-state with 40/60 asymmetric hold",
+    "css-vars": [
+      "--cue-pulse-border-active",
+      "--cue-pulse-border-rest",
+      "--cue-pulse-border-width",
+      "--cue-pulse-border-spread",
+      "--cue-pulse-border-duration"
+    ]
+  },
+  "cue-square-accordion": {
+    "class": "cue-square-accordion",
+    "category": "transition",
+    "vibe": [
+      "interactive",
+      "premium",
+      "square",
+      "intentional",
+      "accordion",
+      "modern"
+    ],
+    "avoid-when": [
+      "cinematic",
+      "hero",
+      "marketing",
+      "playful"
+    ],
+    "pairs": [
+      "cue-enter-fade"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-marquee",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-square-accordion-duration, 0.2s) ease-out forwards — height from width via calc(var(--width) - header-offset)",
+    "css-vars": [
+      "--cue-square-accordion-duration",
+      "--cue-square-accordion-ease",
+      "--cue-square-accordion-header-offset",
+      "--cue-square-accordion-width"
+    ]
+  },
+  "cue-square-accordion--no-header": {
+    "class": "cue-square-accordion--no-header",
+    "category": "transition",
+    "vibe": [
+      "headerless"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-square-accordion"
+    ],
+    "never-pair": [],
+    "timing": "n/a (variant — header-offset: 0px)",
+    "css-vars": [
+      "--cue-square-accordion-header-offset"
+    ]
+  },
+  "cue-square-accordion--header-40": {
+    "class": "cue-square-accordion--header-40",
+    "category": "transition",
+    "vibe": [
+      "large-header"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-square-accordion"
+    ],
+    "never-pair": [],
+    "timing": "n/a (variant — header-offset: 40px)",
+    "css-vars": [
+      "--cue-square-accordion-header-offset"
+    ]
+  },
+  "cue-square-accordion--slow": {
+    "class": "cue-square-accordion--slow",
+    "category": "transition",
+    "vibe": [
+      "deliberate"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-square-accordion"
+    ],
+    "never-pair": [],
+    "timing": "0.3s duration",
+    "css-vars": [
+      "--cue-square-accordion-duration"
+    ]
+  },
+  "cue-square-accordion--fast": {
+    "class": "cue-square-accordion--fast",
+    "category": "transition",
+    "vibe": [
+      "snappy"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-square-accordion"
+    ],
+    "never-pair": [],
+    "timing": "0.15s duration",
+    "css-vars": [
+      "--cue-square-accordion-duration"
+    ]
+  },
+  "cue-carousel-depth": {
+    "class": "cue-carousel-depth",
+    "category": "layout",
+    "vibe": [
+      "premium",
+      "cinematic",
+      "showcase",
+      "3D"
+    ],
+    "avoid-when": [
+      "mobile layouts",
+      "more than 8 items",
+      "content-heavy cards"
+    ],
+    "pairs": [
+      "cue-enter-scale"
+    ],
+    "never-pair": [
+      "cue-marquee",
+      "cue-ambient"
+    ],
+    "timing": "0.6s cubic-bezier(0.44, 0, 0.56, 1) — 3D elliptical with depth-of-field blur + correlated shadow",
+    "css-vars": [
+      "--cue-carousel-radius",
+      "--cue-carousel-tilt",
+      "--cue-carousel-card-size",
+      "--cue-carousel-front-scale",
+      "--cue-carousel-back-scale",
+      "--cue-carousel-max-blur",
+      "--cue-carousel-front-shadow",
+      "--cue-carousel-border-radius"
+    ]
   }
 }
