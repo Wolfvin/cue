@@ -3979,8 +3979,657 @@
 }
 
 /* ========================================================================
-   Issue #104 — prefers-reduced-motion (MUST be last)
+   Issue #141 — cue-gradient-text
+   Animated gradient text via background-clip: text + background-position
+   shift. background-size: 300% makes gradient 3x wider than text, then
+   position animation slides it across for seamless loop (gradient
+   colors repeat at edges). Perfect for AI "Thinking..." text.
    ======================================================================== */
+
+@keyframes cue-gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.cue-gradient-text {
+  background: linear-gradient(
+    var(--cue-gradient-text-angle, 90deg),
+    var(--cue-gradient-text-color-1, var(--cue-color-accent, #3b82f6)),
+    var(--cue-gradient-text-color-2, #7B61FF),
+    var(--cue-gradient-text-color-3, #D95BF5),
+    var(--cue-gradient-text-color-1, var(--cue-color-accent, #3b82f6))
+  );
+  background-size: var(--cue-gradient-text-size, 300% 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cue-gradient-shift var(--cue-gradient-text-duration, 3s)
+             var(--cue-gradient-text-ease, ease-in-out) infinite;
+}
+
+/* AI "thinking" gradient — purple-pink wash */
+.cue-gradient-text--ai {
+  --cue-gradient-text-color-1: #5E6AD2;
+  --cue-gradient-text-color-2: #7B61FF;
+  --cue-gradient-text-color-3: #D95BF5;
+}
+
+/* SaaS accent gradient — brand blue to teal */
+.cue-gradient-text--saas {
+  --cue-gradient-text-color-1: var(--cue-color-accent, #3b82f6);
+  --cue-gradient-text-color-2: #06B6D4;
+  --cue-gradient-text-color-3: #8B5CF6;
+}
+
+/* ========================================================================
+   Issue #151 — cue-boost
+   @property-registered --cue-hover-progress drives compound scroll+hover
+   animation. Compound formula: combined = scroll×0.9 + hover×0.1.
+   @property enables smooth transition on custom property (otherwise
+   CSS vars cannot be transitioned). Per-item stagger via --cue-item-
+   index / --cue-item-total. Scroll-driven variant via @supports.
+   ======================================================================== */
+
+@property --cue-scroll-progress {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: true;
+}
+
+@property --cue-hover-progress {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: true;
+}
+
+.cue-boost {
+  --cue-scroll-progress: 0;
+  --cue-hover-progress: 0;
+  --cue-scroll-weight: 0.9;
+  --cue-hover-weight: 0.1;
+  --cue-combined: calc(
+    var(--cue-scroll-progress) * var(--cue-scroll-weight)
+    + var(--cue-hover-progress) * var(--cue-hover-weight)
+  );
+  transition: --cue-hover-progress 600ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.cue-boost:hover {
+  --cue-hover-progress: 1;
+}
+
+/* Per-item stagger via --cue-item-index / --cue-item-total (set on each child) */
+.cue-boost-stagger {
+  --cue-window-start: calc(var(--cue-item-index, 0) / var(--cue-item-total, 1) * 0.7);
+  --cue-window-end: calc(var(--cue-window-start) + 0.3);
+  --cue-progress-in-window: clamp(
+    0,
+    calc(
+      (var(--cue-combined, 0) - var(--cue-window-start))
+      / (var(--cue-window-end) - var(--cue-window-start))
+    ),
+    1
+  );
+}
+
+/* Scroll-driven variant (modern browsers only) */
+@supports (animation-timeline: scroll()) {
+  .cue-boost-scroll {
+    animation: cue-boost-set-scroll-progress linear;
+    animation-timeline: scroll(nearest block);
+  }
+  @keyframes cue-boost-set-scroll-progress {
+    from { --cue-scroll-progress: 0; }
+    to   { --cue-scroll-progress: 1; }
+  }
+}
+
+/* ========================================================================
+   Issue #152 — cue-var-reset / cue-scroll-detect / cue-scroll-progress
+   @keyframes that animate CSS variable (not transform/opacity). Three
+   patterns: (1) var reset keyframe to escape inherit-on-hover-out,
+   (2) scroll-detect via animation-timeline + keyframe setting
+   --cue-can-scroll, (3) scroll-position → CSS var via animation-
+   timeline. Zero JS scroll listeners needed (modern browsers).
+   ======================================================================== */
+
+/* Pattern 1: var reset keyframe (escape inherit-on-hover-out) */
+@keyframes cue-var-reset {
+  0%, to { --cue-reset-target: ; }
+}
+
+/* Pattern 2: scroll-detect via animation-timeline */
+@keyframes cue-detect-scroll {
+  0%, to { --cue-can-scroll: ; }
+}
+
+.cue-scroll-detect {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  animation: cue-detect-scroll linear;
+  animation-timeline: scroll(nearest inline self);
+}
+
+.cue-scroll-detect::-webkit-scrollbar {
+  display: none;
+}
+
+/* Pattern 3: scroll-position → CSS var (modern browsers only) */
+@keyframes cue-progress-from-scroll {
+  from { --cue-scroll-progress: 0; }
+  to   { --cue-scroll-progress: 1; }
+}
+
+.cue-scroll-progress {
+  animation: cue-progress-from-scroll linear;
+  animation-timeline: scroll(nearest block);
+}
+
+/* Fallback for browsers without animation-timeline */
+@supports not (animation-timeline: scroll()) {
+  .cue-scroll-detect,
+  .cue-scroll-progress {
+    animation: none;
+  }
+}
+
+/* ========================================================================
+   Issue #153 — cue-mask-fade-y / cue-mask-fade-x / cue-mask-radial-fade
+   Text mask gradient — vertical/horizontal/radial fade via mask-image.
+   Hex values in mask-image are alpha (#000=transparent, #fff=opaque),
+   not color. Pure CSS, 0KB image/JS. Pair with mix-blend-mode for
+   editorial integration with background.
+   ======================================================================== */
+
+.cue-mask-fade-y {
+  --cue-mask-fade-size: 20%;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 var(--cue-mask-fade-size),
+    #000 calc(100% - var(--cue-mask-fade-size)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 var(--cue-mask-fade-size),
+    #000 calc(100% - var(--cue-mask-fade-size)),
+    transparent 100%
+  );
+}
+
+.cue-mask-fade-x {
+  --cue-mask-fade-size: 20%;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 var(--cue-mask-fade-size),
+    #000 calc(100% - var(--cue-mask-fade-size)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 var(--cue-mask-fade-size),
+    #000 calc(100% - var(--cue-mask-fade-size)),
+    transparent 100%
+  );
+}
+
+.cue-mask-radial-fade {
+  --cue-mask-fade-radius: 30%;
+  --cue-mask-fade-soft: 75%;
+  -webkit-mask-image: radial-gradient(
+    #000 0%,
+    #000 var(--cue-mask-fade-radius),
+    transparent var(--cue-mask-fade-soft)
+  );
+  mask-image: radial-gradient(
+    #000 0%,
+    #000 var(--cue-mask-fade-radius),
+    transparent var(--cue-mask-fade-soft)
+  );
+}
+
+/* ========================================================================
+   Issue #159 — cue-rotating-text
+   3D rotating announcement bar via paired @keyframes animating CSS
+   vars (--cue-rt-rotate, --cue-rt-x) — not transform directly. @property
+   registration enables smooth interpolation. Child uses transform:
+   rotateY(var) translateX(var). 6.4s cycle: shift → rotate → shift back.
+   ======================================================================== */
+
+@property --cue-rt-rotate {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --cue-rt-x {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes cue-rotating-text-spin {
+  0%, 32.82%   { --cue-rt-rotate: 0deg; }
+  50%          { --cue-rt-rotate: 180deg; }
+  82.82%, 100% { --cue-rt-rotate: 360deg; }
+}
+
+@keyframes cue-rotating-text-shift {
+  0%, 32.82%   { --cue-rt-x: 0px; }
+  50%          { --cue-rt-x: var(--cue-rt-shift, 186px); }
+  82.82%, 100% { --cue-rt-x: 0px; }
+}
+
+.cue-rotating-text {
+  animation:
+    cue-rotating-text-spin var(--cue-rt-duration, 6.4s) linear var(--cue-rt-delay, 3s) infinite,
+    cue-rotating-text-shift var(--cue-rt-duration, 6.4s) linear var(--cue-rt-delay, 3s) infinite;
+}
+
+.cue-rotating-text > * {
+  transform: rotateY(var(--cue-rt-rotate)) translateX(var(--cue-rt-x));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ========================================================================
+   Issue #163 — cue-arrow-link
+   Directional arrow-link hover shifts. 8 directions via data-dir
+   attribute. Amplitude 2-3px (subtle, snappy). Base class has
+   transition only — direction modifiers apply transform on :hover.
+   ======================================================================== */
+
+.cue-arrow-link {
+  transition: transform var(--cue-arrow-link-duration, 0.2s)
+              var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.cue-arrow-link[data-dir="right"]:hover { transform: translateX(var(--cue-arrow-link-shift, 2px)); }
+.cue-arrow-link[data-dir="left"]:hover  { transform: translateX(calc(var(--cue-arrow-link-shift, 2px) * -1)); }
+.cue-arrow-link[data-dir="up"]:hover    { transform: translateY(calc(var(--cue-arrow-link-shift, 2px) * -1)); }
+.cue-arrow-link[data-dir="down"]:hover  { transform: translateY(var(--cue-arrow-link-shift, 2px)); }
+.cue-arrow-link[data-dir="ne"]:hover    { transform: translate(var(--cue-arrow-link-shift, 2px), calc(var(--cue-arrow-link-shift, 2px) * -1)); }
+.cue-arrow-link[data-dir="nw"]:hover    { transform: translate(calc(var(--cue-arrow-link-shift, 2px) * -1), calc(var(--cue-arrow-link-shift, 2px) * -1)); }
+.cue-arrow-link[data-dir="se"]:hover    { transform: translate(var(--cue-arrow-link-shift, 2px), var(--cue-arrow-link-shift, 2px)); }
+.cue-arrow-link[data-dir="sw"]:hover    { transform: translate(calc(var(--cue-arrow-link-shift, 2px) * -1), var(--cue-arrow-link-shift, 2px)); }
+
+/* ========================================================================
+   Issue #168 — cue-tilt-stage / cue-tilt-subject / cue-tilt-fade-y/x
+   3D-perspective hero product tilt with edge-fade + masked backdrop-blur.
+   Stage: perspective 4000px (very deep, subtle 3D). Subject: compound
+   transform translateX(-2%) scale(1.2) rotateX(47deg) rotateY(31deg)
+   rotate(324deg). Edge fades: linear-gradient + masked backdrop-filter
+   blur for depth-of-field dissolve. Responsive @media tuning.
+   ======================================================================== */
+
+.cue-tilt-stage {
+  --cue-tilt-perspective: 4000px;
+  --cue-tilt-origin: 100% 0;
+  --cue-tilt-padding-top: 104px;
+  --cue-tilt-height: 650px;
+  perspective: var(--cue-tilt-perspective);
+  perspective-origin: var(--cue-tilt-origin);
+  transform-style: preserve-3d;
+  padding-top: var(--cue-tilt-padding-top);
+  height: var(--cue-tilt-height);
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.cue-tilt-subject {
+  --cue-tilt-x: -2%;
+  --cue-tilt-scale: 1.2;
+  --cue-tilt-rx: 47deg;
+  --cue-tilt-ry: 31deg;
+  --cue-tilt-rz: 324deg;
+  --cue-tilt-transform-origin: top left;
+  transform: translateX(var(--cue-tilt-x))
+             scale(var(--cue-tilt-scale))
+             rotateX(var(--cue-tilt-rx))
+             rotateY(var(--cue-tilt-ry))
+             rotate(var(--cue-tilt-rz));
+  transform-origin: var(--cue-tilt-transform-origin);
+  backface-visibility: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cue-tilt-fade-y,
+.cue-tilt-fade-x {
+  --cue-tilt-fade-bg: #08090a;
+  --cue-tilt-fade-blur: 1.5px;
+  --cue-tilt-fade-start: 20%;
+  --cue-tilt-fade-end: 55%;
+  --cue-tilt-blur-mask-start: 35%;
+  --cue-tilt-blur-mask-end: 44%;
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cue-tilt-fade-y {
+  background: linear-gradient(to bottom,
+    transparent var(--cue-tilt-fade-start),
+    var(--cue-tilt-fade-bg) var(--cue-tilt-fade-end)
+  );
+}
+.cue-tilt-fade-y::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-backdrop-filter: blur(var(--cue-tilt-fade-blur));
+  backdrop-filter: blur(var(--cue-tilt-fade-blur));
+  -webkit-mask-image: linear-gradient(180deg,
+    transparent var(--cue-tilt-blur-mask-start),
+    #000 var(--cue-tilt-blur-mask-end)
+  );
+  mask-image: linear-gradient(180deg,
+    transparent var(--cue-tilt-blur-mask-start),
+    #000 var(--cue-tilt-blur-mask-end)
+  );
+}
+
+.cue-tilt-fade-x {
+  background: linear-gradient(to right,
+    transparent calc(var(--cue-tilt-fade-start) + 40%),
+    var(--cue-tilt-fade-bg) var(--cue-tilt-fade-end)
+  );
+}
+.cue-tilt-fade-x::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-backdrop-filter: blur(var(--cue-tilt-fade-blur));
+  backdrop-filter: blur(var(--cue-tilt-fade-blur));
+  -webkit-mask-image: linear-gradient(90deg,
+    transparent calc(var(--cue-tilt-blur-mask-start) + 23%),
+    #000 var(--cue-tilt-blur-mask-end)
+  );
+  mask-image: linear-gradient(90deg,
+    transparent calc(var(--cue-tilt-blur-mask-start) + 23%),
+    #000 var(--cue-tilt-blur-mask-end)
+  );
+}
+
+@media (max-width: 768px) {
+  .cue-tilt-stage {
+    --cue-tilt-perspective: 2000px;
+    --cue-tilt-padding-top: 32px;
+    --cue-tilt-height: 450px;
+  }
+  .cue-tilt-subject {
+    --cue-tilt-x: 15%;
+    --cue-tilt-scale: 1;
+  }
+}
+
+/* ========================================================================
+   Issue #170 — cue-frost-stage / cue-frost-plane-top/left/right
+   3D frost-glass planes via skewY(±arctan 0.5) + backdrop-filter: blur.
+   Three skewed divs form isometric glass pane. skewY(±26.44deg) =
+   arctan(0.5) — isometric projection angle. backdrop-filter: blur(12px)
+   makes glass feel real. isolation: isolate contains z-index.
+   ======================================================================== */
+
+.cue-frost-stage {
+  --cue-frost-offset: 24%;
+  --cue-frost-blur: 12px;
+  --cue-frost-tint: rgba(255, 255, 255, 0.04);
+  position: relative;
+  display: grid;
+  isolation: isolate;
+  container-type: inline-size;
+}
+
+.cue-frost-stage > * {
+  grid-area: 1 / 1;
+}
+
+.cue-frost-plane-top {
+  position: absolute;
+  left: 50%;
+  top: calc(47.1% - var(--cue-frost-offset));
+  width: 54.4%;
+  aspect-ratio: 1;
+  z-index: 1;
+  transform: translate(-50%, -50%) scaleY(0.5) rotate(45deg);
+  -webkit-backdrop-filter: blur(var(--cue-frost-blur));
+  backdrop-filter: blur(var(--cue-frost-blur));
+  background: var(--cue-frost-tint);
+  pointer-events: none;
+}
+
+.cue-frost-plane-right {
+  position: absolute;
+  left: 50%;
+  top: calc(47% - var(--cue-frost-offset));
+  width: 38.45%;
+  height: 6.61%;
+  z-index: 1;
+  transform-origin: right top;
+  transform: skewY(-26.44deg);
+  -webkit-backdrop-filter: blur(var(--cue-frost-blur));
+  backdrop-filter: blur(var(--cue-frost-blur));
+  background: var(--cue-frost-tint);
+  pointer-events: none;
+}
+
+.cue-frost-plane-left {
+  position: absolute;
+  left: 11.55%;
+  top: calc(47% - var(--cue-frost-offset));
+  width: 38.45%;
+  height: 6.61%;
+  z-index: 1;
+  transform-origin: left top;
+  transform: skewY(26.44deg);
+  -webkit-backdrop-filter: blur(var(--cue-frost-blur));
+  backdrop-filter: blur(var(--cue-frost-blur));
+  background: var(--cue-frost-tint);
+  pointer-events: none;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cue-frost-plane-top,
+  .cue-frost-plane-right,
+  .cue-frost-plane-left {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ========================================================================
+   Issue #171 — cue-scramble
+   Hero text scramble — char-by-char lock-in with break-all state. CSS
+   part: data-scrambling="true" toggles word-break: break-all so random
+   chars don't overflow container. Mono font + tabular-nums for width
+   consistency. JS orchestrator (companion, not CSS) handles char-by-char
+   lock-in animation. sr-only span for accessibility.
+   ======================================================================== */
+
+.cue-scramble {
+  font-family: var(--cue-scramble-font, ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", monospace);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.cue-scramble[data-scrambling="true"] {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  color: var(--cue-scramble-active-color, var(--cue-color-accent, currentColor));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue-scramble {
+    transition: opacity var(--cue-scramble-reduced-duration, 200ms) ease-out;
+  }
+}
+
+/* ========================================================================
+   Issue #179 — cue-counter-spin
+   Conic-gradient masked counter-arc spin via ::before + composite mask.
+   ::before is 200% size with conic-gradient arc + radial-gradient mask
+   to cut ring (not disc). 5s linear infinite rotate. Ambient "pulse
+   ring" — distinct from cue-spinner (full disc, loading feel).
+   ======================================================================== */
+
+@keyframes cue-counter-spin {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.cue-counter-spin {
+  position: relative;
+  --cue-counter-size: 48px;
+  --cue-counter-ring-width: 2px;
+  --cue-counter-arc-deg: 90deg;
+  --cue-counter-color: var(--cue-color-accent, #3b82f6);
+  --cue-counter-duration: 5s;
+}
+
+.cue-counter-spin::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--cue-counter-size);
+  height: var(--cue-counter-size);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--cue-counter-color) 0deg,
+    var(--cue-counter-color) var(--cue-counter-arc-deg),
+    transparent var(--cue-counter-arc-deg),
+    transparent 360deg
+  );
+  -webkit-mask: radial-gradient(
+    circle,
+    transparent calc(50% - var(--cue-counter-ring-width)),
+    #000 calc(50% - var(--cue-counter-ring-width)),
+    #000 50%
+  );
+  mask: radial-gradient(
+    circle,
+    transparent calc(50% - var(--cue-counter-ring-width)),
+    #000 calc(50% - var(--cue-counter-ring-width)),
+    #000 50%
+  );
+  animation: cue-counter-spin var(--cue-counter-duration) linear infinite;
+  pointer-events: none;
+}
+
+/* ========================================================================
+   Issue #189 — cue-typing-caret
+   Multi-line AI typing caret — height-animating cursor that wraps. ::after
+   pseudo-element width 4px, height animates 0 → 24px (line 1) → 55.92px
+   (line 2 = 24×2 + 7.92px line-gap) → 0. Hold periods between phases
+   match real typing micro-pauses. cubic-bezier(.33,.01,.63,1.01) easeOut
+   with slight overshoot. 2s cycle.
+   ======================================================================== */
+
+@keyframes cue-typing-caret-fluctuate {
+  0%    { opacity: 1; height: 0; }
+  10%   { opacity: 1; height: var(--cue-typing-caret-line-1, 24px); }
+  45%   { opacity: 1; height: var(--cue-typing-caret-line-1, 24px); }
+  80%   { opacity: 1; height: var(--cue-typing-caret-line-2, 55.92px); }
+  82.5% { opacity: 1; height: var(--cue-typing-caret-line-2, 55.92px); }
+  96.5% { opacity: 1; height: 0; }
+  100%  { opacity: 1; height: 0; }
+}
+
+.cue-typing-caret {
+  position: relative;
+  display: inline-block;
+}
+
+.cue-typing-caret::after {
+  content: "";
+  position: absolute;
+  right: calc(var(--cue-typing-caret-width, 4px) * -1);
+  top: 0;
+  width: var(--cue-typing-caret-width, 4px);
+  height: 0;
+  background: var(--cue-typing-caret-color, currentColor);
+  border-radius: var(--cue-typing-caret-radius, 2px);
+  animation: cue-typing-caret-fluctuate
+             var(--cue-typing-caret-duration, 2s)
+             cubic-bezier(0.33, 0.01, 0.63, 1.01)
+             infinite;
+  will-change: height;
+}
+
+/* ========================================================================
+   Issue #195 — cue-donut / cue-donut-animate
+   Conic-gradient donut progress with @property-registered integer.
+   conic-gradient(solid 0 calc(N*1%), transparent calc(N*1%)) — N is
+   0-100 integer, *1% converts to percentage. ::before is inner cutout
+   (smaller circle in page bg color) to hollow out ring. @property
+   enables smooth animation of --cue-donut-value. cue-donut-animate
+   fills from 0 to --cue-donut-target on mount.
+   ======================================================================== */
+
+@property --cue-donut-value {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.cue-donut {
+  --cue-donut-value: 0;
+  --cue-donut-color: var(--cue-color-accent, #3b82f6);
+  --cue-donut-track: transparent;
+  --cue-donut-bg: #ffffff;
+  --cue-donut-size: 48px;
+  --cue-donut-thickness: 4px;
+  width: var(--cue-donut-size);
+  height: var(--cue-donut-size);
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--cue-donut-color) 0 calc(var(--cue-donut-value) * 1%),
+    var(--cue-donut-track) calc(var(--cue-donut-value) * 1%)
+  );
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.cue-donut::before {
+  content: "";
+  width: calc(100% - 2 * var(--cue-donut-thickness));
+  height: calc(100% - 2 * var(--cue-donut-thickness));
+  border-radius: 50%;
+  background: var(--cue-donut-bg);
+  z-index: 1;
+}
+
+.cue-donut-animate {
+  animation: cue-donut-fill 1s var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+@keyframes cue-donut-fill {
+  from { --cue-donut-value: 0; }
+  to   { --cue-donut-value: var(--cue-donut-target, 100); }
+}
+
+@supports not (background: paint(test)) {
+  .cue-donut-animate {
+    animation: none;
+    --cue-donut-value: var(--cue-donut-target, 100);
+  }
+}
 
 /* ========================================================================
    Issue #474 — cue-scattered-float
@@ -5583,4 +6232,79 @@
   .cue-stroke-morph {
     animation: none !important;
   }
+
+  /* Issue #141 — gradient-text parks gradient at center */
+  .cue-gradient-text,
+  .cue-gradient-text--ai,
+  .cue-gradient-text--saas {
+    animation: none !important;
+    background-position: 50% 50% !important;
+  }
+
+  /* Issue #151 — boost: hover-progress instant, no transition */
+  .cue-boost {
+    transition: none !important;
+    --cue-hover-progress: 0 !important;
+  }
+
+  /* Issue #152 — scroll-detect/progress: disable animation-timeline */
+  .cue-scroll-detect,
+  .cue-scroll-progress {
+    animation: none !important;
+  }
+
+  /* Issue #153 — mask-fade: keep mask (static, no animation to disable) */
+
+  /* Issue #159 — rotating-text: show first child, no rotation */
+  .cue-rotating-text {
+    animation: none !important;
+  }
+  .cue-rotating-text > * {
+    transform: none !important;
+  }
+
+  /* Issue #163 — arrow-link: no transform on hover */
+  .cue-arrow-link[data-dir]:hover {
+    transform: none !important;
+  }
+
+  /* Issue #168 — tilt-subject flattened, fades hidden */
+  .cue-tilt-subject {
+    transform: none !important;
+  }
+  .cue-tilt-fade-y,
+  .cue-tilt-fade-x {
+    display: none !important;
+  }
+
+  /* Issue #170 — frost planes hidden (GPU-expensive blur) */
+  .cue-frost-plane-top,
+  .cue-frost-plane-right,
+  .cue-frost-plane-left {
+    display: none !important;
+  }
+
+  /* Issue #171 — scramble: no break-all, just opacity fade */
+  .cue-scramble[data-scrambling="true"] {
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+
+  /* Issue #179 — counter-spin stops */
+  .cue-counter-spin::before {
+    animation: none !important;
+  }
+
+  /* Issue #189 — typing-caret hidden */
+  .cue-typing-caret::after {
+    animation: none !important;
+    height: var(--cue-typing-caret-line-1, 24px) !important;
+  }
+
+  /* Issue #195 — donut-animate: jump to target value */
+  .cue-donut-animate {
+    animation: none !important;
+    --cue-donut-value: var(--cue-donut-target, 100) !important;
+  }
+
 }
