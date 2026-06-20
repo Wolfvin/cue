@@ -3979,8 +3979,439 @@
 }
 
 /* ========================================================================
-   Issue #104 — prefers-reduced-motion (MUST be last)
+   Issue #434 — cue-conic-scan / cue-conic-scan-loop / cue-conic-scan-fast / cue-conic-scan-ambient
+   5-stop non-linear @property angle keyframe for conic-gradient scanning
+   radar. @property --cue-conic-scan-angle drives conic-gradient wedge.
+   Non-linear keyframe (0/18/27/63/72/100%) = "scan, pause, scan, pause"
+   rhythm. linear timing, forwards fill. 4s default.
    ======================================================================== */
+
+@property --cue-conic-scan-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes cue-conic-scan {
+  0%   { --cue-conic-scan-angle: 0deg; }
+  18%  { --cue-conic-scan-angle: 76deg; }
+  27%  { --cue-conic-scan-angle: 104deg; }
+  63%  { --cue-conic-scan-angle: 256deg; }
+  72%  { --cue-conic-scan-angle: 284deg; }
+  100% { --cue-conic-scan-angle: 360deg; }
+}
+
+.cue-conic-scan {
+  --cue-conic-scan-color: #0fc27b;
+  --cue-conic-scan-duration: 4s;
+  background-image: conic-gradient(
+    var(--cue-conic-scan-color) var(--cue-conic-scan-angle),
+    transparent 0
+  );
+  animation: cue-conic-scan var(--cue-conic-scan-duration) linear forwards;
+  will-change: background-image;
+}
+
+.cue-conic-scan-loop {
+  animation-iteration-count: infinite;
+}
+
+.cue-conic-scan-fast {
+  --cue-conic-scan-duration: 1.5s;
+}
+
+.cue-conic-scan-ambient {
+  --cue-conic-scan-duration: 12s;
+}
+
+/* ========================================================================
+   Issue #442 — cue-speech-bubble (designed from title — body was empty)
+   Directional speech bubble entrance dengan translateY(-50%) + scale
+   overshoot + directional translateX. Entrance: translateY(-50%) +
+   scale(0.8) → translateY(0) + scale(1.05) → scale(1). Directional
+   translateX per data-dir (left/right). 300ms ease-out with overshoot.
+   ======================================================================== */
+
+@keyframes cue-speech-bubble-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8) translateX(var(--cue-speech-bubble-dir, 0px));
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05) translateX(var(--cue-speech-bubble-dir, 0px));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) translateX(var(--cue-speech-bubble-dir, 0px));
+  }
+}
+
+.cue-speech-bubble {
+  --cue-speech-bubble-duration: 300ms;
+  --cue-speech-bubble-dir: 0px;
+  animation: cue-speech-bubble-enter var(--cue-speech-bubble-duration) ease-out forwards;
+}
+
+.cue-speech-bubble[data-dir="left"] { --cue-speech-bubble-dir: -8px; }
+.cue-speech-bubble[data-dir="right"] { --cue-speech-bubble-dir: 8px; }
+
+/* ========================================================================
+   Issue #448 — cue-shared-underline / cue-shared-underline-item
+   Shared layout underline morph — Framer layoutId pattern. ::after is
+   single underline that travels between nav items. JS sets --cue-
+   shared-underline-x and --width based on active item offsetLeft/Width.
+   Spring easing cubic-bezier(0.34, 1.56, 0.64, 1). CSS self-contained.
+   ======================================================================== */
+
+.cue-shared-underline {
+  position: relative;
+  display: inline-flex;
+  gap: var(--cue-shared-underline-gap, 0);
+}
+
+.cue-shared-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: var(--cue-shared-underline-height, 2px);
+  width: var(--cue-shared-underline-width, 80px);
+  background: var(--cue-shared-underline-color, currentColor);
+  transform: translateX(var(--cue-shared-underline-x, 0));
+  transition:
+    transform var(--cue-shared-underline-duration, 0.4s) cubic-bezier(0.34, 1.56, 0.64, 1),
+    width var(--cue-shared-underline-duration, 0.4s) cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cue-shared-underline-item {
+  position: relative;
+  z-index: 2;
+}
+
+/* ========================================================================
+   Issue #458 — cue-jump-bounce / cue-jump-bounce--transform / --large / --small / --triple / --loop
+   4-stop double-bounce character jump via margin-top keyframe. Peak
+   -24px at 30%, land at 60%, small bounce -8px (1/3 peak) at 80%,
+   settle at 100%. margin-top (not transform) = pushes surrounding
+   content. 0.4s ease-out. Variants: transform-based, large, small,
+   triple, loop.
+   ======================================================================== */
+
+.cue-jump-bounce {
+  animation: cue-jump-bounce
+    var(--cue-jump-duration, 0.4s)
+    var(--cue-jump-ease, ease-out)
+    var(--cue-jump-iteration, 1)
+    var(--cue-jump-fill-mode, none);
+}
+
+@keyframes cue-jump-bounce {
+  0%   { margin-top: 0; }
+  30%  { margin-top: var(--cue-jump-peak, -24px); }
+  60%  { margin-top: 0; }
+  80%  { margin-top: calc(var(--cue-jump-peak, -24px) / 3); }
+  100% { margin-top: 0; }
+}
+
+.cue-jump-bounce--transform {
+  animation: cue-jump-bounce-transform
+    var(--cue-jump-duration, 0.4s)
+    var(--cue-jump-ease, ease-out)
+    var(--cue-jump-iteration, 1)
+    var(--cue-jump-fill-mode, none);
+}
+
+@keyframes cue-jump-bounce-transform {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(var(--cue-jump-peak, -24px)); }
+  60%  { transform: translateY(0); }
+  80%  { transform: translateY(calc(var(--cue-jump-peak, -24px) / 3)); }
+  100% { transform: translateY(0); }
+}
+
+.cue-jump-bounce--large { --cue-jump-peak: -48px; --cue-jump-duration: 0.6s; }
+.cue-jump-bounce--small { --cue-jump-peak: -12px; --cue-jump-duration: 0.3s; }
+
+.cue-jump-bounce--triple {
+  animation: cue-jump-bounce-triple
+    var(--cue-jump-duration, 0.6s)
+    var(--cue-jump-ease, ease-out)
+    var(--cue-jump-iteration, 1);
+}
+
+@keyframes cue-jump-bounce-triple {
+  0%   { margin-top: 0; }
+  20%  { margin-top: var(--cue-jump-peak, -24px); }
+  40%  { margin-top: 0; }
+  55%  { margin-top: calc(var(--cue-jump-peak, -24px) / 2); }
+  70%  { margin-top: 0; }
+  85%  { margin-top: calc(var(--cue-jump-peak, -24px) / 4); }
+  100% { margin-top: 0; }
+}
+
+.cue-jump-bounce--loop {
+  --cue-jump-iteration: infinite;
+  --cue-jump-duration: 1.2s;
+  --cue-jump-ease: ease-in-out;
+}
+
+/* ========================================================================
+   Issue #495 — cue-scroll-var-parallax / __background
+   Lenis-driven CSS-var scroll parallax with calc-mapped progress. JS
+   writes --cue-progress (0→1). CSS remaps to --cue-mapped-progress
+   (start→end range). Background parallaxes up + overlay fades in.
+   Pure CSS calc() — no per-frame JS transform writes. CSS self-contained.
+   ======================================================================== */
+
+.cue-scroll-var-parallax {
+  --cue-progress: 0;
+  --cue-parallax-distance: 25vh;
+  --cue-overlay-opacity: 0.75;
+  --cue-overlay-color: #000;
+  --cue-progress-start: 0.5;
+  --cue-progress-end: 1;
+  --cue-mapped-progress: calc(
+    (var(--cue-progress) - var(--cue-progress-start)) /
+    (var(--cue-progress-end) - var(--cue-progress-start))
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-scroll-var-parallax__background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  transform: translate3d(0, calc(var(--cue-parallax-distance) * -1 * var(--cue-mapped-progress)), 0);
+  will-change: transform;
+}
+
+.cue-scroll-var-parallax__background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background-color: var(--cue-overlay-color);
+  opacity: calc(var(--cue-mapped-progress) * var(--cue-overlay-opacity));
+  pointer-events: none;
+}
+
+/* ========================================================================
+   Issue #496 — cue-blend-difference / --invert
+   mix-blend-mode: difference as always-readable overlay system. White
+   text + difference = auto-inverts against any background (dark/light/
+   colored/gradient/image/video). isolation: isolate prevents double-
+   blend. @supports fallback. One CSS property solves nav legibility.
+   ======================================================================== */
+
+.cue-blend-difference {
+  mix-blend-mode: difference;
+  color: #fff;
+  isolation: isolate;
+}
+
+.cue-blend-difference--invert {
+  color: #000;
+}
+
+.cue-blend-difference__parent {
+  isolation: isolate;
+}
+
+@supports not (mix-blend-mode: difference) {
+  .cue-blend-difference {
+    mix-blend-mode: normal;
+    color: var(--cue-blend-fallback-color, #fff);
+  }
+}
+
+/* ========================================================================
+   Issue #506 — cue-scan-clip (designed from title — body was empty)
+   3-layer synchronized clip-path scan animation dengan paired translate
+   offsets. 3 child layers each clip-path inset() at different rates,
+   with paired translateX/Y offsets. Synchronized via shared duration
+   but different keyframe percentages. Consumer sets --cue-scan-clip-
+   duration. data-scan="sync" triggers.
+   ======================================================================== */
+
+@keyframes cue-scan-clip-layer-1 {
+  0%   { clip-path: inset(0 100% 0 0); transform: translateX(0); }
+  50%  { clip-path: inset(0 0 0 0); transform: translateX(var(--cue-scan-clip-offset, 10px)); }
+  100% { clip-path: inset(0 0 0 100%); transform: translateX(0); }
+}
+
+@keyframes cue-scan-clip-layer-2 {
+  0%   { clip-path: inset(0 100% 0 0); transform: translateY(0); }
+  50%  { clip-path: inset(0 0 0 0); transform: translateY(var(--cue-scan-clip-offset, 10px)); }
+  100% { clip-path: inset(0 0 0 100%); transform: translateY(0); }
+}
+
+@keyframes cue-scan-clip-layer-3 {
+  0%   { clip-path: inset(0 100% 0 0); transform: translate(var(--cue-scan-clip-offset, 10px), 0); }
+  50%  { clip-path: inset(0 0 0 0); transform: translate(0, var(--cue-scan-clip-offset, 10px)); }
+  100% { clip-path: inset(0 0 0 100%); transform: translate(0, 0); }
+}
+
+.cue-scan-clip > *:nth-child(1) {
+  animation: cue-scan-clip-layer-1 var(--cue-scan-clip-duration, 1.5s) ease-in-out infinite;
+}
+.cue-scan-clip > *:nth-child(2) {
+  animation: cue-scan-clip-layer-2 var(--cue-scan-clip-duration, 1.5s) ease-in-out infinite;
+}
+.cue-scan-clip > *:nth-child(3) {
+  animation: cue-scan-clip-layer-3 var(--cue-scan-clip-duration, 1.5s) ease-in-out infinite;
+}
+
+/* ========================================================================
+   Issue #509 — cue-jiggle (designed from title — body was empty)
+   Error jiggle shake dengan 10 keyframe stops alternating direction.
+   translateX alternates ±Npx with decreasing amplitude. 10 stops =
+   energetic error feedback. 0.4s ease-in-out. 4px amplitude default.
+   ======================================================================== */
+
+@keyframes cue-jiggle {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * -1)); }
+  20% { transform: translateX(var(--cue-jiggle-amp, 4px)); }
+  30% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * -0.8)); }
+  40% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * 0.8)); }
+  50% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * -0.6)); }
+  60% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * 0.6)); }
+  70% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * -0.4)); }
+  80% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * 0.4)); }
+  90% { transform: translateX(calc(var(--cue-jiggle-amp, 4px) * -0.2)); }
+}
+
+.cue-jiggle {
+  animation: cue-jiggle var(--cue-jiggle-duration, 0.4s) ease-in-out;
+}
+
+/* ========================================================================
+   Issue #510 — cue-spin-3d (designed from title — body was empty)
+   Y-axis 3D rotation dengan perspective() + scale peak di midpoint.
+   rotateY 0→180deg with perspective(800px). scale peaks at 1.1 at 50%.
+   1s ease-in-out infinite. Parent must have perspective or use
+   transform: perspective() in keyframe.
+   ======================================================================== */
+
+@keyframes cue-spin-3d {
+  0%   { transform: perspective(var(--cue-spin-3d-perspective, 800px)) rotateY(0deg) scale(1); }
+  50%  { transform: perspective(var(--cue-spin-3d-perspective, 800px)) rotateY(90deg) scale(1.1); }
+  100% { transform: perspective(var(--cue-spin-3d-perspective, 800px)) rotateY(180deg) scale(1); }
+}
+
+.cue-spin-3d {
+  animation: cue-spin-3d var(--cue-spin-3d-duration, 1s) ease-in-out infinite;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* ========================================================================
+   Issue #512 — cue-pulse-border (designed from title — body was empty)
+   Border color + box-shadow dual-state pulse dengan asymmetric hold
+   pattern. border-color and box-shadow alternate between rest and
+   active states. Asymmetric hold: 40% active, 60% rest. 2s infinite.
+   ======================================================================== */
+
+@keyframes cue-pulse-border {
+  0%, 40% {
+    border-color: var(--cue-pulse-border-active, var(--cue-color-accent, #3b82f6));
+    box-shadow: 0 0 0 var(--cue-pulse-border-spread, 2px) var(--cue-pulse-border-active, var(--cue-color-accent, #3b82f6));
+  }
+  41%, 100% {
+    border-color: var(--cue-pulse-border-rest, transparent);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.cue-pulse-border {
+  border: var(--cue-pulse-border-width, 1px) solid var(--cue-pulse-border-rest, transparent);
+  animation: cue-pulse-border var(--cue-pulse-border-duration, 2s) ease-in-out infinite;
+}
+
+/* ========================================================================
+   Issue #516 — cue-square-accordion / --no-header / --header-40 / --slow / --fast
+   Square accordion — animating HEIGHT from WIDTH variable via calc(var
+   (--width) - 27px). Cross-dimension: reads width var, uses as height
+   target minus header offset. Solves "animate height to match width"
+   without JS. data-state=open/closed triggers. Variants for header size
+   and speed.
+   ======================================================================== */
+
+.cue-square-accordion {
+  --cue-square-accordion-duration: 0.2s;
+  --cue-square-accordion-ease: ease-out;
+  --cue-square-accordion-header-offset: 27px;
+  overflow: hidden;
+  height: 0;
+  animation: cue-square-accordion-up
+             var(--cue-square-accordion-duration)
+             var(--cue-square-accordion-ease)
+             forwards;
+}
+
+.cue-square-accordion[data-state="open"],
+.cue-square-accordion.is-open {
+  animation: cue-square-accordion-down
+             var(--cue-square-accordion-duration)
+             var(--cue-square-accordion-ease)
+             forwards;
+}
+
+@keyframes cue-square-accordion-down {
+  0%   { height: 0; }
+  100% { height: calc(var(--cue-square-accordion-width, var(--radix-accordion-content-width, 100%)) - var(--cue-square-accordion-header-offset)); }
+}
+
+@keyframes cue-square-accordion-up {
+  0%   { height: calc(var(--cue-square-accordion-width, var(--radix-accordion-content-width, 100%)) - var(--cue-square-accordion-header-offset)); }
+  100% { height: 0; }
+}
+
+.cue-square-accordion--no-header { --cue-square-accordion-header-offset: 0px; }
+.cue-square-accordion--header-40 { --cue-square-accordion-header-offset: 40px; }
+.cue-square-accordion--slow { --cue-square-accordion-duration: 0.3s; }
+.cue-square-accordion--fast { --cue-square-accordion-duration: 0.15s; }
+
+/* ========================================================================
+   Issue #567 — cue-carousel-depth
+   3D elliptical carousel with depth-of-field blur + correlated shadow +
+   z-index. Front card sharp (blur 0), rear progressively blur up to
+   1.5px. Shadow scales with distance. Scale 1→0.72. z-index 1000→0.
+   Consumer sets per-card transform via JS. CSS provides base + transition.
+   ======================================================================== */
+
+.cue-carousel-depth {
+  --cue-carousel-radius: 230px;
+  --cue-carousel-tilt: 30deg;
+  --cue-carousel-card-size: 145px;
+  --cue-carousel-front-scale: 1;
+  --cue-carousel-back-scale: 0.72;
+  --cue-carousel-max-blur: 1.5px;
+  --cue-carousel-front-shadow: 0 40px 64px rgba(0,0,0,0.2);
+  --cue-carousel-border-radius: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+}
+
+.cue-carousel-depth > * {
+  position: absolute;
+  width: var(--cue-carousel-card-size);
+  height: var(--cue-carousel-card-size);
+  border-radius: var(--cue-carousel-border-radius);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.6s cubic-bezier(0.44, 0, 0.56, 1),
+              filter 0.6s cubic-bezier(0.44, 0, 0.56, 1),
+              box-shadow 0.6s cubic-bezier(0.44, 0, 0.56, 1);
+}
 
 /* ========================================================================
    Issue #474 — cue-scattered-float
@@ -5583,4 +6014,78 @@
   .cue-stroke-morph {
     animation: none !important;
   }
+
+  /* Issue #434 — conic-scan: no animation */
+  .cue-conic-scan,
+  .cue-conic-scan-loop,
+  .cue-conic-scan-fast,
+  .cue-conic-scan-ambient {
+    animation: none !important;
+    background-image: none !important;
+  }
+
+  /* Issue #442 — speech-bubble: instant show */
+  .cue-speech-bubble {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Issue #448 — shared-underline: instant move */
+  .cue-shared-underline::after {
+    transition: none !important;
+  }
+
+  /* Issue #458 — jump-bounce: no jump */
+  .cue-jump-bounce,
+  .cue-jump-bounce--transform,
+  .cue-jump-bounce--triple {
+    animation: none !important;
+    margin-top: 0 !important;
+    transform: none !important;
+  }
+
+  /* Issue #495 — scroll-var-parallax: no parallax */
+  .cue-scroll-var-parallax__background {
+    transform: none !important;
+  }
+
+  /* Issue #496 — blend-difference: keep blend (not motion) */
+
+  /* Issue #506 — scan-clip: no animation */
+  .cue-scan-clip > * {
+    animation: none !important;
+    clip-path: none !important;
+  }
+
+  /* Issue #509 — jiggle: no shake */
+  .cue-jiggle {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #510 — spin-3d: no rotation */
+  .cue-spin-3d {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #512 — pulse-border: no pulse */
+  .cue-pulse-border {
+    animation: none !important;
+  }
+
+  /* Issue #516 — square-accordion: instant open/close */
+  .cue-square-accordion {
+    animation: none !important;
+  }
+  .cue-square-accordion[data-state="closed"]:not(.is-open) {
+    height: 0 !important;
+  }
+
+  /* Issue #567 — carousel-depth: no transitions */
+  .cue-carousel-depth > * {
+    transition: none !important;
+  }
+
 }
