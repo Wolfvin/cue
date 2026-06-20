@@ -5463,6 +5463,406 @@
 }
 
 
+/* ========================================================================
+   Issue #395 — cue-state-cut (designed from title — body was empty)
+   Hard-cut CSS-var state toggle via steps(1) keyframe. @keyframes yang
+   hanya set CSS var di 0% dan 100% dengan steps(1) timing = instant
+   discrete swap (no interpolation). Consumer sets target var via --cue-
+   state-cut-var. Escape inherit-on-hover-out pattern (companion to #152).
+   ======================================================================== */
+
+@keyframes cue-state-cut {
+  0%, 100% { --cue-state-cut-value: 1; }
+}
+
+.cue-state-cut {
+  animation: cue-state-cut 1ms steps(1) forwards;
+}
+
+
+/* ========================================================================
+   Issue #396 — cue-theme-crossfade (designed from title — body was empty)
+   Cross-fade antara light-dark() theme variants via @property <percentage>
+   opacity var. @property --cue-theme-progress (0-100%) drives opacity
+   transition. light-dark() returns light/dark color per color-scheme.
+   Animate --cue-theme-progress 0→100 untuk smooth theme crossfade.
+   ======================================================================== */
+
+@property --cue-theme-progress {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: true;
+}
+
+@keyframes cue-theme-crossfade-run {
+  from { --cue-theme-progress: 0%; }
+  to   { --cue-theme-progress: 100%; }
+}
+
+.cue-theme-crossfade {
+  animation: cue-theme-crossfade-run var(--cue-theme-duration, 600ms) ease-in-out forwards;
+}
+
+
+/* ========================================================================
+   Issue #397 — cue-orbit-spotlight (designed from title — body was empty)
+   Orbiting radial-gradient spotlight via @property <angle> dengan cos/sin
+   positioning. @property --cue-orbit-angle drives translate(cos,sin).
+   radial-gradient spotlight orbits element center. 20s linear infinite.
+   ======================================================================== */
+
+@property --cue-orbit-spotlight-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes cue-orbit-spotlight-run {
+  to { --cue-orbit-spotlight-angle: 360deg; }
+}
+
+.cue-orbit-spotlight {
+  position: absolute;
+  width: var(--cue-orbit-spotlight-size, 200px);
+  height: var(--cue-orbit-spotlight-size, 200px);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--cue-orbit-spotlight-color, rgba(255, 255, 255, 0.3)) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform:
+    translate(-50%, -50%)
+    translate(
+      calc(cos(var(--cue-orbit-spotlight-angle)) * var(--cue-orbit-spotlight-radius, 100px)),
+      calc(sin(var(--cue-orbit-spotlight-angle)) * var(--cue-orbit-spotlight-radius, 100px))
+    );
+  animation: cue-orbit-spotlight-run var(--cue-orbit-spotlight-duration, 20s) linear infinite;
+  will-change: transform;
+}
+
+
+/* ========================================================================
+   Issue #400 — cue-timeline-scope (designed from title — body was empty)
+   Cross-tree scroll-driven animations via view-timeline-name + timeline-
+   scope. Parent declares timeline-scope: --cue-timeline. Child sets
+   view-timeline-name: --cue-timeline. Sibling elements can reference
+   the timeline via animation-timeline: --cue-timeline. Enables scroll-
+   driven animations across DOM tree boundaries.
+   ======================================================================== */
+
+.cue-timeline-scope {
+  timeline-scope: --cue-timeline;
+}
+
+.cue-timeline-scope-source {
+  view-timeline-name: --cue-timeline;
+}
+
+.cue-timeline-scope-consumer {
+  animation: var(--cue-timeline-scope-animation, none);
+  animation-timeline: --cue-timeline;
+}
+
+@supports not (timeline-scope: none) {
+  .cue-timeline-scope-consumer {
+    animation: none;
+  }
+}
+
+
+/* ========================================================================
+   Issue #401 — cue-display-discrete (designed from title — body was empty)
+   display: allow-discrete + @starting-style untuk animasi display:none →
+   display:block transitions. @starting-style defines initial state for
+   elements entering DOM. transition-behavior: allow-discrete enables
+   display property animation. Consumer toggles [data-open] attribute.
+   ======================================================================== */
+
+.cue-display-discrete {
+  opacity: 0;
+  transform: translateY(-10px);
+  display: none;
+  transition:
+    opacity var(--cue-display-duration, 200ms) ease,
+    transform var(--cue-display-duration, 200ms) ease,
+    display var(--cue-display-duration, 200ms) ease allow-discrete;
+}
+
+.cue-display-discrete[data-open="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+}
+
+@starting-style {
+  .cue-display-discrete[data-open="true"] {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@supports not (transition-behavior: allow-discrete) {
+  .cue-display-discrete {
+    transition: opacity var(--cue-display-duration, 200ms) ease, transform var(--cue-display-duration, 200ms) ease;
+  }
+}
+
+
+/* ========================================================================
+   Issue #403 — cue-offset-move / cue-offset-orbit / cue-offset-travel
+   CSS Motion Path animation — offset-distance along arbitrary path() /
+   circle(). Consumer sets --cue-offset-path via inline style. offset-
+   rotate: auto = element faces direction of travel. 3 presets: cue-
+   offset-move (var-driven), cue-offset-orbit (circular), cue-offset-
+   travel (one-shot entrance).
+   ======================================================================== */
+
+@keyframes cue-offset-move {
+  0%   { offset-distance: var(--cue-offset-start, 0%); }
+  100% { offset-distance: var(--cue-offset-end, 100%); }
+}
+
+.cue-offset-move {
+  offset-path: var(--cue-offset-path, none);
+  offset-rotate: var(--cue-offset-rotate, auto);
+  animation: cue-offset-move var(--cue-offset-duration, 10s) var(--cue-offset-easing, linear) var(--cue-offset-iteration, infinite);
+  will-change: offset-distance;
+}
+
+.cue-offset-orbit {
+  offset-path: circle(var(--cue-offset-radius, 50%) at var(--cue-offset-cx, 50%) var(--cue-offset-cy, 50%));
+  offset-rotate: var(--cue-offset-rotate, auto);
+  animation: cue-offset-move var(--cue-offset-duration, 10s) linear infinite;
+  will-change: offset-distance;
+}
+
+.cue-offset-travel {
+  offset-path: var(--cue-offset-path, none);
+  offset-rotate: var(--cue-offset-rotate, auto);
+  animation: cue-offset-move var(--cue-offset-duration, 2s) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  will-change: offset-distance;
+}
+
+
+/* ========================================================================
+   Issue #409 — cue-melt / cue-melt-overlay
+   clip-path:path() melt/drip animation — SVG Bézier path keyframe
+   interpolation. ::overlay starts with drip-tips path (above element),
+   animates to full-coverage path. 2s ease forwards on hover. Text color
+   flips for readability. Consumer can override paths via CSS vars.
+   ======================================================================== */
+
+@keyframes cue-melt-down {
+  0% {
+    clip-path: path(var(--cue-melt-path-start, 'M0 -0.12C8.33 -8.46 16.67 -12.62 25 -12.62C37.5 -12.62 35.91 0.15 50 -0.12C64.09 -0.4 62.5 -34.5 75 -34.5C87.5 -34.5 87.17 -4.45 100 -0.12C112.83 4.2 112.71 -17.95 125 -18.28C137.29 -18.62 137.76 1.54 150.48 -0.12C163.19 -1.79 162.16 -25.12 174.54 -25.12C182.79 -25.12 191.28 -16.79 200 -0.12L200 -34.37L0 -34.37L0 -0.12Z'));
+  }
+  100% {
+    clip-path: path(var(--cue-melt-path-end, 'M0 199.88C8.33 270.71 16.67 306.13 25 306.13C37.5 306.13 35.91 231.4 50 231.13C64.09 230.85 62.5 284.25 75 284.25C87.5 284.25 87.17 208.05 100 212.38C112.83 216.7 112.71 300.8 125 300.47C137.29 300.13 137.76 239.04 150.48 237.38C163.19 235.71 162.16 293.63 174.54 293.63C182.79 293.63 191.28 262.38 200 199.88L200 0.13L0 0.13L0 199.88Z'));
+  }
+}
+
+.cue-melt {
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-melt-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--cue-melt-color, #151515);
+  clip-path: path(var(--cue-melt-path-start, 'M0 -0.12C8.33 -8.46 16.67 -12.62 25 -12.62C37.5 -12.62 35.91 0.15 50 -0.12C64.09 -0.4 62.5 -34.5 75 -34.5C87.5 -34.5 87.17 -4.45 100 -0.12C112.83 4.2 112.71 -17.95 125 -18.28C137.29 -18.62 137.76 1.54 150.48 -0.12C163.19 -1.79 162.16 -25.12 174.54 -25.12C182.79 -25.12 191.28 -16.79 200 -0.12L200 -34.37L0 -34.37L0 -0.12Z'));
+  pointer-events: none;
+}
+
+.cue-melt:hover .cue-melt-overlay,
+.cue-melt.is-active .cue-melt-overlay {
+  animation: cue-melt-down var(--cue-melt-duration, 2s) var(--cue-melt-ease, ease) forwards;
+}
+
+
+/* ========================================================================
+   Issue #410 — cue-slide-nav
+   Rectangular bar slide navigation — 3px×40px sharp-corner pagination
+   with brand-color focus ring. Replaces default round dots with
+   industrial rectangular bars. border-radius:0 = sharp corners. Brand-
+   color focus ring via outline. aria-selected/active drives opacity.
+   ======================================================================== */
+
+.cue-slide-nav [role="tab"],
+.cue-slide-nav .cue-slide-nav-bullet {
+  width: var(--cue-slide-nav-width, 40px);
+  height: var(--cue-slide-nav-height, 3px);
+  border-radius: var(--cue-slide-nav-radius, 0px);
+  background-color: var(--cue-slide-nav-bg, currentColor);
+  opacity: var(--cue-slide-nav-inactive-opacity, 0.3);
+  transition: opacity var(--cue-duration-normal, 300ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  border: none;
+  cursor: pointer;
+}
+
+.cue-slide-nav [role="tab"][aria-selected="true"],
+.cue-slide-nav .cue-slide-nav-bullet.is-active {
+  opacity: var(--cue-slide-nav-active-opacity, 1);
+}
+
+.cue-slide-nav [role="tab"]:focus-visible,
+.cue-slide-nav .cue-slide-nav-bullet:focus-visible {
+  outline: var(--cue-slide-nav-focus-width, 2px) solid var(--cue-slide-nav-focus-color, var(--cue-color-accent, #3b82f6));
+  outline-offset: var(--cue-slide-nav-focus-offset, 3px);
+  box-shadow: none;
+  opacity: 1;
+}
+
+
+/* ========================================================================
+   Issue #412 — cue-skeleton / cue-skeleton-dark
+   Skeleton shimmer with :has() auto-hide — CSS-only loading state.
+   linear-gradient(90deg, base 25%, highlight 50%, base 75%) shimmer.
+   background-position 200%→-200% sweep. 1.5s linear infinite. :has()
+   auto-hide: .cue-skeleton-container:has([data-loaded]) .cue-skeleton
+   { display: none }. No JS needed.
+   ======================================================================== */
+
+@keyframes cue-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.cue-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--cue-skeleton-base, #f0f0f0) 25%,
+    var(--cue-skeleton-highlight, #e0e0e0) 50%,
+    var(--cue-skeleton-base, #f0f0f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: cue-skeleton-shimmer var(--cue-skeleton-duration, 1.5s) linear infinite;
+  border-radius: var(--cue-skeleton-radius, 4px);
+}
+
+.cue-skeleton-container:has([data-loaded="true"]) .cue-skeleton,
+.cue-skeleton-container:has(.cue-loaded) .cue-skeleton {
+  display: none;
+}
+
+.cue-skeleton-dark {
+  --cue-skeleton-base: #2a2a2a;
+  --cue-skeleton-highlight: #3a3a3a;
+}
+
+
+/* ========================================================================
+   Issue #424 — cue-overshoot-pop
+   Moderate Y=1.2 overshoot + 100ms delay for secondary content pop.
+   cubic-bezier(0.37, 1.2, 0.42, 1.02) = 20% overshoot (moderate, vs
+   cue-spring-rise Y=2.0 extreme). 100ms delay = "anticipation" before
+   pop. transition: all = any animatable property. For secondary content
+   hierarchy (primary reveals first, secondary pops after).
+   ======================================================================== */
+
+.cue-overshoot-pop {
+  transition:
+    var(--cue-pop-duration, 0.4s)
+    cubic-bezier(
+      var(--cue-pop-cb-x1, 0.37),
+      var(--cue-pop-cb-y1, 1.2),
+      var(--cue-pop-cb-x2, 0.42),
+      var(--cue-pop-cb-y2, 1.02)
+    )
+    var(--cue-pop-delay, 0.1s)
+    var(--cue-pop-props, all);
+  will-change: var(--cue-pop-props, all);
+}
+
+
+/* ========================================================================
+   Issue #426 — cue-icon-swap
+   Twin-stacked-icon crossfade with paired scale+opacity for state toggle.
+   Two icons always mounted (no DOM thrash). Active: scale(1) opacity:1.
+   Inactive: scale(0.8) opacity:0. 0.2s ease transition. data-state or
+   aria-hidden drives active/inactive. For play/pause, menu/close, etc.
+   ======================================================================== */
+
+.cue-icon-swap {
+  position: relative;
+  display: inline-flex;
+  width: var(--cue-icon-swap-size, 72px);
+  height: var(--cue-icon-swap-size, 72px);
+}
+
+.cue-icon-swap > * {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%) scale(var(--cue-icon-swap-active-scale, 1));
+  opacity: 1;
+  transition:
+    transform var(--cue-icon-swap-duration, 0.2s) var(--cue-icon-swap-ease, ease),
+    opacity var(--cue-icon-swap-duration, 0.2s) var(--cue-icon-swap-ease, ease);
+  will-change: transform, opacity;
+}
+
+.cue-icon-swap > [data-state="inactive"],
+.cue-icon-swap > [aria-hidden="true"] {
+  transform: translate(-50%, -50%) scale(var(--cue-icon-swap-inactive-scale, 0.8));
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ========================================================================
+   Issue #429 — cue-overflow-detect
+   CSS-only overflow detection via scroll-timeline activation + @container
+   style() query. @keyframes sets --cue-has-overflow:1 only when scroll
+   (self inline) timeline is active (i.e., element has horizontal overflow).
+   @container style() query consumes the var to conditionally apply
+   animations. @supports fallback always runs animation.
+   ======================================================================== */
+
+@keyframes cue-overflow-detect-signal {
+  0%, to { --cue-has-overflow: 1; }
+}
+
+.cue-overflow-detect {
+  animation: cue-overflow-detect-signal;
+  animation-timeline: scroll(self inline);
+  container-type: inline-size;
+  container-name: cue-overflow-container;
+}
+
+@container cue-overflow-container style(--cue-has-overflow: 1) {
+  .cue-overflow-detect__marquee {
+    animation: cue-marquee 30s linear infinite;
+  }
+  .cue-overflow-detect__scroll-hint {
+    opacity: 1;
+  }
+}
+
+.cue-overflow-detect__marquee {
+  animation: none;
+}
+
+.cue-overflow-detect__scroll-hint {
+  opacity: 0;
+}
+
+@supports not (animation-timeline: scroll(self inline)) {
+  .cue-overflow-detect__marquee {
+    animation: cue-marquee 30s linear infinite;
+  }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   .cue-scramble {
     transition: opacity var(--cue-scramble-reduced-duration, 200ms) ease-out;
@@ -9376,5 +9776,1035 @@
   .cue-tooltip-fade-out {
     animation: none !important;
     opacity: 1 !important;
+  }
+.cue-spinner,
+  .cue-glow,
+  .cue-pulse,
+  .cue-shake {
+    animation: none !important;
+  }
+
+  .cue-enter,
+  .cue-enter-fade,
+  .cue-enter-scale,
+  .cue-enter-slide-down,
+  .cue-enter-slide-left,
+  .cue-enter-slide-right,
+  .cue-enter-bounce {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .fx-slide-in,
+  .fx-fade-in,
+  .fx-rise {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-cinematic {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-marquee-track {
+    animation-play-state: paused !important;
+  }
+
+  .cue-pointer {
+    transition: none !important;
+  }
+
+  .cue-ambient,
+  .cue-group:hover .cue-ambient,
+  .cue-group:focus-within .cue-ambient {
+    animation-play-state: paused !important;
+  }
+
+  /* ── Reduced-motion overrides for new techniques ─────────────────────── */
+
+  .cue-dot-grid-dot {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  .cue-shine::after {
+    animation: none !important;
+  }
+
+  .cue-glow-spot--pulse::before {
+    animation: none !important;
+  }
+
+  .cue-scanner {
+    animation: none !important;
+  }
+
+  .cue-sweep {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cue-bounce-y {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-words-rise .cue-word {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .cue-shine-text {
+    background: none !important;
+    color: var(--cue-shine-bg) !important;
+    -webkit-text-fill-color: var(--cue-shine-bg) !important;
+    animation: none !important;
+  }
+
+  .cue-trail {
+    animation: none !important;
+  }
+
+  .cue-input-sweep::after {
+    animation: none !important;
+  }
+
+  .cue-ping {
+    animation: none !important;
+  }
+
+  .cue-menu-3d-enter,
+  .cue-menu-3d-exit {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cue-conic-border > i::before {
+    animation: none !important;
+    transform: translate(-50%, -50%) rotate(180deg) !important;
+  }
+
+  .cue-logo-cycle > * {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  .cue-dolly-in,
+  .cue-dolly-in-mobile {
+    animation: cue-fade-in 1ms ease-out both !important;
+    transform: none !important;
+  }
+
+  .cue-stripes,
+  .cue-stripes-running,
+  .cue-group:hover .cue-stripes,
+  .cue-group:focus-within .cue-stripes {
+    animation: none !important;
+  }
+
+  .cue-chrome-stagger:not([data-chrome-reveal="active"]) [data-chrome-stagger] {
+    opacity: 1;
+    transform: none;
+  }
+  .cue-chrome-stagger[data-chrome-reveal="active"] [data-chrome-stagger] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cue-stagger-duration-1,
+  .cue-stagger-duration-2,
+  .cue-stagger-duration-3,
+  .cue-stagger-duration-var {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-stagger-var,
+  .cue-stagger-enter {
+    animation-delay: 0s !important;
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-radar-sweep {
+    animation: none !important;
+  }
+
+  .cue-breathe,
+  .cue-breathe-1,
+  .cue-breathe-2,
+  .cue-breathe-3 {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-hero-staged {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cue-bars-bounce > * {
+    animation: none !important;
+    transform: scaleX(0.9) !important;
+  }
+
+  .cue-unicorn,
+  .cue-unicorn-text {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+
+  .cue-arrow-teleport-left,
+  .cue-arrow-teleport-right {
+    animation: none !important;
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+  }
+
+  .cue-stagger-reveal > .cue-stagger-reveal-type,
+  .cue-stagger-reveal > .cue-stagger-reveal-body,
+  .cue-stagger-reveal > .cue-stagger-reveal-detail {
+    animation: none !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-type {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    background: none !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-body {
+    opacity: 1 !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-detail {
+    grid-template-rows: 1fr !important;
+  }
+
+  .cue-dropdown-reveal {
+    transition: none !important;
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .cue-dropdown-reveal > * {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .cue-card-img-zoom {
+    filter: var(--cue-card-img-hover-filter) !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .cue-rainbow-border,
+  .cue-rainbow-border::after {
+    animation: none !important;
+    --cue-rainbow-angle: 90deg !important;
+  }
+
+  .cue-hover-draw svg {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .cue-caret-blink,
+  .cue-caret-blink--block {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cue-hover-xray::before {
+    transition: none !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 0 !important;
+  }
+  .cue-hover-xray:hover::before {
+    opacity: 1 !important;
+  }
+
+  .cue-nav-dropdown,
+  .cue-nav-dropdown-host:hover .cue-nav-dropdown,
+  .cue-nav-dropdown-host:focus-within .cue-nav-dropdown {
+    transition-duration: 0ms !important;
+    transition-delay: 0s !important;
+    transform: none !important;
+  }
+
+  .cue-shake-damped {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-hamburger-x > * {
+    transition: none !important;
+  }
+
+  .cue-dialog[open],
+  .cue-dialog.is-closing,
+  .cue-dialog--slide-up[open] {
+    animation: none !important;
+  }
+  .cue-dialog::backdrop {
+    animation: none !important;
+  }
+
+  .cue-flare-loop,
+  .cue-flare {
+    animation: none !important;
+    -webkit-mask-image: none !important;
+            mask-image: none !important;
+  }
+
+  .cue-sky-cycle__layer { transition-duration: 0s !important; }
+  .cue-sky-cycle__indicator { transition-duration: 0s !important; }
+
+  .cue-dot-flow__dot { animation: none !important; opacity: 0.3 !important; }
+
+  .cue-marquee-pair .cue-marquee-track,
+  .cue-marquee-pair .cue-marquee-track-reverse,
+  .cue-marquee-pair:hover .cue-marquee-track,
+  .cue-marquee-pair:hover .cue-marquee-track-reverse {
+    animation-play-state: paused !important;
+  }
+
+  .cue-heartbeat,
+  .cue-heartbeat-hover:hover {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-dots-wave,
+  .cue-dots-wave::before,
+  .cue-dots-wave::after {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-ambient-orbs,
+  .cue-ambient-orbs[data-cue-active="true"] {
+    animation: none !important;
+  }
+
+  .cue-glow-spot--pulse::before {
+    animation: none !important;
+  }
+
+  .cue-toast-enter {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  /* Issue #351 — dropdown-clip transitions collapse to instant */
+  .cue-dropdown-clip__panel,
+  .cue-dropdown-clip__overlay {
+    transition-duration: 0s !important;
+  }
+
+  /* Issue #378 — hero-stagger shows immediately */
+  .cue-hero-stagger {
+    animation: none !important;
+    opacity: 1 !important;
+    scale: 1 !important;
+    transform: none !important;
+  }
+
+  /* Issue #380 — loader-dash freezes; parent rotation + child morph off */
+  .cue-loader-dash,
+  .cue-loader-dash-circle {
+    animation: none !important;
+  }
+
+  /* Issue #383 — arrow-draw-3key shows fully drawn, no movement */
+  .cue-arrow-draw-3key,
+  .cue-arrow-draw-3key-stem,
+  .cue-arrow-draw-3key-head {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    transform: none !important;
+  }
+
+  /* Issue #387 — mask-wipe reveals content instantly */
+  .cue-mask-wipe {
+    animation: none !important;
+    --cue-mask-wipe-position: 120% !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  /* Issue #388 — equalizer shows static mid-height bars */
+  .cue-equalizer > * {
+    animation: none !important;
+    transform: scaleY(0.5) !important;
+  }
+
+  /* Issue #391 — easing tokens snap to step-end */
+  :root {
+    --cue-ease-in: step-end !important;
+    --cue-ease-out: step-end !important;
+    --cue-ease-in-out: step-end !important;
+    --cue-ease-spring: step-end !important;
+    --cue-ease-bounce: step-end !important;
+    --cue-ease-expo-out: step-end !important;
+    --cue-ease-quart: step-end !important;
+    --cue-ease-snappy: step-end !important;
+  }
+
+  /* Issue #392 — aurora-dots shows static (no rotation) */
+  .cue-aurora-dots.is-active,
+  [data-state="active"] .cue-aurora-dots {
+    animation: none !important;
+  }
+
+  /* Issue #393 — glass-button transitions off */
+  .cue-glass-button {
+    transition: none !important;
+  }
+
+  /* Issue #419 — state-transition collapses to instant visibility swap */
+  .cue-state-transition,
+  .cue-state-transition.is-visible {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+
+  /* Issue #420 — orbit-glow parks at static halo, no orbit */
+  .cue-orbit-glow {
+    animation: none !important;
+    offset-distance: 25% !important;
+  }
+
+  /* Issue #421 — shimmer-border parks stripe statically */
+  .cue-shimmer-border::before {
+    animation: none !important;
+    background-position: 50% 0 !important;
+    opacity: 0.5 !important;
+  }
+
+  /* Issue #422 — button-tactile collapses to single duration */
+  .cue-button-tactile,
+  .cue-button-tactile:hover,
+  .cue-button-tactile:active {
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
+
+  /* Issue #425 — header-morph instant height change */
+  .cue-header-morph {
+    transition: none !important;
+  }
+
+  /* Issue #427 — scroll-counter shows end value */
+  .cue-scroll-counter {
+    animation: none !important;
+    --cue-counter-step: var(--cue-counter-start) !important;
+  }
+
+  /* Issue #430 — hover-shadow-has instant opacity swap */
+  .cue-hover-shadow-has:has(.cue-hover-shadow-has__anchor)::after,
+  .cue-hover-shadow-has::after {
+    transition: none !important;
+  }
+
+  /* Issue #431 — spring-linear tokens snap to step-end */
+  :root {
+    --cue-spring-timing: step-end !important;
+    --cue-spring-timing-strong: step-end !important;
+    --cue-spring-timing-subtle: step-end !important;
+  }
+
+  /* Issue #432 — offset-marquee pauses; vertical scroll fallback */
+  .cue-offset-marquee__item {
+    animation: none !important;
+    position: relative !important;
+  }
+  .cue-offset-marquee {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Issue #455 — sprite shows first frame statically */
+  .cue-sprite {
+    animation: none !important;
+    background-position: 0 0 !important;
+  }
+
+  /* Issue #459 — snappy-fade instant appearance */
+  .cue-snappy-fade,
+  .cue-snappy-fade--rise,
+  .cue-snappy-fade--scale {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #464 — develop shows final image instantly */
+  .cue-develop,
+  .cue-develop--sepia,
+  .cue-develop--noir,
+  .cue-develop--invert {
+    animation: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Issue #469 — breathe-scale stops animating */
+  .cue-breathe-scale {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #470 — progress-timer instant fill */
+  .cue-progress-timer,
+  .cue-progress-timer--vertical,
+  .cue-progress-timer--scale-x {
+    animation: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: scaleX(1) !important;
+  }
+
+.cue-spinner,
+  .cue-glow,
+  .cue-pulse,
+  .cue-shake {
+    animation: none !important;
+  }
+
+  .cue-enter,
+  .cue-enter-fade,
+  .cue-enter-scale,
+  .cue-enter-slide-down,
+  .cue-enter-slide-left,
+  .cue-enter-slide-right,
+  .cue-enter-bounce {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .fx-slide-in,
+  .fx-fade-in,
+  .fx-rise {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-cinematic {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-marquee-track {
+    animation-play-state: paused !important;
+  }
+
+  .cue-pointer {
+    transition: none !important;
+  }
+
+  .cue-ambient,
+  .cue-group:hover .cue-ambient,
+  .cue-group:focus-within .cue-ambient {
+    animation-play-state: paused !important;
+  }
+
+  /* ── Reduced-motion overrides for new techniques ─────────────────────── */
+
+  .cue-dot-grid-dot {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  .cue-shine::after {
+    animation: none !important;
+  }
+
+  .cue-glow-spot--pulse::before {
+    animation: none !important;
+  }
+
+  .cue-scanner {
+    animation: none !important;
+  }
+
+  .cue-sweep {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cue-bounce-y {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-words-rise .cue-word {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .cue-shine-text {
+    background: none !important;
+    color: var(--cue-shine-bg) !important;
+    -webkit-text-fill-color: var(--cue-shine-bg) !important;
+    animation: none !important;
+  }
+
+  .cue-trail {
+    animation: none !important;
+  }
+
+  .cue-input-sweep::after {
+    animation: none !important;
+  }
+
+  .cue-ping {
+    animation: none !important;
+  }
+
+  .cue-menu-3d-enter,
+  .cue-menu-3d-exit {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cue-conic-border > i::before {
+    animation: none !important;
+    transform: translate(-50%, -50%) rotate(180deg) !important;
+  }
+
+  .cue-logo-cycle > * {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  .cue-dolly-in,
+  .cue-dolly-in-mobile {
+    animation: cue-fade-in 1ms ease-out both !important;
+    transform: none !important;
+  }
+
+  .cue-stripes,
+  .cue-stripes-running,
+  .cue-group:hover .cue-stripes,
+  .cue-group:focus-within .cue-stripes {
+    animation: none !important;
+  }
+
+  .cue-chrome-stagger:not([data-chrome-reveal="active"]) [data-chrome-stagger] {
+    opacity: 1;
+    transform: none;
+  }
+  .cue-chrome-stagger[data-chrome-reveal="active"] [data-chrome-stagger] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cue-stagger-duration-1,
+  .cue-stagger-duration-2,
+  .cue-stagger-duration-3,
+  .cue-stagger-duration-var {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-stagger-var,
+  .cue-stagger-enter {
+    animation-delay: 0s !important;
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-radar-sweep {
+    animation: none !important;
+  }
+
+  .cue-breathe,
+  .cue-breathe-1,
+  .cue-breathe-2,
+  .cue-breathe-3 {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-hero-staged {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cue-bars-bounce > * {
+    animation: none !important;
+    transform: scaleX(0.9) !important;
+  }
+
+  .cue-unicorn,
+  .cue-unicorn-text {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+
+  .cue-arrow-teleport-left,
+  .cue-arrow-teleport-right {
+    animation: none !important;
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+  }
+
+  .cue-stagger-reveal > .cue-stagger-reveal-type,
+  .cue-stagger-reveal > .cue-stagger-reveal-body,
+  .cue-stagger-reveal > .cue-stagger-reveal-detail {
+    animation: none !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-type {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    background: none !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-body {
+    opacity: 1 !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-detail {
+    grid-template-rows: 1fr !important;
+  }
+
+  .cue-dropdown-reveal {
+    transition: none !important;
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .cue-dropdown-reveal > * {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .cue-card-img-zoom {
+    filter: var(--cue-card-img-hover-filter) !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .cue-rainbow-border,
+  .cue-rainbow-border::after {
+    animation: none !important;
+    --cue-rainbow-angle: 90deg !important;
+  }
+
+  .cue-hover-draw svg {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .cue-caret-blink,
+  .cue-caret-blink--block {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cue-hover-xray::before {
+    transition: none !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 0 !important;
+  }
+  .cue-hover-xray:hover::before {
+    opacity: 1 !important;
+  }
+
+  .cue-nav-dropdown,
+  .cue-nav-dropdown-host:hover .cue-nav-dropdown,
+  .cue-nav-dropdown-host:focus-within .cue-nav-dropdown {
+    transition-duration: 0ms !important;
+    transition-delay: 0s !important;
+    transform: none !important;
+  }
+
+  .cue-shake-damped {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-hamburger-x > * {
+    transition: none !important;
+  }
+
+  .cue-dialog[open],
+  .cue-dialog.is-closing,
+  .cue-dialog--slide-up[open] {
+    animation: none !important;
+  }
+  .cue-dialog::backdrop {
+    animation: none !important;
+  }
+
+  .cue-flare-loop,
+  .cue-flare {
+    animation: none !important;
+    -webkit-mask-image: none !important;
+            mask-image: none !important;
+  }
+
+  .cue-sky-cycle__layer { transition-duration: 0s !important; }
+  .cue-sky-cycle__indicator { transition-duration: 0s !important; }
+
+  .cue-dot-flow__dot { animation: none !important; opacity: 0.3 !important; }
+
+  .cue-marquee-pair .cue-marquee-track,
+  .cue-marquee-pair .cue-marquee-track-reverse,
+  .cue-marquee-pair:hover .cue-marquee-track,
+  .cue-marquee-pair:hover .cue-marquee-track-reverse {
+    animation-play-state: paused !important;
+  }
+
+  .cue-heartbeat,
+  .cue-heartbeat-hover:hover {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-dots-wave,
+  .cue-dots-wave::before,
+  .cue-dots-wave::after {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-ambient-orbs,
+  .cue-ambient-orbs[data-cue-active="true"] {
+    animation: none !important;
+  }
+
+  .cue-glow-spot--pulse::before {
+    animation: none !important;
+  }
+
+  .cue-toast-enter {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  /* Issue #351 — dropdown-clip transitions collapse to instant */
+  .cue-dropdown-clip__panel,
+  .cue-dropdown-clip__overlay {
+    transition-duration: 0s !important;
+  }
+
+  /* Issue #378 — hero-stagger shows immediately */
+  .cue-hero-stagger {
+    animation: none !important;
+    opacity: 1 !important;
+    scale: 1 !important;
+    transform: none !important;
+  }
+
+  /* Issue #380 — loader-dash freezes; parent rotation + child morph off */
+  .cue-loader-dash,
+  .cue-loader-dash-circle {
+    animation: none !important;
+  }
+
+  /* Issue #383 — arrow-draw-3key shows fully drawn, no movement */
+  .cue-arrow-draw-3key,
+  .cue-arrow-draw-3key-stem,
+  .cue-arrow-draw-3key-head {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    transform: none !important;
+  }
+
+  /* Issue #387 — mask-wipe reveals content instantly */
+  .cue-mask-wipe {
+    animation: none !important;
+    --cue-mask-wipe-position: 120% !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  /* Issue #388 — equalizer shows static mid-height bars */
+  .cue-equalizer > * {
+    animation: none !important;
+    transform: scaleY(0.5) !important;
+  }
+
+  /* Issue #391 — easing tokens snap to step-end */
+  :root {
+    --cue-ease-in: step-end !important;
+    --cue-ease-out: step-end !important;
+    --cue-ease-in-out: step-end !important;
+    --cue-ease-spring: step-end !important;
+    --cue-ease-bounce: step-end !important;
+    --cue-ease-expo-out: step-end !important;
+    --cue-ease-quart: step-end !important;
+    --cue-ease-snappy: step-end !important;
+  }
+
+  /* Issue #392 — aurora-dots shows static (no rotation) */
+  .cue-aurora-dots.is-active,
+  [data-state="active"] .cue-aurora-dots {
+    animation: none !important;
+  }
+
+  /* Issue #393 — glass-button transitions off */
+  .cue-glass-button {
+    transition: none !important;
+  }
+
+  /* Issue #419 — state-transition collapses to instant visibility swap */
+  .cue-state-transition,
+  .cue-state-transition.is-visible {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+
+  /* Issue #474 — scattered-float parks at home position */
+  .cue-scattered-float {
+    animation: none !important;
+    transform: translate(var(--cue-float-base-x, -50%), var(--cue-float-base-y, -50%)) !important;
+  }
+
+  /* Issue #492 — perspective-tilt-in/out instant snap, no 3D */
+  .cue-perspective-tilt-in,
+  .cue-perspective-tilt-out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Issue #497 — content-swap shows first non-empty slot statically */
+  .cue-content-swap::before {
+    animation: none !important;
+    content: var(--cue-swap-slot-2, "✨") !important;
+  }
+
+  /* Issue #498 — hover-asymmetric collapses to single duration */
+  .cue-hover-asymmetric,
+  .cue-hover-asymmetric:hover,
+  .cue-hover-asymmetric:focus-visible {
+    transition-duration: 0s !important;
+  }
+
+  /* Issue #502 — pulse-beam freezes */
+  .cue-pulse-beam::before,
+  .cue-pulse-beam--double::after {
+    animation: none !important;
+  }
+
+  /* Issue #519 — content-ellipsis shows static 3 dots */
+  .cue-content-ellipsis::after {
+    animation: none !important;
+    content: "..." !important;
+  }
+
+  /* Issue #520 — typewriter shows full text width */
+  .cue-typewriter {
+    animation: none !important;
+    width: var(--cue-typewriter-target, 4ch) !important;
+  }
+
+  /* Issue #525 — stream-color-handoff instant fade */
+  .cue-stream-color-handoff {
+    animation: cue-fade-in 1ms ease-out both !important;
+    color: currentColor !important;
+  }
+
+  /* Issue #532 — button-enable instant enable, no celebration */
+  .cue-button-enable {
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    background-image: none !important;
+  }
+
+  /* Issue #546 — text-roll instant swap, no roll */
+  .cue-text-roll > span {
+    transition: none !important;
+  }
+  .cue-text-roll > span::after {
+    display: none !important;
+  }
+
+  /* Issue #548 — cursor-exclusion hidden, restore OS cursor */
+  .cue-cursor-exclusion {
+    display: none !important;
+  }
+
+  /* Issue #549 — hamburger-choreography instant state swap */
+  .cue-hamburger-choreography.is-active span:first-child {
+    animation: none !important;
+    top: calc(50% - var(--cue-hamburger-bar-thickness, 2px) * 0.5) !important;
+    transform: rotate(45deg) !important;
+  }
+  .cue-hamburger-choreography.is-active span:last-child {
+    animation: none !important;
+    top: calc(50% - var(--cue-hamburger-bar-thickness, 2px) * 0.5) !important;
+    transform: rotate(-45deg) !important;
+  }
+
+  /* Issue #551 — stroke-morph static stroke, no animation */
+  .cue-stroke-morph {
+    animation: none !important;
+  }
+
+  /* Issue #395 — state-cut: no animation */
+  .cue-state-cut {
+    animation: none !important;
+  }
+
+  /* Issue #396 — theme-crossfade: instant */
+  .cue-theme-crossfade {
+    animation: none !important;
+    --cue-theme-progress: 100% !important;
+  }
+
+  /* Issue #397 — orbit-spotlight: static center */
+  .cue-orbit-spotlight {
+    animation: none !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  /* Issue #400 — timeline-scope: no scroll-driven animation */
+  .cue-timeline-scope-consumer {
+    animation: none !important;
+  }
+
+  /* Issue #401 — display-discrete: instant show/hide */
+  .cue-display-discrete {
+    transition: none !important;
+  }
+
+  /* Issue #403 — offset-move/orbit/travel: static at end position */
+  .cue-offset-move,
+  .cue-offset-orbit,
+  .cue-offset-travel {
+    animation: none !important;
+    offset-distance: var(--cue-offset-end, 100%) !important;
+  }
+
+  /* Issue #409 — melt: no animation, show final state */
+  .cue-melt-overlay {
+    animation: none !important;
+  }
+
+  /* Issue #410 — slide-nav: instant opacity */
+  .cue-slide-nav [role="tab"],
+  .cue-slide-nav .cue-slide-nav-bullet {
+    transition: none !important;
+  }
+
+  /* Issue #412 — skeleton: no shimmer */
+  .cue-skeleton {
+    animation: none !important;
+  }
+
+  /* Issue #424 — overshoot-pop: instant, no delay */
+  .cue-overshoot-pop {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  /* Issue #426 — icon-swap: instant swap */
+  .cue-icon-swap > * {
+    transition: none !important;
+  }
+
+  /* Issue #429 — overflow-detect: no scroll-timeline, fallback to always-on */
+  .cue-overflow-detect {
+    animation: none !important;
   }
 }
