@@ -23,6 +23,9 @@ jobs:
 
       - run: pnpm install --no-frozen-lockfile
 
+      - name: Validate CSS ↔ Manifest
+        run: pnpm run validate --filter=@cue-vin/css
+
       - run: pnpm run build --filter=!./examples/**
 
       - run: pnpm run test --filter=!./examples/** || true

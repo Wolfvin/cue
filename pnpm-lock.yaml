@@ -129,7 +129,11 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@25.9.3)(jsdom@29.1.1)(lightningcss@1.32.0)
 
-  packages/css: {}
+  packages/css:
+    devDependencies:
+      postcss:
+        specifier: ^8.4.49
+        version: 8.5.15
 
   packages/mcp:
     dependencies:
