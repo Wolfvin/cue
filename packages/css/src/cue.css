@@ -493,6 +493,2140 @@
   animation-play-state: running;
 }
 
+
+/* ── Issue #134 — Breathing dot grid (cue-dot-grid) ─────────────────── */
+
+@keyframes cue-dot-breathe {
+  0%   { opacity: var(--cue-dot-dim, 0.3); }
+  50%  { opacity: var(--cue-dot-bright, 1); }
+  100% { opacity: var(--cue-dot-dim, 0.3); }
+}
+
+.cue-dot-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cue-dot-cols, 5), 1fr);
+  gap: var(--cue-dot-gap, 24px);
+  place-items: center;
+}
+
+.cue-dot-grid-dot {
+  width: var(--cue-dot-size, 4px);
+  height: var(--cue-dot-size, 4px);
+  border-radius: 50%;
+  background: var(--cue-dot-color, var(--cue-color-accent));
+  opacity: var(--cue-dot-dim, 0.3);
+  animation: cue-dot-breathe var(--cue-dot-cycle, 2800ms)
+             steps(1, end) infinite;
+  animation-delay: var(--cue-dot-phase, 0ms);
+}
+
+.cue-dot-grid-dot:nth-child(5n+1) { --cue-dot-phase: 0ms; }
+.cue-dot-grid-dot:nth-child(5n+2) { --cue-dot-phase: 350ms; }
+.cue-dot-grid-dot:nth-child(5n+3) { --cue-dot-phase: 700ms; }
+.cue-dot-grid-dot:nth-child(5n+4) { --cue-dot-phase: 1050ms; }
+.cue-dot-grid-dot:nth-child(5n+5) { --cue-dot-phase: 1400ms; }
+
+
+/* ── Issue #135 — Directional shine sweep (cue-shine) ───────────────── */
+
+@keyframes cue-shine-sweep {
+  0% {
+    transform: translateX(var(--cue-shine-start, -100%));
+  }
+  15% {
+    transform: translateX(var(--cue-shine-end, 100%));
+  }
+  100% {
+    transform: translateX(var(--cue-shine-end, 100%));
+  }
+}
+
+.cue-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    var(--cue-shine-angle, 105deg),
+    transparent var(--cue-shine-lead, 40%),
+    var(--cue-shine-color, rgba(255, 255, 255, 0.08)) 45%,
+    var(--cue-shine-peak, rgba(255, 255, 255, 0.15)) 50%,
+    var(--cue-shine-color, rgba(255, 255, 255, 0.08)) 55%,
+    transparent var(--cue-shine-trail, 60%)
+  );
+  transform: translateX(var(--cue-shine-start, -100%));
+  animation: cue-shine-sweep var(--cue-shine-duration, 6s)
+             var(--cue-shine-ease, ease-in-out) infinite;
+  animation-delay: var(--cue-shine-delay, 2s);
+  pointer-events: none;
+}
+
+
+/* ── Issue #138 — Radial spotlight glow (cue-glow-spot) ─────────────── */
+
+.cue-glow-spot {
+  position: relative;
+}
+
+.cue-glow-spot::before {
+  content: "";
+  position: absolute;
+  inset: var(--cue-gs-inset, -40%);
+  background: radial-gradient(
+    var(--cue-gs-shape, 50% 50%) at var(--cue-gs-x, 50%) var(--cue-gs-y, 50%),
+    var(--cue-gs-color, rgba(255, 255, 255, 0.04)) 0px,
+    transparent var(--cue-gs-fade, 90%)
+  );
+  opacity: var(--cue-gs-opacity, 1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.cue-glow-spot--pulse::before {
+  animation: cue-gs-pulse var(--cue-gs-pulse-duration, 4s) ease-in-out infinite alternate;
+}
+
+@keyframes cue-gs-pulse {
+  from { opacity: var(--cue-gs-opacity-min, 0.6); }
+  to   { opacity: var(--cue-gs-opacity-max, 1); }
+}
+
+.cue-glow-spot--accent::before {
+  --cue-gs-color: rgba(94, 106, 210, 0.06);
+}
+
+.cue-glow-spot--warm::before {
+  --cue-gs-color: rgba(255, 170, 100, 0.05);
+}
+
+
+/* ── Issue #150 — Cursor-following gradient border (cue-hover-spotlight) ─ */
+
+@property --cue-spotlight-x {
+  syntax: "<percentage>";
+  initial-value: 50%;
+  inherits: false;
+}
+@property --cue-spotlight-y {
+  syntax: "<percentage>";
+  initial-value: 50%;
+  inherits: false;
+}
+@property --cue-grow {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+.cue-hover-spotlight {
+  --cue-radius: 8px;
+  --cue-duration: 800ms;
+  --cue-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  isolation: isolate;
+}
+
+.cue-hover-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: var(--cue-radius);
+  background: var(--cue-spotlight-color, radial-gradient(
+    circle at var(--cue-spotlight-x) var(--cue-spotlight-y),
+    var(--cue-color-active, #635bff) 0%,
+    transparent 60%
+  ));
+  opacity: 0;
+  transition: opacity 250ms linear;
+  pointer-events: none;
+}
+
+.cue-hover-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--cue-radius);
+  background: var(--cue-fallback-border, #e5e7eb);
+  clip-path: inset(0 round var(--cue-radius));
+  transition: clip-path var(--cue-duration) var(--cue-ease);
+  pointer-events: none;
+}
+
+.cue-hover-spotlight:hover::before { opacity: 1; }
+.cue-hover-spotlight:hover::after  {
+  clip-path: inset(calc(-1 * var(--cue-grow, 6px)) round var(--cue-radius));
+}
+
+
+/* ── Issue #154 — Multi-orb ambient gradient (cue-ambient-orbs) ─────── */
+
+@keyframes cue-ambient-orbs-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cue-ambient-orbs {
+  --cue-orb-color-a: var(--cue-color-accent, #635bff);
+  --cue-orb-color-b: #f59e0b;
+  --cue-orb-blur: 10px;
+  --cue-orb-duration: 800ms;
+  --cue-orb-ease: linear;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  isolation: isolate;
+  align-items: flex-end;
+  pointer-events: none;
+  opacity: 0;
+  animation: cue-ambient-orbs-fade var(--cue-orb-duration) var(--cue-orb-ease) alternate;
+}
+
+.cue-ambient-orbs[data-cue-active="true"] {
+  animation-direction: alternate;
+  opacity: 1;
+}
+
+.cue-ambient-orbs__orb {
+  position: absolute;
+  filter: blur(var(--cue-orb-blur));
+  will-change: transform;
+}
+
+.cue-ambient-orbs__orb--1 {
+  background: radial-gradient(50% 50% at 50% 50%, var(--cue-orb-color-a) 23.56%, transparent 100%);
+  transform: rotate(25.862deg) translate(31%, 75%);
+  width: 70%;
+  aspect-ratio: 1238/2077;
+}
+
+.cue-ambient-orbs__orb--2 {
+  background: radial-gradient(50% 50% at 50% 50%, var(--cue-orb-color-a) 0%, transparent 100%);
+  transform: rotate(25.862deg) translate(44%, 71%);
+  width: 45%;
+  aspect-ratio: 926/1068;
+}
+
+.cue-ambient-orbs__orb--3 {
+  background: radial-gradient(50% 50% at 50% 50%, var(--cue-orb-color-b) 27.4%, transparent 100%);
+  transform: rotate(27.305deg) translate(40%, 56%);
+  right: 0;
+  width: 60%;
+  aspect-ratio: 1141/971;
+}
+
+.cue-ambient-orbs__orb--4 {
+  background: radial-gradient(50% 50% at 50% 50%, var(--cue-orb-color-b) 0%, transparent 100%);
+  right: 0;
+  transform: rotate(36.009deg) translate(39%, 4%);
+  width: 45%;
+  aspect-ratio: 771/338;
+}
+
+
+/* ── Issue #155 — Composable stagger (cue-stagger-flow) ─────────────── */
+
+@keyframes cue-stagger-flow-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+}
+
+.cue-stagger-flow {
+  --cue-stagger-base-delay: 0ms;
+  --cue-stagger-step: 100ms;
+  --cue-stagger-duration: 750ms;
+  --cue-stagger-ease: cubic-bezier(0.2, 0, 0, 1);
+  opacity: 0;
+  animation: cue-stagger-flow-rise var(--cue-stagger-duration) var(--cue-stagger-ease) var(--cue-stagger-base-delay) forwards;
+}
+
+.cue-stagger-flow:nth-of-type(1),
+.cue-stagger-flow-parent:nth-child(1) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 0 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(2),
+.cue-stagger-flow-parent:nth-child(2) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 1 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(3),
+.cue-stagger-flow-parent:nth-child(3) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 2 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(4),
+.cue-stagger-flow-parent:nth-child(4) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 3 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(5),
+.cue-stagger-flow-parent:nth-child(5) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 4 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(6),
+.cue-stagger-flow-parent:nth-child(6) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 5 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(7),
+.cue-stagger-flow-parent:nth-child(7) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 6 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(8),
+.cue-stagger-flow-parent:nth-child(8) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 7 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(9),
+.cue-stagger-flow-parent:nth-child(9) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 8 * var(--cue-stagger-step)); }
+.cue-stagger-flow:nth-of-type(10),
+.cue-stagger-flow-parent:nth-child(10) .cue-stagger-flow { animation-delay: calc(var(--cue-stagger-base-delay) + 9 * var(--cue-stagger-step)); }
+
+.cue-stagger-flow--delayed {
+  --cue-stagger-base-delay: 200ms;
+}
+
+@keyframes cue-stagger-flow-from-left {
+  from { opacity: 0; transform: translate3d(-30px, 0, 0); }
+  to   { opacity: 1; transform: translateZ(0); }
+}
+
+.cue-stagger-flow--from-left {
+  animation-name: cue-stagger-flow-from-left;
+}
+
+@keyframes cue-stagger-flow-from-right {
+  from { opacity: 0; transform: translate3d(30px, 0, 0); }
+  to   { opacity: 1; transform: translateZ(0); }
+}
+
+.cue-stagger-flow--from-right {
+  animation-name: cue-stagger-flow-from-right;
+}
+
+
+/* ── Issue #156 — Knight Rider scanner (cue-scanner) ────────────────── */
+
+@keyframes cue-scanner-sweep {
+  0%, 100% {
+    left: 0;
+    transform: translateX(0);
+  }
+  50% {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}
+
+.cue-scanner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--cue-scanner-width, 200px);
+  height: var(--cue-scanner-height, 1px);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--cue-scanner-color, #fff) 50%,
+    transparent 100%
+  );
+  opacity: var(--cue-scanner-opacity, 0.5);
+  animation: cue-scanner-sweep
+             var(--cue-scanner-duration, 2s)
+             var(--cue-ease-in-out, cubic-bezier(0.83, 0, 0.17, 1))
+             infinite;
+  will-change: left, transform;
+  pointer-events: none;
+}
+
+
+/* ── Issue #157 — One-shot loading sweep (cue-sweep) ────────────────── */
+
+@keyframes cue-sweep-run {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  100% {
+    left: var(--cue-sweep-end, 26%);
+    opacity: 1;
+  }
+}
+
+.cue-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cue-sweep-width, 48%);
+  height: var(--cue-sweep-height, 1px);
+  background: linear-gradient(
+    270deg,
+    transparent,
+    var(--cue-sweep-color, rgba(255, 255, 255, 0.7)) 51.04%,
+    transparent
+  );
+  animation: cue-sweep-run
+             var(--cue-sweep-duration, 1.5s)
+             cubic-bezier(0.455, 0.03, 0.515, 0.955)
+             forwards;
+  pointer-events: none;
+  will-change: left, opacity;
+}
+
+
+/* ── Issue #160 — macOS dock bounce Y (cue-bounce-y) ────────────────── */
+
+@keyframes cue-bounce-y {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--cue-bounce-amplitude, -10px)));
+  }
+}
+
+.cue-bounce-y {
+  animation: cue-bounce-y
+             var(--cue-bounce-duration, 1.2s)
+             var(--cue-ease-in-out, cubic-bezier(0.83, 0, 0.17, 1))
+             forwards;
+  will-change: transform;
+}
+
+
+/* ── Issue #161 — Toast corner entrance (cue-toast-enter) ───────────── */
+
+@keyframes cue-toast-enter-run {
+  0% {
+    opacity: 0;
+    transform: translate(
+                 var(--cue-toast-enter-x, 10px),
+                 var(--cue-toast-enter-y, 10px)
+               )
+               scale(var(--cue-toast-enter-scale, 0.9));
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.cue-toast-enter {
+  animation: cue-toast-enter-run
+             var(--cue-toast-enter-duration, 0.3s)
+             ease
+             forwards;
+  will-change: transform, opacity;
+}
+
+
+/* ── Issue #165 — Per-word cinematic headline reveal (cue-words-rise) ── */
+
+.cue-words-rise {
+  --cue-word-y: 50%;
+  --cue-word-blur: 8px;
+  --cue-word-duration: 600ms;
+  --cue-word-delay: 90ms;
+  --cue-word-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cue-words-rise .cue-word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(var(--cue-word-blur));
+  transform: translateY(var(--cue-word-y));
+  will-change: opacity, filter, transform;
+  animation: cue-word-rise var(--cue-word-duration) var(--cue-word-ease) both;
+  animation-delay: calc(var(--cue-word-delay) * var(--cue-word-i, 0));
+}
+
+.cue-words-rise .cue-word:nth-child(1)  { --cue-word-i: 0; }
+.cue-words-rise .cue-word:nth-child(2)  { --cue-word-i: 1; }
+.cue-words-rise .cue-word:nth-child(3)  { --cue-word-i: 2; }
+.cue-words-rise .cue-word:nth-child(4)  { --cue-word-i: 3; }
+.cue-words-rise .cue-word:nth-child(5)  { --cue-word-i: 4; }
+.cue-words-rise .cue-word:nth-child(6)  { --cue-word-i: 5; }
+.cue-words-rise .cue-word:nth-child(7)  { --cue-word-i: 6; }
+.cue-words-rise .cue-word:nth-child(8)  { --cue-word-i: 7; }
+.cue-words-rise .cue-word:nth-child(9)  { --cue-word-i: 8; }
+.cue-words-rise .cue-word:nth-child(10) { --cue-word-i: 9; }
+.cue-words-rise .cue-word:nth-child(11) { --cue-word-i: 10; }
+.cue-words-rise .cue-word:nth-child(12) { --cue-word-i: 11; }
+
+@keyframes cue-word-rise {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+
+/* ── Issue #169 — Heading shine sweep on text (cue-shine-text) ──────── */
+
+.cue-shine-text {
+  --cue-shine-bg: var(--cue-color-text-base, currentColor);
+  --cue-shine-band: var(--cue-color-text-bright, #ffffff);
+  --cue-shine-duration: 1.8s;
+  --cue-shine-timing: linear;
+  --cue-shine-bg-size: 300%;
+  --cue-shine-band-start: 60%;
+  --cue-shine-band-end: 80%;
+
+  background: linear-gradient(-0.6turn,
+    var(--cue-shine-bg)   0%,
+    var(--cue-shine-band) var(--cue-shine-band-start),
+    var(--cue-shine-bg)   var(--cue-shine-band-end),
+    var(--cue-shine-bg)   100%
+  );
+  background-size: var(--cue-shine-bg-size) auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  will-change: background-position;
+
+  animation: cue-shine-text-sweep var(--cue-shine-duration) var(--cue-shine-timing) infinite;
+}
+
+@keyframes cue-shine-text-sweep {
+  0%   { background-position: 0%; }
+  100% { background-position: var(--cue-shine-bg-size); }
+}
+
+.cue-shine-text:hover {
+  animation-play-state: paused;
+}
+
+
+/* ── Issue #184 — CSS Motion Path border trail (cue-trail) ──────────── */
+
+@keyframes cue-trail-run {
+  0%   { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+.cue-trail {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  offset-path: rect(
+    0 var(--cue-trail-w, 100%) var(--cue-trail-h, 100%) 0
+    round var(--cue-trail-radius, 16px)
+  );
+  width: var(--cue-trail-size, 2px);
+  height: var(--cue-trail-size, 2px);
+  background: var(--cue-trail-color, #fff);
+  border-radius: 9999px;
+  box-shadow:
+    0 0 8px var(--cue-trail-color, #fff),
+    0 0 16px var(--cue-trail-color, #fff);
+  animation: cue-trail-run
+             var(--cue-trail-duration, 5s)
+             linear
+             infinite;
+  will-change: offset-distance;
+}
+
+.cue-trail-host {
+  position: relative;
+  isolation: isolate;
+}
+
+
+/* ── Issue #186 — Command palette input sweep (cue-input-sweep) ─────── */
+
+@keyframes cue-input-sweep-run {
+  0%   { opacity: 1; transform: translate(-100%); }
+  100% { opacity: 1; transform: translate(300%); }
+}
+
+.cue-input-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-input-sweep::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cue-input-sweep-width, 100%);
+  height: var(--cue-input-sweep-height, 1px);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--cue-input-sweep-color, rgba(255, 255, 255, 0.6)) 50%,
+    transparent 100%
+  );
+  animation: cue-input-sweep-run
+             var(--cue-input-sweep-duration, 1.1s)
+             cubic-bezier(0.455, 0.03, 0.515, 0.955)
+             infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+
+
+/* ── Issue #187 — Material-style ping (cue-ping) ────────────────────── */
+
+@keyframes cue-ping-ripple {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75%, 100% {
+    opacity: 0;
+    transform: scale(var(--cue-ping-scale, 2));
+  }
+}
+
+.cue-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--cue-ping-color, currentColor);
+  animation: cue-ping-ripple
+             var(--cue-ping-duration, 1s)
+             cubic-bezier(0, 0, 0.2, 1)
+             infinite;
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: -1;
+}
+
+.cue-ping-host {
+  position: relative;
+  isolation: isolate;
+}
+
+
+/* ── Issue #188 — 3D dropdown menu enter (cue-menu-3d) ─────────────── */
+
+@keyframes cue-menu-3d-enter-run {
+  0% {
+    opacity: 0;
+    transform: rotateX(var(--cue-menu-3d-enter-rotate, -30deg))
+               scale(var(--cue-menu-3d-enter-scale, 0.9));
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0) scale(1);
+  }
+}
+
+@keyframes cue-menu-3d-exit-run {
+  0% {
+    opacity: 1;
+    transform: rotateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotateX(var(--cue-menu-3d-exit-rotate, -10deg))
+               scale(var(--cue-menu-3d-exit-scale, 0.95));
+  }
+}
+
+.cue-menu-3d-enter {
+  animation: cue-menu-3d-enter-run
+             var(--cue-menu-3d-duration, 0.15s)
+             var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1))
+             forwards;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.cue-menu-3d-exit {
+  animation: cue-menu-3d-exit-run
+             var(--cue-menu-3d-duration, 0.15s)
+             var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1))
+             forwards;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+
+/* ── Issue #191 — Card stack directional swap (cue-card-swap) ───────── */
+
+@keyframes cue-card-swap-left-run {
+  0%   { transform: translate(0) rotate(0); }
+  50%  { transform: translate(calc(var(--cue-card-swap-distance, 80px) * -1))
+                    rotate(calc(var(--cue-card-swap-rotate, 6deg) * -1)); }
+  100% { z-index: 0;
+         opacity: var(--cue-card-swap-back-opacity, 0.5);
+         transform: translate(0) rotate(0); }
+}
+
+@keyframes cue-card-swap-right-run {
+  0%   { transform: translate(0) rotate(0); }
+  50%  { transform: translate(var(--cue-card-swap-distance, 80px))
+                    rotate(var(--cue-card-swap-rotate, 6deg)); }
+  100% { z-index: 10;
+         opacity: 1;
+         transform: translate(0) rotate(0); }
+}
+
+@keyframes cue-card-swap-left-reverse-run {
+  0%   { z-index: 0;
+         opacity: var(--cue-card-swap-back-opacity, 0.5);
+         transform: translate(0) rotate(0); }
+  50%  { transform: translate(calc(var(--cue-card-swap-distance, 80px) * -1))
+                    rotate(calc(var(--cue-card-swap-rotate, 6deg) * -1)); }
+  100% { z-index: 10;
+         opacity: 1;
+         transform: translate(0) rotate(0); }
+}
+
+@keyframes cue-card-swap-right-reverse-run {
+  0%   { z-index: 10;
+         opacity: 1;
+         transform: translate(0) rotate(0); }
+  50%  { transform: translate(var(--cue-card-swap-distance, 80px))
+                    rotate(var(--cue-card-swap-rotate, 6deg)); }
+  100% { z-index: 0;
+         opacity: var(--cue-card-swap-back-opacity, 0.5);
+         transform: translate(0) rotate(0); }
+}
+
+.cue-card-swap-left         { animation: cue-card-swap-left-run          var(--cue-card-swap-duration, 0.5s) ease-in-out forwards; }
+.cue-card-swap-right        { animation: cue-card-swap-right-run         var(--cue-card-swap-duration, 0.5s) ease-in-out forwards; }
+.cue-card-swap-left-reverse { animation: cue-card-swap-left-reverse-run  var(--cue-card-swap-duration, 0.5s) ease-in-out forwards; }
+.cue-card-swap-right-reverse{ animation: cue-card-swap-right-reverse-run var(--cue-card-swap-duration, 0.5s) ease-in-out forwards; }
+
+
+/* ── Issue #192 — Spinning conic-gradient border (cue-conic-border) ─── */
+
+.cue-conic-border {
+  --cue-conic-bg: conic-gradient(from 180deg at 50% 50%,
+    #e92a67 0deg, #a853ba 112.5deg, #2a8af6 228.75deg, #2a8af600 360deg);
+  --cue-conic-radius: 2.5rem;
+  --cue-conic-border-size: 1px;
+  --cue-conic-padding: .5rem;
+  --cue-conic-glow: 0 0 40px 20px;
+  --cue-conic-duration: 5s;
+  --cue-conic-direction: reverse;
+
+  padding: calc(var(--cue-conic-padding) + var(--cue-conic-border-size));
+  border-radius: var(--cue-conic-radius);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.cue-conic-border > i {
+  content: "";
+  position: absolute;
+  top: var(--cue-conic-border-size);
+  right: var(--cue-conic-border-size);
+  bottom: var(--cue-conic-border-size);
+  left: var(--cue-conic-border-size);
+  padding: var(--cue-conic-border-size);
+  z-index: -1;
+  border-radius: calc(var(--cue-conic-radius) - var(--cue-conic-border-size));
+  -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+  mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+  -webkit-mask-composite: source-in;
+  mask-composite: exclude;
+}
+
+.cue-conic-border > i::before {
+  content: "";
+  background: var(--cue-conic-bg);
+  box-shadow: var(--cue-conic-glow) var(--cue-conic-bg);
+  border-radius: 100%;
+  width: 141.421%;
+  padding-bottom: 141.421%;
+  position: absolute;
+  top: 50%; left: 50%;
+  z-index: -2;
+  animation: cue-conic-spin var(--cue-conic-duration) linear infinite;
+  animation-direction: var(--cue-conic-direction);
+}
+
+@keyframes cue-conic-spin {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to   { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+
+/* ── Issue #197 — Logo fade-cycle (cue-logo-cycle) ──────────────────── */
+
+.cue-logo-cycle {
+  --cue-cycle-duration: 12s;
+  --cue-cycle-stagger: 1.5s;
+  --cue-cycle-ease: ease-in-out;
+
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 5%, black 95%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, black 5%, black 95%, transparent 100%);
+}
+
+.cue-logo-cycle > * {
+  opacity: 0;
+  animation: cue-logo-cycle-fade var(--cue-cycle-duration) var(--cue-cycle-ease) infinite;
+  animation-delay: calc(-1 * var(--cue-cycle-stagger) * var(--cue-cycle-i, 0));
+}
+
+.cue-logo-cycle > *:nth-child(1)  { --cue-cycle-i: 0; }
+.cue-logo-cycle > *:nth-child(2)  { --cue-cycle-i: 1; }
+.cue-logo-cycle > *:nth-child(3)  { --cue-cycle-i: 2; }
+.cue-logo-cycle > *:nth-child(4)  { --cue-cycle-i: 3; }
+.cue-logo-cycle > *:nth-child(5)  { --cue-cycle-i: 4; }
+.cue-logo-cycle > *:nth-child(6)  { --cue-cycle-i: 5; }
+.cue-logo-cycle > *:nth-child(7)  { --cue-cycle-i: 6; }
+.cue-logo-cycle > *:nth-child(8)  { --cue-cycle-i: 7; }
+.cue-logo-cycle > *:nth-child(9)  { --cue-cycle-i: 8; }
+.cue-logo-cycle > *:nth-child(10) { --cue-cycle-i: 9; }
+.cue-logo-cycle > *:nth-child(11) { --cue-cycle-i: 10; }
+.cue-logo-cycle > *:nth-child(12) { --cue-cycle-i: 11; }
+
+@keyframes cue-logo-cycle-fade {
+  0%   { opacity: 0; }
+  3%   { opacity: 1; }
+  22%  { opacity: 1; }
+  25%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+
+/* ── Issue #199 — 4-stage dolly cinematic (cue-dolly-in) ────────────── */
+
+@keyframes cue-dolly-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--cue-dolly-x, 0px), var(--cue-dolly-y, 22vh), 0) scale(1.32);
+  }
+  18% { opacity: 1; }
+  45% {
+    opacity: 1;
+    transform: translate3d(var(--cue-dolly-x, 0px), 0, 0) scale(1.32);
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(var(--cue-dolly-x, 0px), 0, 0) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes cue-dolly-in-mobile {
+  0%, 68% {
+    opacity: 0;
+    transform: translateX(var(--cue-dolly-x, -220px)) scale(0.94);
+  }
+  78% {
+    opacity: 1;
+    transform: translateX(calc(var(--cue-dolly-x, -220px) * 0.82)) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.cue-dolly-in {
+  --cue-dolly-x: 0px;
+  --cue-dolly-y: 22vh;
+  animation: cue-dolly-in 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: transform, opacity;
+}
+
+.cue-dolly-in-mobile {
+  --cue-dolly-x: -220px;
+  animation: cue-dolly-in-mobile 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: transform, opacity;
+}
+
+
+/* ── Issue #202 — Diagonal stripe loader (cue-stripes) ──────────────── */
+
+@keyframes cue-stripes-flow {
+  0%   { background-position: 0 0; }
+  100% { background-position: 28.28px -28.28px; }
+}
+
+.cue-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--cue-stripe-color, rgba(255, 255, 255, 0.08)) 0,
+    var(--cue-stripe-color, rgba(255, 255, 255, 0.08)) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  background-size: 28.28px 28.28px;
+  animation: cue-stripes-flow var(--cue-stripes-duration, 2000ms) linear infinite;
+  animation-play-state: paused;
+  will-change: background-position;
+}
+
+.cue-group:hover .cue-stripes,
+.cue-group:focus-within .cue-stripes {
+  animation-play-state: running;
+}
+
+.cue-stripes-running {
+  animation-play-state: running;
+}
+
+
+/* ── Issue #212 — Browser-chrome stagger reveal (cue-chrome-stagger) ── */
+
+@keyframes cue-chrome-stagger {
+  0%   { opacity: 0; transform: translateY(var(--cue-chrome-shift, -6px)); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.cue-chrome-stagger:not([data-chrome-reveal="active"]) [data-chrome-stagger] {
+  opacity: 0;
+  transform: translateY(var(--cue-chrome-shift, -6px));
+}
+
+.cue-chrome-stagger[data-chrome-reveal="active"] [data-chrome-stagger] {
+  animation: cue-chrome-stagger var(--cue-chrome-duration, 520ms) var(--cue-chrome-ease, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation-delay: var(--cue-stagger-delay, 0ms);
+}
+
+
+/* ── Issue #213 — Duration-based stagger (cue-stagger-duration) ─────── */
+
+@keyframes cue-fade-up-soft {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.cue-stagger-duration-1 {
+  animation: cue-fade-up-soft var(--cue-sd-1, 280ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.cue-stagger-duration-2 {
+  animation: cue-fade-up-soft var(--cue-sd-2, 320ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.cue-stagger-duration-3 {
+  animation: cue-fade-up-soft var(--cue-sd-3, 360ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.cue-stagger-duration-var {
+  animation: cue-fade-up-soft var(--cue-sd-duration, 320ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+
+/* ── Issue #215 — CSS-var-driven infinite stagger (cue-stagger-var) ─── */
+
+.cue-stagger-var {
+  animation-delay: var(--cue-stagger-delay, 0ms);
+}
+
+.cue-stagger-enter {
+  animation: cue-slide-up var(--cue-duration-normal, 300ms) var(--cue-ease-out) both;
+  animation-delay: var(--cue-stagger-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+
+/* ── Issue #222 — SVG-friendly infinite rotation (cue-radar-sweep) ──── */
+
+.cue-radar-sweep {
+  transform-box: fill-box;
+  transform-origin: var(--cue-radar-origin, center);
+  animation: cue-radar-sweep-kf
+    var(--cue-radar-duration, 3500ms)
+    linear
+    infinite;
+  will-change: transform;
+}
+
+@keyframes cue-radar-sweep-kf {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.cue-radar-sweep--ccw {
+  animation-direction: reverse;
+}
+
+.cue-radar-sweep--fast {
+  --cue-radar-duration: 1200ms;
+}
+
+.cue-radar-sweep--slow {
+  --cue-radar-duration: 8000ms;
+}
+
+
+/* ── Issue #229 — Multi-plane parallax breathing (cue-breathe) ──────── */
+
+.cue-breathe {
+  will-change: transform;
+  animation-timing-function: var(--cue-ease-weighty, cubic-bezier(0.59, 0.01, 0.28, 1));
+  animation-iteration-count: infinite;
+  animation-fill-mode: forwards;
+}
+
+@keyframes cue-breathe-1 {
+  0%   { transform: translate3d(0, var(--cue-breathe-1-start, -5%), 0); }
+  25%  { transform: translate3d(0, var(--cue-breathe-1-mid, -11%), 0); }
+  75%  { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(0, var(--cue-breathe-1-start, -5%), 0); }
+}
+.cue-breathe-1 {
+  animation-name: cue-breathe-1;
+  animation-duration: var(--cue-breathe-1-duration, 19.5s);
+}
+
+@keyframes cue-breathe-2 {
+  0%   { transform: translate3d(0, var(--cue-breathe-2-start, -42%), 0); }
+  25%  { transform: translate3d(0, var(--cue-breathe-2-mid, -38%), 0); }
+  75%  { transform: translate3d(0, var(--cue-breathe-2-low, -48%), 0); }
+  100% { transform: translate3d(0, var(--cue-breathe-2-start, -42%), 0); }
+}
+.cue-breathe-2 {
+  animation-name: cue-breathe-2;
+  animation-duration: var(--cue-breathe-2-duration, 20s);
+}
+
+@keyframes cue-breathe-3 {
+  0%   { transform: translate3d(0, var(--cue-breathe-3-start, 51%), 0); }
+  25%  { transform: translate3d(0, var(--cue-breathe-3-mid, 53%), 0); }
+  75%  { transform: translate3d(0, var(--cue-breathe-3-low, 46%), 0); }
+  100% { transform: translate3d(0, var(--cue-breathe-3-start, 51%), 0); }
+}
+.cue-breathe-3 {
+  animation-name: cue-breathe-3;
+  animation-duration: var(--cue-breathe-3-duration, 18.5s);
+}
+
+.cue-parallax-layer {
+  transform: translate3d(0, var(--cue-parallax-y, 0%), 0);
+}
+
+
+/* ── Issue #231 — Hairline clip-path anti-aliasing fix (cue-clip-hairline) ─ */
+
+.cue-clip-hairline {
+  --cue-clip-inset: 1px;
+  clip-path: polygon(
+    var(--cue-clip-inset) var(--cue-clip-inset),
+    calc(100% - var(--cue-clip-inset)) var(--cue-clip-inset),
+    calc(100% - var(--cue-clip-inset)) calc(100% - var(--cue-clip-inset)),
+    var(--cue-clip-inset) calc(100% - var(--cue-clip-inset))
+  );
+}
+
+.cue-clip-hairline-lg {
+  --cue-clip-inset: 1.5px;
+  clip-path: polygon(
+    var(--cue-clip-inset) var(--cue-clip-inset),
+    calc(100% - var(--cue-clip-inset)) var(--cue-clip-inset),
+    calc(100% - var(--cue-clip-inset)) calc(100% - var(--cue-clip-inset)),
+    var(--cue-clip-inset) calc(100% - var(--cue-clip-inset))
+  );
+}
+
+@supports (-webkit-hyphens: none) {
+  .cue-clip-hairline-safari {
+    --cue-clip-inset: 1px;
+    clip-path: polygon(
+      var(--cue-clip-inset) var(--cue-clip-inset),
+      calc(100% - var(--cue-clip-inset)) var(--cue-clip-inset),
+      calc(100% - var(--cue-clip-inset)) calc(100% - var(--cue-clip-inset)),
+      var(--cue-clip-inset) calc(100% - var(--cue-clip-inset))
+    );
+  }
+}
+
+@supports (-webkit-hyphens: none) {
+  @supports selector(:has(*)) {
+    .cue-clip-hairline-safari-17 {
+      --cue-clip-inset: 1.5px;
+      clip-path: polygon(
+        var(--cue-clip-inset) var(--cue-clip-inset),
+        calc(100% - var(--cue-clip-inset)) var(--cue-clip-inset),
+        calc(100% - var(--cue-clip-inset)) calc(100% - var(--cue-clip-inset)),
+        var(--cue-clip-inset) calc(100% - var(--cue-clip-inset))
+      );
+    }
+  }
+}
+
+@supports selector(:has(*)) {
+  .cue-clip-hairline-auto:has(video),
+  .cue-clip-hairline-auto:has(iframe),
+  .cue-clip-hairline-auto:has(canvas) {
+    --cue-clip-inset: 1px;
+    clip-path: polygon(
+      var(--cue-clip-inset) var(--cue-clip-inset),
+      calc(100% - var(--cue-clip-inset)) var(--cue-clip-inset),
+      calc(100% - var(--cue-clip-inset)) calc(100% - var(--cue-clip-inset)),
+      var(--cue-clip-inset) calc(100% - var(--cue-clip-inset))
+    );
+  }
+}
+
+.cue-clip-hairline-none {
+  clip-path: none;
+}
+
+
+/* ── Issue #241 — Compound hero entrance (cue-hero-staged) ──────────── */
+
+@keyframes cue-hero-staged {
+  0%   { opacity: 0; transform: scale(var(--cue-hero-staged-from, 0.97)); }
+  30%  { opacity: 0; }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.cue-hero-staged {
+  transform-origin: var(--cue-hero-staged-origin, 50% 50%);
+  animation-composition: add;
+  opacity: 0;
+  animation: cue-hero-staged var(--cue-hero-staged-duration, 1s) ease-out var(--cue-hero-staged-delay, 0.1s) both;
+}
+
+@supports not (animation-composition: add) {
+  .cue-hero-staged {
+    animation-composition: replace;
+  }
+}
+
+
+/* ── Issue #244 — Audio waveform bars-bounce (cue-bars-bounce) ──────── */
+
+@keyframes cue-bars-bounce {
+  10%  { transform: scaleX(var(--cue-bars-compress, 0.84)) translate(var(--cue-bars-drift-min, 1px)); }
+  30%  { transform: scaleX(var(--cue-bars-stretch, 1.5))  translate(var(--cue-bars-drift-max, 2px)); }
+  60%  { transform: scaleX(var(--cue-bars-compress, 0.84)) translate(var(--cue-bars-drift-max, 2px)); }
+  80%  { transform: scaleX(0.96) translate(var(--cue-bars-drift-min, 1px)); }
+  to   { transform: scaleX(1)    translate(var(--cue-bars-drift-max, 2px)); }
+}
+
+.cue-bars-bounce {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cue-bars-gap, 2px);
+}
+
+.cue-bars-bounce > * {
+  display: block;
+  width: var(--cue-bars-width, 3px);
+  height: var(--cue-bars-height, 16px);
+  border-radius: var(--cue-bars-radius, 9999px);
+  background-color: var(--cue-bars-color, currentColor);
+  transform-origin: center;
+  animation: cue-bars-bounce var(--cue-bars-duration, 2.24s) ease-in-out infinite alternate;
+}
+
+.cue-bars-bounce > *:nth-child(1) { animation-delay: 0ms; }
+.cue-bars-bounce > *:nth-child(2) { animation-delay: calc(1 * var(--cue-bars-stagger, 80ms)); }
+.cue-bars-bounce > *:nth-child(3) { animation-delay: calc(2 * var(--cue-bars-stagger, 80ms)); }
+.cue-bars-bounce > *:nth-child(4) { animation-delay: calc(3 * var(--cue-bars-stagger, 80ms)); }
+.cue-bars-bounce > *:nth-child(5) { animation-delay: calc(4 * var(--cue-bars-stagger, 80ms)); }
+
+
+/* ── Issue #248 — Unicorn gradient sweep (cue-unicorn) ──────────────── */
+
+@keyframes cue-uni-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.cue-unicorn {
+  background: linear-gradient(
+    var(--cue-uni-angle, 300deg),
+    var(--cue-uni-c1, #ff0080),
+    var(--cue-uni-c2, #ff8c00),
+    var(--cue-uni-c3, #40e0d0),
+    var(--cue-uni-c4, #7b68ee),
+    var(--cue-uni-c5, #ff1493),
+    var(--cue-uni-c6, #ff0080)
+  );
+  background-size: var(--cue-uni-size, 300% 300%);
+  animation: cue-uni-flow var(--cue-uni-duration, 8s) ease infinite;
+}
+
+.cue-unicorn-text {
+  background: linear-gradient(
+    var(--cue-uni-angle, 300deg),
+    var(--cue-uni-c1, #ff0080),
+    var(--cue-uni-c2, #ff8c00),
+    var(--cue-uni-c3, #40e0d0),
+    var(--cue-uni-c4, #7b68ee),
+    var(--cue-uni-c5, #ff1493),
+    var(--cue-uni-c6, #ff0080)
+  );
+  background-size: var(--cue-uni-size, 300% 300%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: cue-uni-flow var(--cue-uni-duration, 8s) ease infinite;
+}
+
+
+/* ── Issue #252 — Bidirectional teleporting arrow (cue-arrow-teleport) ─ */
+
+.cue-arrow-teleport-left,
+.cue-arrow-teleport-right {
+  --cue-arrow-distance: 40px;
+  --cue-arrow-duration: 6s;
+  --cue-arrow-delay: 0s;
+  --cue-arrow-ease: linear;
+
+  animation: var(--cue-arrow-duration) var(--cue-arrow-ease) var(--cue-arrow-delay) infinite;
+  will-change: transform, opacity;
+}
+
+.cue-arrow-teleport-left {
+  animation-name: cue-arrow-teleport-left-kf;
+}
+
+.cue-arrow-teleport-right {
+  animation-name: cue-arrow-teleport-right-kf;
+}
+
+.cue-arrow-teleport-alt {
+  --cue-arrow-delay: calc(var(--cue-arrow-duration) / 2);
+}
+
+@keyframes cue-arrow-teleport-left-kf {
+  0%   { transform: translateX(0); opacity: 1; }
+  40%  { transform: translateX(calc(-1 * var(--cue-arrow-distance))); opacity: 1; }
+  41%  { transform: translateX(calc(-1 * var(--cue-arrow-distance))); opacity: 0; }
+  59%  { transform: translateX(var(--cue-arrow-distance)); opacity: 0; }
+  60%  { transform: translateX(var(--cue-arrow-distance)); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes cue-arrow-teleport-right-kf {
+  0%   { transform: translateX(0); opacity: 1; }
+  40%  { transform: translateX(var(--cue-arrow-distance)); opacity: 1; }
+  41%  { transform: translateX(var(--cue-arrow-distance)); opacity: 0; }
+  59%  { transform: translateX(calc(-1 * var(--cue-arrow-distance))); opacity: 0; }
+  60%  { transform: translateX(calc(-1 * var(--cue-arrow-distance))); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+
+/* ── Issue #255 — 3-stage AI response reveal (cue-stagger-reveal) ───── */
+
+.cue-stagger-reveal {
+  --cue-reveal-type-delay: 0s;
+  --cue-reveal-body-delay: 0.6s;
+  --cue-reveal-detail-delay: 0.6s;
+  --cue-reveal-body-duration: 0.2s;
+  --cue-reveal-detail-duration: 0.2s;
+  --cue-reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --cue-type-per-char: 0.02s;
+}
+
+.cue-stagger-reveal > .cue-stagger-reveal-type {
+  color: transparent;
+  background: linear-gradient(currentColor 0 0) 0 0;
+  background-size: calc(var(--cue-type-n, 0) * 1ch) 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-repeat: no-repeat;
+  animation: cue-stagger-reveal-type
+             calc(var(--cue-type-n, 0) * var(--cue-type-per-char))
+             steps(var(--cue-type-n, 0))
+             forwards
+             var(--cue-reveal-type-delay);
+  word-break: break-word;
+}
+
+@keyframes cue-stagger-reveal-type {
+  0% { background-size: 0 200%; }
+}
+
+.cue-stagger-reveal > .cue-stagger-reveal-body {
+  opacity: 0;
+  animation: cue-stagger-reveal-fade
+             var(--cue-reveal-body-duration)
+             var(--cue-reveal-ease)
+             forwards
+             var(--cue-reveal-body-delay);
+}
+
+@keyframes cue-stagger-reveal-fade {
+  to { opacity: 1; }
+}
+
+.cue-stagger-reveal > .cue-stagger-reveal-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  animation: cue-stagger-reveal-grow
+             var(--cue-reveal-detail-duration)
+             var(--cue-reveal-ease)
+             forwards
+             var(--cue-reveal-detail-delay);
+}
+.cue-stagger-reveal > .cue-stagger-reveal-detail > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@keyframes cue-stagger-reveal-grow {
+  to { grid-template-rows: 1fr; }
+}
+
+
+/* ── Issue #256 + #317 — Dropdown reveal (cue-dropdown-reveal) ──────── */
+
+/* Issue #317 approach: grid-template-rows 0fr→1fr */
+.cue-dropdown-reveal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--cue-dropdown-duration, 400ms)
+      var(--cue-dropdown-ease, cubic-bezier(0.77, 0, 0.175, 1)),
+    opacity var(--cue-dropdown-duration, 400ms)
+      var(--cue-dropdown-ease, cubic-bezier(0.77, 0, 0.175, 1)),
+    visibility var(--cue-dropdown-duration, 400ms);
+  width: max-content;
+}
+
+.cue-dropdown-reveal > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cue-dropdown-trigger[aria-expanded="true"] + .cue-dropdown-reveal,
+.cue-dropdown-reveal.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Issue #256 approach: scaleY variant + staggered children */
+.cue-dropdown-reveal--scale-y {
+  display: block;
+  overflow: hidden;
+  transform-origin: var(--cue-dr-origin, top center);
+  visibility: visible;
+  opacity: 1;
+  animation: cue-dr-open var(--cue-dr-duration, 300ms) var(--cue-dr-ease, ease-out) forwards;
+}
+
+.cue-dropdown-reveal--scale-y[data-state=closed],
+.cue-dropdown-reveal--scale-y.cue-closing {
+  animation: cue-dr-close var(--cue-dr-close-duration, 200ms) var(--cue-dr-close-ease, ease-in) forwards;
+}
+
+@keyframes cue-dr-open {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@keyframes cue-dr-close {
+  from { transform: scaleY(1); }
+  to   { transform: scaleY(0); }
+}
+
+.cue-dropdown-reveal--scale-y > * {
+  opacity: 0;
+  animation: cue-dr-item-in var(--cue-dr-item-duration, 250ms) var(--cue-dr-item-ease, ease-out) forwards;
+}
+
+.cue-dropdown-reveal--scale-y > *:nth-child(1)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + 0ms); }
+.cue-dropdown-reveal--scale-y > *:nth-child(2)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 1); }
+.cue-dropdown-reveal--scale-y > *:nth-child(3)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 2); }
+.cue-dropdown-reveal--scale-y > *:nth-child(4)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 3); }
+.cue-dropdown-reveal--scale-y > *:nth-child(5)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 4); }
+.cue-dropdown-reveal--scale-y > *:nth-child(6)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 5); }
+.cue-dropdown-reveal--scale-y > *:nth-child(7)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 6); }
+.cue-dropdown-reveal--scale-y > *:nth-child(8)  { animation-delay: calc(var(--cue-dr-item-base-delay, 100ms) + var(--cue-dr-stagger, 50ms) * 7); }
+
+@keyframes cue-dr-item-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cue-closing > * {
+  animation: cue-dr-item-out var(--cue-dr-close-duration, 200ms) ease-in forwards !important;
+  animation-delay: 0ms !important;
+}
+
+@keyframes cue-dr-item-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.cue-dropdown-reveal--fast {
+  --cue-dropdown-duration: 200ms;
+}
+
+.cue-dropdown-reveal--slow {
+  --cue-dropdown-duration: 600ms;
+}
+
+
+/* ── Issue #260 — Dual-duration card image hover (cue-card-img-zoom) ── */
+
+.cue-card-img-zoom {
+  --cue-card-img-zoom-duration: 300ms;
+  --cue-card-img-zoom-ease: ease;
+  --cue-card-img-zoom-scale: 1.05;
+  --cue-card-img-colorize-duration: 400ms;
+  --cue-card-img-colorize-ease: ease;
+  --cue-card-img-default-filter: grayscale(1);
+  --cue-card-img-hover-filter: grayscale(0);
+
+  filter: var(--cue-card-img-default-filter);
+  transform: scale(1);
+  transition: transform var(--cue-card-img-zoom-duration) var(--cue-card-img-zoom-ease),
+              filter var(--cue-card-img-colorize-duration) var(--cue-card-img-colorize-ease);
+  will-change: transform, filter;
+}
+
+.cue-card-img-trigger:hover .cue-card-img-zoom,
+.cue-card-img-trigger:focus-visible .cue-card-img-zoom {
+  transform: scale(var(--cue-card-img-zoom-scale));
+  filter: var(--cue-card-img-hover-filter);
+}
+
+
+/* ── Issue #270 — Rotating gradient border (cue-rainbow-border) ─────── */
+
+@property --cue-rainbow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.cue-rainbow-border {
+  position: relative;
+  background: linear-gradient(var(--cue-rainbow-angle),
+    var(--cue-rainbow-color-1, #02fcef70) 0%,
+    var(--cue-rainbow-color-2, #ffb52b70) 50%,
+    var(--cue-rainbow-color-3, #a02bfe70) 100%);
+  animation: cue-rainbow-rotate
+    var(--cue-rainbow-duration, 30s)
+    linear
+    infinite;
+  border-radius: var(--cue-rainbow-radius, 9999px);
+}
+
+.cue-rainbow-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--cue-rainbow-angle),
+    var(--cue-rainbow-color-1-solid, #02fcef) 0%,
+    var(--cue-rainbow-color-2-solid, #ffb52b) 50%,
+    var(--cue-rainbow-color-3-solid, #a02bfe) 100%);
+  filter: blur(var(--cue-rainbow-glow-blur, 20px));
+  opacity: 0;
+  transition: opacity var(--cue-rainbow-glow-fade, 0.3s) ease-out,
+              transform var(--cue-rainbow-glow-fade, 0.3s) ease-out;
+  animation: cue-rainbow-rotate
+    var(--cue-rainbow-duration, 30s)
+    linear
+    infinite;
+  transform: scale(var(--cue-rainbow-glow-scale-x, 0.95),
+                   var(--cue-rainbow-glow-scale-y, 0.6));
+  z-index: -1;
+  border-radius: inherit;
+}
+
+.cue-rainbow-border > * {
+  position: relative;
+  z-index: 1;
+  background-color: var(--cue-rainbow-inner-bg, #0b0e14);
+  border-radius: inherit;
+  transition: background-color var(--cue-rainbow-inner-fade, 0.2s) ease-out;
+}
+
+.cue-rainbow-border:hover::after {
+  opacity: var(--cue-rainbow-glow-hover-opacity, 0.9);
+  transform: scaleX(var(--cue-rainbow-glow-hover-scale-x, 1.1));
+}
+
+.cue-rainbow-border:hover > * {
+  background-color: var(--cue-rainbow-inner-bg-hover, #0b0e14d1);
+}
+
+@keyframes cue-rainbow-rotate {
+  to { --cue-rainbow-angle: 360deg; }
+}
+
+
+/* ── Issue #271 — SVG stroke draw-on-hover (cue-hover-draw) ─────────── */
+
+.cue-hover-draw {
+  position: relative;
+  display: inline-block;
+}
+
+.cue-hover-draw svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + var(--cue-hover-draw-overscan, 20px));
+  pointer-events: none;
+
+  stroke: var(--cue-hover-draw-stroke, currentColor);
+  fill: transparent;
+  stroke-width: var(--cue-hover-draw-stroke-width, 0.4px);
+  stroke-miterlimit: 1;
+  stroke-linecap: round;
+
+  stroke-dasharray: var(--cue-hover-draw-path-length, 338);
+  stroke-dashoffset: var(--cue-hover-draw-path-length, 338);
+
+  transition:
+    stroke-dashoffset var(--cue-hover-draw-in-duration, 0.24s)
+      var(--cue-hover-draw-in-ease, cubic-bezier(0.66, 0.06, 0.36, 0.96))
+      var(--cue-hover-draw-in-delay, 0.36s),
+    opacity var(--cue-hover-draw-in-duration, 0.24s)
+      var(--cue-hover-draw-in-ease, cubic-bezier(0.36, 0.66, 0.6, 0.96));
+
+  opacity: var(--cue-hover-draw-idle-opacity, 0.7);
+}
+
+.cue-hover-draw:hover svg {
+  stroke-dashoffset: 0;
+  opacity: 1;
+
+  transition:
+    opacity var(--cue-hover-draw-out-opacity-duration, 0.12s)
+      var(--cue-hover-draw-out-ease, cubic-bezier(0.36, 0.66, 0.6, 0.96)),
+    stroke-dashoffset var(--cue-hover-draw-out-duration, 0.36s)
+      var(--cue-hover-draw-out-ease, cubic-bezier(0.66, 0.06, 0.36, 0.96));
+}
+
+
+/* ── Issue #277 — Terminal caret blink (cue-caret-blink) ────────────── */
+
+.cue-caret-blink {
+  animation: cue-caret-blink-kf
+    var(--cue-caret-duration, 1.2s)
+    var(--cue-caret-ease, ease-out)
+    infinite;
+}
+
+@keyframes cue-caret-blink-kf {
+  0%  { opacity: var(--cue-caret-on, 1); }
+  20% { opacity: var(--cue-caret-off, 0); }
+  50% { opacity: var(--cue-caret-off, 0); }
+  70% { opacity: var(--cue-caret-on, 1); }
+  to  { opacity: var(--cue-caret-on, 1); }
+}
+
+.cue-caret-blink--fast {
+  --cue-caret-duration: 0.8s;
+}
+
+.cue-caret-blink--slow {
+  --cue-caret-duration: 2s;
+}
+
+.cue-caret-blink--hard {
+  --cue-caret-ease: step-end;
+}
+
+.cue-caret-blink--block {
+  animation: cue-caret-blink-block
+    var(--cue-caret-duration, 1.2s)
+    var(--cue-caret-ease, ease-out)
+    infinite;
+}
+
+@keyframes cue-caret-blink-block {
+  0%  { background-color: var(--cue-caret-color, currentColor); color: var(--cue-caret-bg, transparent); }
+  20% { background-color: var(--cue-caret-bg, transparent); color: var(--cue-caret-color, currentColor); }
+  50% { background-color: var(--cue-caret-bg, transparent); color: var(--cue-caret-color, currentColor); }
+  70% { background-color: var(--cue-caret-color, currentColor); color: var(--cue-caret-bg, transparent); }
+  to  { background-color: var(--cue-caret-color, currentColor); color: var(--cue-caret-bg, transparent); }
+}
+
+
+/* ── Issue #278 — Card hover X-ray (cue-hover-xray) ─────────────────── */
+
+.cue-hover-xray {
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-hover-xray > * {
+  transition-property: filter;
+  transition-duration: var(--cue-xray-content-duration, 0.4s);
+  transition-delay: var(--cue-xray-delay, 50ms);
+  transition-timing-function: var(--cue-xray-ease, cubic-bezier(0.19, 1, 0.22, 1));
+  position: relative;
+  z-index: 1;
+}
+
+.cue-hover-xray::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--cue-xray-circle-size, 125%);
+  aspect-ratio: 1;
+  background-color: var(--cue-xray-circle-color, #fff);
+  border-radius: 100%;
+  transform: translate(-50%, -50%) scale(0);
+  transition-property: transform;
+  transition-duration: var(--cue-xray-circle-duration, 0.6s);
+  transition-delay: var(--cue-xray-delay, 50ms);
+  transition-timing-function: var(--cue-xray-ease, cubic-bezier(0.19, 1, 0.22, 1));
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cue-hover-xray:hover::before {
+  transform: translate(-50%, -50%) scale(var(--cue-xray-circle-scale, 1.05));
+}
+
+.cue-hover-xray:hover > * {
+  filter: invert();
+}
+
+.cue-hover-xray--selective:hover > .cue-xray-invert {
+  filter: invert();
+}
+.cue-hover-xray--selective:hover > *:not(.cue-xray-invert) {
+  filter: none;
+}
+
+.cue-hover-xray--dark {
+  --cue-xray-circle-color: #000;
+}
+
+.cue-hover-xray--accent {
+  --cue-xray-circle-color: var(--cue-color-accent, #3b82f6);
+}
+
+
+/* ── Issue #279 — AI streaming word fade (cue-stream-word) ──────────── */
+
+@keyframes cue-stream-word-fade {
+  0%   { opacity: var(--cue-stream-word-start, 0.4); }
+  100% { opacity: 1; }
+}
+
+.cue-stream-word {
+  animation: cue-stream-word-fade
+             var(--cue-stream-word-duration, 80ms)
+             var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1))
+             forwards;
+  will-change: opacity;
+}
+
+
+/* ── Issue #281 — Nav sub-menu spring dropdown (cue-nav-dropdown) ───── */
+
+:root {
+  --cue-ease-out-quint: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.cue-nav-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(var(--cue-nav-dropdown-offset, -0.4rem));
+  transition:
+    opacity var(--cue-nav-dropdown-duration, 0.25s) var(--cue-ease-out-quint),
+    transform var(--cue-nav-dropdown-duration, 0.25s) var(--cue-ease-out-quint),
+    visibility 0s linear var(--cue-nav-dropdown-duration, 0.25s);
+  will-change: opacity, transform;
+}
+
+.cue-nav-dropdown-host:hover .cue-nav-dropdown,
+.cue-nav-dropdown-host:focus-within .cue-nav-dropdown,
+.cue-nav-dropdown[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition:
+    opacity var(--cue-nav-dropdown-duration, 0.25s) var(--cue-ease-out-quint),
+    transform var(--cue-nav-dropdown-duration, 0.25s) var(--cue-ease-out-quint),
+    visibility 0s linear 0s;
+}
+
+.cue-nav-dropdown[data-direction="up"] {
+  transform: translateY(calc(var(--cue-nav-dropdown-offset, -0.4rem) * -1));
+}
+
+
+/* ── Issue #283 — Damped shake (cue-shake-damped) ───────────────────── */
+
+@keyframes cue-shake-damped-run {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(calc(var(--cue-shake-damped-amp, 6px) * -1)); }
+  40%      { transform: translateX(calc(var(--cue-shake-damped-amp, 6px) * 0.83)); }
+  60%      { transform: translateX(calc(var(--cue-shake-damped-amp, 6px) * -0.5)); }
+  80%      { transform: translateX(calc(var(--cue-shake-damped-amp, 6px) * 0.33)); }
+}
+
+.cue-shake-damped {
+  animation: cue-shake-damped-run
+             var(--cue-shake-damped-duration, 0.4s)
+             ease-out;
+  will-change: transform;
+}
+
+
+/* ── Issue #287 — Squircle corners (cue-squircle) ───────────────────── */
+
+@supports (corner-shape: superellipse(2)) {
+  :root { --cue-corner-shape-supported: 1; }
+}
+
+.cue-squircle {
+  --cue-squircle-radius: 16px;
+  --cue-squircle-fallback: 0.752;
+  --cue-squircle-exponent: 1.5;
+  border-radius: calc(var(--cue-squircle-radius) *
+    var(--cue-corner-shape-supported, var(--cue-squircle-fallback, 1)));
+  corner-shape: superellipse(var(--cue-squircle-exponent));
+}
+
+.cue-squircle-ios {
+  --cue-squircle-radius: 16px;
+  --cue-squircle-fallback: 0.569;
+  --cue-squircle-exponent: 2;
+  border-radius: calc(var(--cue-squircle-radius) *
+    var(--cue-corner-shape-supported, var(--cue-squircle-fallback, 1)));
+  corner-shape: superellipse(var(--cue-squircle-exponent));
+}
+
+
+/* ── Issue #288 — Ghost dot flow wave (cue-dot-flow) ────────────────── */
+
+@keyframes cue-dot-flow-pulse {
+  0%, 18% { opacity: 1; }
+  35%     { opacity: 0.6; }
+  50%, 100% { opacity: 0.3; }
+}
+
+.cue-dot-flow {
+  --cue-dot-size: 2px;
+  --cue-dot-gap: 2.67px;
+  --cue-dot-color: #09f;
+  --cue-dot-duration: 750ms;
+}
+
+.cue-dot-flow__dot {
+  position: absolute;
+  width: var(--cue-dot-size);
+  height: var(--cue-dot-size);
+  border-radius: 50%;
+  background-color: var(--cue-dot-color);
+  opacity: 0.3;
+  animation: cue-dot-flow-pulse var(--cue-dot-duration) linear infinite;
+}
+
+
+/* ── Issue #296 — Paired opposing-direction marquees (cue-marquee-pair) ─ */
+
+@keyframes cue-marquee-reverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+.cue-marquee-pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cue-marquee-pair-gap, 1rem);
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.cue-marquee-pair .cue-marquee-track {
+  animation: cue-marquee var(--cue-marquee-pair-forward, 60s) linear infinite;
+  animation-play-state: paused;
+}
+
+.cue-marquee-pair .cue-marquee-track-reverse {
+  display: flex;
+  flex-shrink: 0;
+  animation: cue-marquee-reverse var(--cue-marquee-pair-reverse, 65s) linear infinite;
+  animation-play-state: paused;
+}
+
+.cue-marquee-pair:hover .cue-marquee-track,
+.cue-marquee-pair:hover .cue-marquee-track-reverse {
+  animation-play-state: running;
+}
+
+
+/* ── Issue #305 — Heartbeat double-peak scale (cue-heartbeat) ───────── */
+
+@keyframes cue-heartbeat-run {
+  0%   { transform: scale(1); }
+  10%  { transform: scale(var(--cue-heartbeat-peak-1, 1.07)); }
+  20%  { transform: scale(var(--cue-heartbeat-dip, 1.02)); }
+  40%  { transform: scale(var(--cue-heartbeat-dip, 1.02)); }
+  50%  { transform: scale(var(--cue-heartbeat-peak-2, 1.06)); }
+  60%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+.cue-heartbeat {
+  animation: cue-heartbeat-run
+             var(--cue-heartbeat-duration, 1s)
+             ease-in-out
+             var(--cue-heartbeat-iter, 1);
+  will-change: transform;
+}
+
+.cue-heartbeat-hover {
+  transition: none;
+}
+.cue-heartbeat-hover:hover {
+  animation: cue-heartbeat-run
+             var(--cue-heartbeat-duration, 1s)
+             ease-in-out
+             1;
+}
+
+
+/* ── Issue #307 — Three-dot asymmetric scaleY wave (cue-dots-wave) ──── */
+
+@keyframes cue-dots-wave-center {
+  0%, 25%, 75%, 100% { transform: scale(1); }
+  50%                { transform: scaleY(var(--cue-dots-wave-stretch, 1.4)); }
+}
+
+@keyframes cue-dots-wave-left {
+  0%, 75%, 100%       { transform: scale(1); }
+  25%                 { transform: scaleY(var(--cue-dots-wave-stretch, 1.4)); }
+  50%                 { transform: scaleY(var(--cue-dots-wave-contract, 0.67)); }
+}
+
+@keyframes cue-dots-wave-right {
+  0%, 25%, 100%       { transform: scale(1); }
+  50%                 { transform: scaleY(var(--cue-dots-wave-contract, 0.67)); }
+  75%                 { transform: scaleY(var(--cue-dots-wave-stretch, 1.4)); }
+}
+
+.cue-dots-wave {
+  display: inline-block;
+  position: relative;
+  width: var(--cue-dots-wave-size, 4px);
+  height: var(--cue-dots-wave-size, 4px);
+  border-radius: 50%;
+  background: var(--cue-dots-wave-color, currentColor);
+  animation: cue-dots-wave-center
+             var(--cue-dots-wave-duration, 1.5s)
+             linear
+             infinite;
+}
+
+.cue-dots-wave::before,
+.cue-dots-wave::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: var(--cue-dots-wave-size, 4px);
+  height: var(--cue-dots-wave-size, 4px);
+  border-radius: 50%;
+  background: var(--cue-dots-wave-color, currentColor);
+}
+
+.cue-dots-wave::before {
+  left: calc(var(--cue-dots-wave-size, 4px) * -1.5);
+  animation: cue-dots-wave-left
+             var(--cue-dots-wave-duration, 1.5s)
+             linear
+             infinite;
+}
+
+.cue-dots-wave::after {
+  left: calc(var(--cue-dots-wave-size, 4px) * 1.5);
+  animation: cue-dots-wave-right
+             var(--cue-dots-wave-duration, 1.5s)
+             linear
+             infinite;
+}
+
+
+/* ── Issue #320 — Hamburger-to-X morph (cue-hamburger-x) ────────────── */
+
+.cue-hamburger-x {
+  --cue-hamburger-thickness: var(--cue-hamburger-line-thickness, 2px);
+  --cue-hamburger-gap: var(--cue-hamburger-line-gap, 0.4rem);
+  --cue-hamburger-rotate: 45;
+  --cue-hamburger-duration: var(--cue-hamburger-transition-duration, 300ms);
+  --cue-hamburger-ease: var(--cue-hamburger-transition-ease, cubic-bezier(0.77, 0, 0.175, 1));
+
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--cue-hamburger-gap);
+  width: var(--cue-hamburger-width, 24px);
+  height: var(--cue-hamburger-height, 24px);
+  cursor: pointer;
+}
+
+.cue-hamburger-x > * {
+  display: block;
+  height: var(--cue-hamburger-thickness);
+  background-color: var(--cue-hamburger-color, currentColor);
+  border-radius: var(--cue-hamburger-line-radius, 9999px);
+  transition:
+    transform var(--cue-hamburger-duration) var(--cue-hamburger-ease),
+    opacity var(--cue-hamburger-duration) var(--cue-hamburger-ease),
+    width var(--cue-hamburger-duration) var(--cue-hamburger-ease);
+  transform-origin: center;
+}
+
+.cue-hamburger-x > :last-child {
+  width: var(--cue-hamburger-line-short-width, 70%);
+}
+.cue-hamburger-x > :first-child,
+.cue-hamburger-x > :nth-child(2) {
+  width: 100%;
+}
+
+.cue-hamburger-x.is-open > :first-child,
+.cue-hamburger-x[aria-expanded="true"] > :first-child {
+  transform:
+    translateY(
+      calc(var(--cue-hamburger-thickness) * 0.75 + var(--cue-hamburger-gap) * 1)
+    )
+    rotate(calc(var(--cue-hamburger-rotate) * -1deg));
+}
+
+.cue-hamburger-x.is-open > :nth-child(2),
+.cue-hamburger-x[aria-expanded="true"] > :nth-child(2) {
+  opacity: 0;
+}
+
+.cue-hamburger-x.is-open > :last-child,
+.cue-hamburger-x[aria-expanded="true"] > :last-child {
+  transform:
+    translateY(
+      calc(var(--cue-hamburger-thickness) * -0.75 + var(--cue-hamburger-gap) * -1)
+    )
+    rotate(calc(var(--cue-hamburger-rotate) * 1deg));
+  width: 100%;
+}
+
+
+/* ── Issue #322 — Native dialog + backdrop (cue-dialog) ─────────────── */
+
+.cue-dialog {
+  border: none;
+  padding: 0;
+  background: var(--cue-dialog-bg, var(--cue-color-bg, #fff));
+  border-radius: var(--cue-dialog-radius, 12px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: var(--cue-dialog-max-width, 32rem);
+  max-height: var(--cue-dialog-max-height, 85vh);
+  overflow: auto;
+}
+
+.cue-dialog[open] {
+  animation: cue-dialog-fadein
+    var(--cue-dialog-duration, 400ms)
+    var(--cue-dialog-ease, ease-out)
+    forwards;
+}
+
+@keyframes cue-dialog-fadein {
+  from {
+    opacity: 0;
+    transform: scale(var(--cue-dialog-scale-start, 0.96));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cue-dialog::backdrop {
+  background: color-mix(
+    in srgb,
+    var(--cue-dialog-backdrop-color, var(--cue-color-bg-dark, #000))
+    var(--cue-dialog-backdrop-opacity, 80%),
+    transparent
+  );
+  animation: cue-dialog-backdrop-fadein
+    var(--cue-dialog-duration, 400ms)
+    ease-out
+    forwards;
+}
+
+@keyframes cue-dialog-backdrop-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cue-dialog.is-closing {
+  animation: cue-dialog-fadeout
+    var(--cue-dialog-duration, 400ms)
+    var(--cue-dialog-ease, ease-out)
+    forwards;
+}
+
+@keyframes cue-dialog-fadeout {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(var(--cue-dialog-scale-start, 0.96));
+  }
+}
+
+.cue-dialog--slide-up[open] {
+  animation: cue-dialog-slide-up
+    var(--cue-dialog-duration, 400ms)
+    var(--cue-dialog-ease, cubic-bezier(0.16, 1, 0.3, 1))
+    forwards;
+}
+
+@keyframes cue-dialog-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cue-dialog--blur-backdrop::backdrop {
+  background: color-mix(
+    in srgb,
+    var(--cue-dialog-backdrop-color, var(--cue-color-bg-dark, #000))
+    var(--cue-dialog-backdrop-opacity, 60%),
+    transparent
+  );
+  backdrop-filter: blur(var(--cue-dialog-backdrop-blur, 8px));
+  -webkit-backdrop-filter: blur(var(--cue-dialog-backdrop-blur, 8px));
+}
+
+
+/* ── Issue #339 — Diagonal mask-position flare sweep (cue-flare-loop) ── */
+
+@keyframes cue-flare {
+  0% {
+    -webkit-mask-image: linear-gradient(var(--cue-flare-angle, 60deg),
+                                       #000 25%, #00000066 50%, #000 75%);
+            mask-image: linear-gradient(var(--cue-flare-angle, 60deg),
+                                       #000 25%, #00000066 50%, #000 75%);
+    -webkit-mask-position: 100%;
+            mask-position: 100%;
+    -webkit-mask-size: 400%;
+            mask-size: 400%;
+  }
+  to {
+    -webkit-mask-image: linear-gradient(var(--cue-flare-angle, 60deg),
+                                       #000 25%, #00000066 50%, #000 75%);
+            mask-image: linear-gradient(var(--cue-flare-angle, 60deg),
+                                       #000 25%, #00000066 50%, #000 75%);
+    -webkit-mask-position: 0%;
+            mask-position: 0%;
+    -webkit-mask-size: 400%;
+            mask-size: 400%;
+  }
+}
+
+@keyframes cue-flare-loop {
+  0%       { -webkit-mask-position: 100%; mask-position: 100%; }
+  70%, to  { -webkit-mask-position: 0%;   mask-position: 0%;   }
+}
+
+.cue-flare-loop {
+  --cue-flare-angle: 60deg;
+  -webkit-mask-image: linear-gradient(var(--cue-flare-angle),
+                                      #000 25%, #00000066 50%, #000 75%);
+          mask-image: linear-gradient(var(--cue-flare-angle),
+                                      #000 25%, #00000066 50%, #000 75%);
+  -webkit-mask-size: 400%;
+          mask-size: 400%;
+  animation: cue-flare-loop var(--cue-flare-duration, 3.4s) cubic-bezier(0.33, 1, 0.68, 1) both infinite;
+}
+
+.cue-flare {
+  --cue-flare-angle: 60deg;
+  -webkit-mask-image: linear-gradient(var(--cue-flare-angle),
+                                      #000 25%, #00000066 50%, #000 75%);
+          mask-image: linear-gradient(var(--cue-flare-angle),
+                                      #000 25%, #00000066 50%, #000 75%);
+  -webkit-mask-size: 400%;
+          mask-size: 400%;
+  animation: cue-flare var(--cue-flare-duration, 1.8s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+/* ── Issue #349 — Day-night gradient atmosphere (cue-sky-cycle) ──────── */
+
+.cue-sky-cycle {
+  --cue-sky-duration: 1.2s;
+  --cue-sky-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-sky-cycle__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--cue-sky-duration) var(--cue-sky-ease);
+  pointer-events: none;
+}
+
+.cue-sky-cycle__layer--active {
+  opacity: 1;
+}
+
+.cue-sky-cycle__layer--pre-dawn {
+  background: radial-gradient(103% 103% at 50% 103%,
+    #486ffd 0%, #7f81f3 9.84%, #c489ff 20.83%,
+    #dac0ff 34.13%, #eadcff 44.86%, #f9f6ff 58.59%, #f8fafd 100%);
+}
+
+.cue-sky-cycle__layer--sunrise {
+  background: radial-gradient(103% 99% at 50% 105%,
+    #cb83ff 0%, #ff90b9 15.77%, #ffc977 30.62%,
+    #ffd79b 38.04%, #fff1dc 50.11%, #fff 63.1%, #f8fafd 100%);
+}
+
+.cue-sky-cycle__layer--daytime {
+  background: radial-gradient(103% 105% at 50% 105%,
+    #0071c1 1.33%, #60a8e2 15.71%, #b4d8ff 33.15%,
+    #d9ebff 45%, #f8fafd 60%);
+}
+
+.cue-sky-cycle__layer--dusk {
+  background: radial-gradient(103% 103% at 50% 105%,
+    #ffb451 0%, #efc680 16.73%, #b4d8ff 33.03%,
+    #d2e8ff 43.38%, #fafdff 59.16%, #f8fafd 100%);
+}
+
+.cue-sky-cycle__layer--sunset {
+  background: radial-gradient(103% 100% at 50% 100%,
+    #ffa577 0%, #ff90a1 15.52%, #ddadff 30.09%,
+    #ecd8ff 45.72%, #f5eaff 54.96%, #f8fafd 88.16%);
+}
+
+.cue-sky-cycle__layer--night {
+  background: radial-gradient(103% 106% at 50% 106%,
+    #fcfdfe 1.11%, #6763e4 28.73%, #453bb3 45.76%,
+    #29227d 63.37%, #1e2064 78.67%, #141e4b 100%);
+}
+
+.cue-sky-cycle__indicator {
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
 /* ========================================================================
    Issue #104 — prefers-reduced-motion (MUST be last)
    ======================================================================== */
@@ -538,4 +2672,281 @@
   .cue-group:focus-within .cue-ambient {
     animation-play-state: paused !important;
   }
+
+  /* ── Reduced-motion overrides for new techniques ─────────────────────── */
+
+  .cue-dot-grid-dot {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  .cue-shine::after {
+    animation: none !important;
+  }
+
+  .cue-glow-spot--pulse::before {
+    animation: none !important;
+  }
+
+  .cue-scanner {
+    animation: none !important;
+  }
+
+  .cue-sweep {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cue-bounce-y {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-words-rise .cue-word {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .cue-shine-text {
+    background: none !important;
+    color: var(--cue-shine-bg) !important;
+    -webkit-text-fill-color: var(--cue-shine-bg) !important;
+    animation: none !important;
+  }
+
+  .cue-trail {
+    animation: none !important;
+  }
+
+  .cue-input-sweep::after {
+    animation: none !important;
+  }
+
+  .cue-ping {
+    animation: none !important;
+  }
+
+  .cue-menu-3d-enter,
+  .cue-menu-3d-exit {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cue-conic-border > i::before {
+    animation: none !important;
+    transform: translate(-50%, -50%) rotate(180deg) !important;
+  }
+
+  .cue-logo-cycle > * {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  .cue-dolly-in,
+  .cue-dolly-in-mobile {
+    animation: cue-fade-in 1ms ease-out both !important;
+    transform: none !important;
+  }
+
+  .cue-stripes,
+  .cue-stripes-running,
+  .cue-group:hover .cue-stripes,
+  .cue-group:focus-within .cue-stripes {
+    animation: none !important;
+  }
+
+  .cue-chrome-stagger:not([data-chrome-reveal="active"]) [data-chrome-stagger] {
+    opacity: 1;
+    transform: none;
+  }
+  .cue-chrome-stagger[data-chrome-reveal="active"] [data-chrome-stagger] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cue-stagger-duration-1,
+  .cue-stagger-duration-2,
+  .cue-stagger-duration-3,
+  .cue-stagger-duration-var {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-stagger-var,
+  .cue-stagger-enter {
+    animation-delay: 0s !important;
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
+  .cue-radar-sweep {
+    animation: none !important;
+  }
+
+  .cue-breathe,
+  .cue-breathe-1,
+  .cue-breathe-2,
+  .cue-breathe-3 {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-hero-staged {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cue-bars-bounce > * {
+    animation: none !important;
+    transform: scaleX(0.9) !important;
+  }
+
+  .cue-unicorn,
+  .cue-unicorn-text {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+
+  .cue-arrow-teleport-left,
+  .cue-arrow-teleport-right {
+    animation: none !important;
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+  }
+
+  .cue-stagger-reveal > .cue-stagger-reveal-type,
+  .cue-stagger-reveal > .cue-stagger-reveal-body,
+  .cue-stagger-reveal > .cue-stagger-reveal-detail {
+    animation: none !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-type {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    background: none !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-body {
+    opacity: 1 !important;
+  }
+  .cue-stagger-reveal > .cue-stagger-reveal-detail {
+    grid-template-rows: 1fr !important;
+  }
+
+  .cue-dropdown-reveal {
+    transition: none !important;
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .cue-dropdown-reveal > * {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .cue-card-img-zoom {
+    filter: var(--cue-card-img-hover-filter) !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .cue-rainbow-border,
+  .cue-rainbow-border::after {
+    animation: none !important;
+    --cue-rainbow-angle: 90deg !important;
+  }
+
+  .cue-hover-draw svg {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .cue-caret-blink,
+  .cue-caret-blink--block {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cue-hover-xray::before {
+    transition: none !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 0 !important;
+  }
+  .cue-hover-xray:hover::before {
+    opacity: 1 !important;
+  }
+
+  .cue-nav-dropdown,
+  .cue-nav-dropdown-host:hover .cue-nav-dropdown,
+  .cue-nav-dropdown-host:focus-within .cue-nav-dropdown {
+    transition-duration: 0ms !important;
+    transition-delay: 0s !important;
+    transform: none !important;
+  }
+
+  .cue-shake-damped {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-hamburger-x > * {
+    transition: none !important;
+  }
+
+  .cue-dialog[open],
+  .cue-dialog.is-closing,
+  .cue-dialog--slide-up[open] {
+    animation: none !important;
+  }
+  .cue-dialog::backdrop {
+    animation: none !important;
+  }
+
+  .cue-flare-loop,
+  .cue-flare {
+    animation: none !important;
+    -webkit-mask-image: none !important;
+            mask-image: none !important;
+  }
+
+  .cue-sky-cycle__layer { transition-duration: 0s !important; }
+  .cue-sky-cycle__indicator { transition-duration: 0s !important; }
+
+  .cue-dot-flow__dot { animation: none !important; opacity: 0.3 !important; }
+
+  .cue-marquee-pair .cue-marquee-track,
+  .cue-marquee-pair .cue-marquee-track-reverse,
+  .cue-marquee-pair:hover .cue-marquee-track,
+  .cue-marquee-pair:hover .cue-marquee-track-reverse {
+    animation-play-state: paused !important;
+  }
+
+  .cue-heartbeat,
+  .cue-heartbeat-hover:hover {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-dots-wave,
+  .cue-dots-wave::before,
+  .cue-dots-wave::after {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cue-ambient-orbs,
+  .cue-ambient-orbs[data-cue-active="true"] {
+    animation: none !important;
+  }
+
+  .cue-glow-spot--pulse::before {
+    animation: none !important;
+  }
+
+  .cue-toast-enter {
+    animation: cue-fade-in 1ms ease-out both !important;
+  }
+
 }
