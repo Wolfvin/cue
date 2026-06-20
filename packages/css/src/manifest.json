@@ -5266,5 +5266,618 @@
       "--cue-stroke-morph-gap",
       "--cue-stroke-morph-duration"
     ]
+  },
+  "cue-slide-pattern": {
+    "class": "cue-slide-pattern",
+    "category": "ambient",
+    "vibe": [
+      "engineering",
+      "blueprint",
+      "tech",
+      "telemetry",
+      "monitoring",
+      "scanline"
+    ],
+    "avoid-when": [
+      "playful",
+      "calm",
+      "minimal",
+      "cinematic",
+      "luxury"
+    ],
+    "pairs": [
+      "cue-group",
+      "cue-ambient",
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-marquee",
+      "cue-marquee-track",
+      "cue-glow",
+      "cue-cinematic"
+    ],
+    "timing": "var(--cue-pattern-duration, 2s) linear infinite (paused default, running on cue-group:hover)",
+    "css-vars": [
+      "--cue-pattern-color",
+      "--cue-pattern-angle",
+      "--cue-pattern-line-width",
+      "--cue-pattern-tile",
+      "--cue-pattern-shift",
+      "--cue-pattern-duration",
+      "--cue-pattern-blur"
+    ]
+  },
+  "cue-live-dot": {
+    "class": "cue-live-dot",
+    "category": "ambient",
+    "vibe": [
+      "live",
+      "active",
+      "real-time",
+      "monitoring",
+      "status",
+      "dashboard",
+      "telemetry"
+    ],
+    "avoid-when": [
+      "calm",
+      "static",
+      "cinematic",
+      "playful"
+    ],
+    "pairs": [
+      "cue-canvas",
+      "cue-ambient",
+      "cue-radar-sweep"
+    ],
+    "never-pair": [
+      "cue-pulse",
+      "cue-glow",
+      "cue-counter-spin"
+    ],
+    "timing": "var(--cue-live-duration, 1200ms) ease-in-out infinite — opacity 0.35↔1 + drop-shadow glow",
+    "css-vars": [
+      "--cue-live-color",
+      "--cue-live-size",
+      "--cue-live-glow-radius",
+      "--cue-live-duration",
+      "--cue-live-ease",
+      "--cue-live-min-opacity"
+    ]
+  },
+  "cue-live-dot-svg": {
+    "class": "cue-live-dot-svg",
+    "category": "ambient",
+    "vibe": [
+      "live",
+      "active",
+      "real-time",
+      "svg"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-live-dot"
+    ],
+    "never-pair": [],
+    "timing": "Same as cue-live-dot; for SVG <circle> elements (no width/height, uses filter:drop-shadow only)",
+    "css-vars": [
+      "--cue-live-color",
+      "--cue-live-glow-radius",
+      "--cue-live-duration",
+      "--cue-live-ease",
+      "--cue-live-min-opacity"
+    ]
+  },
+  "cue-lqip": {
+    "class": "cue-lqip",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "editorial",
+      "cinematic",
+      "photographic",
+      "modern"
+    ],
+    "avoid-when": [
+      "brutalist",
+      "data-dense-grid"
+    ],
+    "pairs": [
+      "cue-cinematic"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-marquee"
+    ],
+    "timing": "var(--cue-lqip-duration, 300ms) — inner <img> opacity fade-in on .cue-lqip-loaded",
+    "css-vars": [
+      "--cue-lqip-duration",
+      "--cue-lqip-ease"
+    ]
+  },
+  "cue-lqip-cinematic": {
+    "class": "cue-lqip-cinematic",
+    "category": "entrance",
+    "vibe": [
+      "cinematic",
+      "editorial",
+      "photographic",
+      "premium"
+    ],
+    "avoid-when": [
+      "data-dense",
+      "playful",
+      "rapid-feedback"
+    ],
+    "pairs": [
+      "cue-lqip",
+      "cue-cinematic"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-pulse"
+    ],
+    "timing": "300ms opacity + 600ms transform scale(1.04→1) for focus-pull feel",
+    "css-vars": [
+      "--cue-lqip-duration",
+      "--cue-lqip-ease"
+    ]
+  },
+  "cue-tab-slide": {
+    "class": "cue-tab-slide",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "responsive",
+      "interactive",
+      "navigation"
+    ],
+    "avoid-when": [
+      "static content",
+      "single-item contexts",
+      "vertically-stacked navigation (needs horizontal)"
+    ],
+    "pairs": [
+      "cue-ambient",
+      "cue-group"
+    ],
+    "never-pair": [
+      "cue-hover-lift",
+      "cue-hover-scale"
+    ],
+    "timing": "var(--cue-ts-duration, 300ms) cubic-bezier(0, 0, 0.2, 1) — strong deceleration slide",
+    "css-vars": [
+      "--cue-ts-bg",
+      "--cue-ts-radius",
+      "--cue-ts-duration",
+      "--cue-ts-ease",
+      "--cue-ts-fade-duration",
+      "--cue-ts-opacity",
+      "--cue-ts-width",
+      "--cue-ts-height",
+      "--cue-ts-left",
+      "--cue-ts-top"
+    ]
+  },
+  "cue-shrink-out": {
+    "class": "cue-shrink-out",
+    "category": "transition",
+    "vibe": [
+      "chat",
+      "interactive",
+      "removal",
+      "premium",
+      "intentional",
+      "feedback"
+    ],
+    "avoid-when": [
+      "static-landing",
+      "cinematic",
+      "hero",
+      "marketing",
+      "data-dense"
+    ],
+    "pairs": [
+      "cue-shrink-out-host"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-marquee",
+      "cue-shake",
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--cue-shrink-duration, 0.2s) cubic-bezier(0.4, 0, 1, 1) forwards — translateX(24px) + scale(0)",
+    "css-vars": [
+      "--cue-shrink-distance",
+      "--cue-shrink-duration",
+      "--cue-shrink-ease"
+    ]
+  },
+  "cue-shrink-out-host": {
+    "class": "cue-shrink-out-host",
+    "category": "transition",
+    "vibe": [
+      "chat",
+      "removal",
+      "collapse"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-shrink-out"
+    ],
+    "never-pair": [],
+    "timing": "grid-template-rows 1fr→0fr, delay = 50% of shrink-duration",
+    "css-vars": [
+      "--cue-shrink-duration",
+      "--cue-shrink-ease"
+    ]
+  },
+  "cue-delay-swap": {
+    "class": "cue-delay-swap",
+    "category": "utility",
+    "vibe": [
+      "engineered",
+      "choreographed",
+      "polished"
+    ],
+    "avoid-when": [
+      "simple buttons",
+      "single-property transitions"
+    ],
+    "pairs": [
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-pulse",
+      "cue-spinner"
+    ],
+    "timing": "background-color 0ms var(--cue-ds-wait, 300ms) — delayed instant snap; color 200ms ease-out",
+    "css-vars": [
+      "--cue-ds-wait",
+      "--cue-ds-color-duration",
+      "--cue-ds-color-ease"
+    ]
+  },
+  "cue-delay-swap--border": {
+    "class": "cue-delay-swap--border",
+    "category": "utility",
+    "vibe": [
+      "engineered"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-delay-swap"
+    ],
+    "never-pair": [],
+    "timing": "border-color 0ms var(--cue-ds-wait, 300ms) instead of background-color",
+    "css-vars": [
+      "--cue-ds-wait",
+      "--cue-ds-color-duration"
+    ]
+  },
+  "cue-delay-swap--shadow": {
+    "class": "cue-delay-swap--shadow",
+    "category": "utility",
+    "vibe": [
+      "engineered"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-delay-swap"
+    ],
+    "never-pair": [],
+    "timing": "box-shadow 0ms var(--cue-ds-wait, 300ms) instead of background-color",
+    "css-vars": [
+      "--cue-ds-wait",
+      "--cue-ds-color-duration"
+    ]
+  },
+  "cue-accordion": {
+    "class": "cue-accordion",
+    "category": "transition",
+    "vibe": [
+      "smooth",
+      "responsive",
+      "functional",
+      "polished"
+    ],
+    "avoid-when": [
+      "content that changes height after open",
+      "very tall content (> 2000px)"
+    ],
+    "pairs": [
+      "cue-enter-fade",
+      "cue-stagger-2"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--cue-acc-duration, 300ms) ease-out — height 0↔var(--cue-acc-height) via @keyframes",
+    "css-vars": [
+      "--cue-acc-height",
+      "--cue-acc-duration",
+      "--cue-acc-ease"
+    ]
+  },
+  "cue-accordion--spring": {
+    "class": "cue-accordion--spring",
+    "category": "transition",
+    "vibe": [
+      "spring",
+      "playful-premium"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-accordion"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-acc-duration, 400ms) cubic-bezier(0.34, 1.56, 0.64, 1) spring ease",
+    "css-vars": [
+      "--cue-acc-duration"
+    ]
+  },
+  "cue-logo-reveal": {
+    "class": "cue-logo-reveal",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "saas",
+      "enterprise",
+      "partnership"
+    ],
+    "avoid-when": [
+      "playful",
+      "indie",
+      "colorful"
+    ],
+    "pairs": [
+      "cue-marquee",
+      "cue-logo-reveal-tooltip"
+    ],
+    "never-pair": [
+      "cue-enter-bounce",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-logo-hover-duration, 200ms) — opacity 0.4→0.7 + grayscale(1) stays",
+    "css-vars": [
+      "--cue-logo-dim",
+      "--cue-logo-bright",
+      "--cue-logo-hover-duration"
+    ]
+  },
+  "cue-logo-reveal-tooltip": {
+    "class": "cue-logo-reveal-tooltip",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "context",
+      "partnership"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-logo-reveal"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-logo-hover-duration, 200ms) — translateY(4px→0) + opacity 0→1",
+    "css-vars": [
+      "--cue-logo-tooltip-bg",
+      "--cue-logo-tooltip-text",
+      "--cue-logo-tooltip-offset",
+      "--cue-logo-hover-duration"
+    ]
+  },
+  "cue-pill-toggle": {
+    "class": "cue-pill-toggle",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "saas",
+      "enterprise",
+      "minimal"
+    ],
+    "avoid-when": [
+      "playful",
+      "bold",
+      "indie"
+    ],
+    "pairs": [
+      "cue-pill-toggle-option"
+    ],
+    "never-pair": [
+      "cue-enter-bounce",
+      "cue-shake"
+    ],
+    "timing": "n/a (container — rounded-full track with bg)",
+    "css-vars": [
+      "--cue-pill-track-bg"
+    ]
+  },
+  "cue-pill-toggle-option": {
+    "class": "cue-pill-toggle-option",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "minimal",
+      "accessible"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-pill-toggle"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-normal, 300ms) color + background-color transition; aria-selected drives active state",
+    "css-vars": [
+      "--cue-pill-active-bg",
+      "--cue-pill-hover-bg",
+      "--cue-pill-active-text",
+      "--cue-pill-inactive-text"
+    ]
+  },
+  "cue-scrollspy-nav": {
+    "class": "cue-scrollspy-nav",
+    "category": "layout",
+    "vibe": [
+      "premium",
+      "enterprise",
+      "docs",
+      "product-page"
+    ],
+    "avoid-when": [
+      "playful",
+      "landing-only",
+      "single-section"
+    ],
+    "pairs": [
+      "cue-scrollspy-item",
+      "cue-scrollspy-icon",
+      "cue-scrollspy-layout"
+    ],
+    "never-pair": [
+      "cue-enter-bounce"
+    ],
+    "timing": "n/a (sticky container — position: sticky top: 6rem)",
+    "css-vars": [
+      "--cue-scrollspy-top"
+    ]
+  },
+  "cue-scrollspy-item": {
+    "class": "cue-scrollspy-item",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "navigation",
+      "scroll-aware"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-scrollspy-nav",
+      "cue-scrollspy-icon"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-normal, 300ms) color transition; aria-current/.is-active drives active",
+    "css-vars": [
+      "--cue-scrollspy-border",
+      "--cue-scrollspy-active-text",
+      "--cue-scrollspy-inactive-text"
+    ]
+  },
+  "cue-scrollspy-icon": {
+    "class": "cue-scrollspy-icon",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "navigation"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-scrollspy-item"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-normal, 300ms) opacity transition 0.45→1 on active/hover",
+    "css-vars": [
+      "--cue-scrollspy-inactive-opacity"
+    ]
+  },
+  "cue-scrollspy-layout": {
+    "class": "cue-scrollspy-layout",
+    "category": "layout",
+    "vibe": [
+      "premium",
+      "docs",
+      "two-column"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-scrollspy-nav"
+    ],
+    "never-pair": [],
+    "timing": "n/a (grid layout — 320px nav + 1fr content)",
+    "css-vars": [
+      "--cue-scrollspy-nav-width",
+      "--cue-scrollspy-gap"
+    ]
+  },
+  "cue-spotlight": {
+    "class": "cue-spotlight",
+    "category": "utility",
+    "vibe": [
+      "interactive",
+      "premium",
+      "tactile",
+      "magical",
+      "ambient",
+      "cursor-aware"
+    ],
+    "avoid-when": [
+      "mobile-touch",
+      "static-landing",
+      "enterprise-flat"
+    ],
+    "pairs": [
+      "cue-group",
+      "cue-hover-glow",
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "Instant cursor tracking (no transform transition), var(--cue-spotlight-fade, 500ms) opacity fade",
+    "css-vars": [
+      "--cue-spotlight-size",
+      "--cue-spotlight-color",
+      "--cue-spotlight-blend",
+      "--cue-spotlight-fade",
+      "--cue-spotlight-x",
+      "--cue-spotlight-y"
+    ]
+  },
+  "cue-spotlight--always-on": {
+    "class": "cue-spotlight--always-on",
+    "category": "utility",
+    "vibe": [
+      "ambient",
+      "always-visible"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-spotlight"
+    ],
+    "never-pair": [],
+    "timing": "n/a (opacity: 1 always, no hover trigger)",
+    "css-vars": []
+  },
+  "cue-spotlight--screen": {
+    "class": "cue-spotlight--screen",
+    "category": "utility",
+    "vibe": [
+      "bright",
+      "flashlight"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-spotlight"
+    ],
+    "never-pair": [],
+    "timing": "n/a (blend mode variant — mix-blend-mode: screen)",
+    "css-vars": [
+      "--cue-spotlight-blend"
+    ]
+  },
+  "cue-spotlight--overlay": {
+    "class": "cue-spotlight--overlay",
+    "category": "utility",
+    "vibe": [
+      "contrasty"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-spotlight"
+    ],
+    "never-pair": [],
+    "timing": "n/a (blend mode variant — mix-blend-mode: overlay)",
+    "css-vars": [
+      "--cue-spotlight-blend"
+    ]
   }
 }

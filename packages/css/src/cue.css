@@ -3979,8 +3979,477 @@
 }
 
 /* ========================================================================
-   Issue #104 — prefers-reduced-motion (MUST be last)
+   Issue #206 — cue-slide-pattern
+   Hover-triggered diagonal line-pattern drift via animated background-
+   position. repeating-linear-gradient(45deg) thin lines. background-size
+   = tile×√2 for 45deg seamless loop. Shift = 4×tile×√2/2 = 28.28px.
+   Paused default, running on cue-group:hover. 2s linear infinite.
    ======================================================================== */
+
+@keyframes cue-slide-pattern {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: var(--cue-pattern-shift, 28.28px) calc(var(--cue-pattern-shift, 28.28px) * -1); }
+}
+
+.cue-slide-pattern {
+  position: absolute;
+  inset: 0;
+  --cue-pattern-color: rgba(180, 180, 180, 0.25);
+  --cue-pattern-angle: 45deg;
+  --cue-pattern-line-width: 1px;
+  --cue-pattern-tile: 5px;
+  --cue-pattern-shift: 28.28px;
+  --cue-pattern-duration: 2s;
+  --cue-pattern-blur: 0px;
+  background-image: repeating-linear-gradient(
+    var(--cue-pattern-angle),
+    transparent 0px,
+    transparent calc(var(--cue-pattern-tile) - var(--cue-pattern-line-width)),
+    var(--cue-pattern-color) calc(var(--cue-pattern-tile) - var(--cue-pattern-line-width)),
+    var(--cue-pattern-color) var(--cue-pattern-tile)
+  );
+  background-size: calc(var(--cue-pattern-tile) * 1.4142) calc(var(--cue-pattern-tile) * 1.4142);
+  background-position: 0px 0px;
+  animation: cue-slide-pattern var(--cue-pattern-duration) linear infinite;
+  animation-play-state: paused;
+  filter: blur(var(--cue-pattern-blur));
+  pointer-events: none;
+}
+
+.cue-group:hover .cue-slide-pattern,
+.cue-group:focus-within .cue-slide-pattern {
+  animation-play-state: running;
+}
+
+/* ========================================================================
+   Issue #208 — cue-live-dot
+   Live status dot — drop-shadow + wide-range opacity pulse. opacity
+   0.35→1→0.35 (65% range, more dramatic than cue-pulse 50%). filter:
+   drop-shadow (follows shape, works for SVG). 1200ms ease-in-out.
+   ======================================================================== */
+
+@keyframes cue-live-dot {
+  0%, 100% { opacity: var(--cue-live-min-opacity, 0.35); }
+  50%      { opacity: 1; }
+}
+
+.cue-live-dot {
+  --cue-live-color: var(--cue-color-accent, #3b82f6);
+  --cue-live-size: 8px;
+  --cue-live-glow-radius: 7px;
+  --cue-live-duration: 1200ms;
+  --cue-live-ease: ease-in-out;
+  --cue-live-min-opacity: 0.35;
+  width: var(--cue-live-size);
+  height: var(--cue-live-size);
+  border-radius: 50%;
+  background-color: var(--cue-live-color);
+  filter: drop-shadow(0 0 var(--cue-live-glow-radius) var(--cue-live-color));
+  animation: cue-live-dot var(--cue-live-duration) var(--cue-live-ease) infinite;
+}
+
+/* SVG variant — apply to <circle> or any SVG element */
+.cue-live-dot-svg {
+  --cue-live-color: var(--cue-color-accent, #3b82f6);
+  --cue-live-glow-radius: 7px;
+  --cue-live-duration: 1200ms;
+  --cue-live-ease: ease-in-out;
+  --cue-live-min-opacity: 0.35;
+  filter: drop-shadow(0 0 var(--cue-live-glow-radius) var(--cue-live-color));
+  animation: cue-live-dot var(--cue-live-duration) var(--cue-live-ease) infinite;
+}
+
+/* ========================================================================
+   Issue #227 — cue-lqip / cue-lqip-cinematic
+   LQIP blur-up image preload. Wrapper has inline bg-image (tiny blurred
+   placeholder). Inner <img> starts opacity:0, fades in on load.
+   .cue-lqip-loaded (toggled via JS onload) clears bg-image instantly
+   (!important state-cut, not cross-fade) + fades in img. Cinematic
+   variant adds scale(1.04→1) for focus-pull feel.
+   ======================================================================== */
+
+.cue-lqip {
+  background-size: cover;
+  background-position: center;
+}
+
+.cue-lqip > img,
+.cue-lqip-img {
+  opacity: 0;
+  transition: opacity var(--cue-lqip-duration, 300ms) var(--cue-lqip-ease, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  will-change: opacity;
+}
+
+.cue-lqip-loaded > img,
+.cue-lqip-loaded .cue-lqip-img,
+.cue-lqip-img.cue-lqip-loaded {
+  opacity: 1;
+}
+
+.cue-lqip-loaded {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.cue-lqip-cinematic > img,
+.cue-lqip-cinematic .cue-lqip-img {
+  transform: scale(1.04);
+  transition:
+    opacity var(--cue-lqip-duration, 300ms) var(--cue-lqip-ease, cubic-bezier(0.25, 0.46, 0.45, 0.94)),
+    transform var(--cue-lqip-duration, 600ms) var(--cue-lqip-ease, cubic-bezier(0.59, 0.01, 0.28, 1));
+}
+.cue-lqip-cinematic.cue-lqip-loaded > img,
+.cue-lqip-cinematic.cue-lqip-loaded .cue-lqip-img {
+  transform: scale(1);
+}
+
+/* ========================================================================
+   Issue #249 — cue-tab-slide
+   Sliding tab pill indicator. ::before is absolutely-positioned pill,
+   starts at opacity:0 width:0 height:0. JS sets --cue-ts-left/top/
+   width/height on hover. transition: all 300ms cubic-bezier(0,0,0.2,1)
+   strong deceleration. data-cue-ts-active attribute toggles visibility.
+   CSS self-contained — JS only sets CSS vars (companion pattern).
+   ======================================================================== */
+
+.cue-tab-slide {
+  position: relative;
+}
+
+.cue-tab-slide::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border-radius: var(--cue-ts-radius, 10px);
+  background-color: var(--cue-ts-bg, hsl(240 10% 15%));
+  opacity: 0;
+  width: 0;
+  height: 0;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  transition:
+    left var(--cue-ts-duration, 300ms) var(--cue-ts-ease, cubic-bezier(0, 0, 0.2, 1)),
+    top var(--cue-ts-duration, 300ms) var(--cue-ts-ease, cubic-bezier(0, 0, 0.2, 1)),
+    width var(--cue-ts-duration, 300ms) var(--cue-ts-ease, cubic-bezier(0, 0, 0.2, 1)),
+    height var(--cue-ts-duration, 300ms) var(--cue-ts-ease, cubic-bezier(0, 0, 0.2, 1)),
+    opacity var(--cue-ts-fade-duration, 150ms) var(--cue-ts-ease, cubic-bezier(0, 0, 0.2, 1));
+}
+
+.cue-tab-slide[data-cue-ts-active]::before {
+  opacity: var(--cue-ts-opacity, 1);
+  width: var(--cue-ts-width, 0px);
+  height: var(--cue-ts-height, 0px);
+  left: var(--cue-ts-left, 0px);
+  top: var(--cue-ts-top, 0px);
+}
+
+.cue-tab-slide > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ========================================================================
+   Issue #254 — cue-shrink-out / cue-shrink-out-host
+   Chat-message shrink-out exit — translateX(24px) + scale(0). Combined
+   effect: "sucked out through right edge" not "fading away". 24px =
+   one gap + one padding (exits its slot). scale(0) not scale(0.5) =
+   truly invisible by end. ease-in (accelerating out). cue-shrink-out-
+   host collapses height via grid-template-rows 1fr→0fr after 50% delay.
+   RTL: exit to left.
+   ======================================================================== */
+
+.cue-shrink-out {
+  --cue-shrink-distance: 24px;
+  --cue-shrink-duration: 0.2s;
+  --cue-shrink-ease: cubic-bezier(0.4, 0, 1, 1);
+  transform-origin: right center;
+  animation: cue-shrink-out var(--cue-shrink-duration) var(--cue-shrink-ease) forwards;
+  will-change: transform;
+}
+
+@keyframes cue-shrink-out {
+  to {
+    transform: translateX(var(--cue-shrink-distance)) scale(0);
+  }
+}
+
+[dir="rtl"] .cue-shrink-out {
+  --cue-shrink-distance: -24px;
+  transform-origin: left center;
+}
+
+.cue-shrink-out-host {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: cue-shrink-out-collapse var(--cue-shrink-duration, 0.2s) var(--cue-shrink-ease, cubic-bezier(0.4, 0, 1, 1)) forwards;
+  animation-delay: calc(var(--cue-shrink-duration, 0.2s) * 0.5);
+}
+
+.cue-shrink-out-host > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@keyframes cue-shrink-out-collapse {
+  to { grid-template-rows: 0fr; }
+}
+
+/* ========================================================================
+   Issue #264 — cue-delay-swap
+   Delayed property transition — background-color waits 300ms then
+   instantly swaps. transition: bg-color 0ms 300ms = delayed instant
+   snap. Companion to pill-expand (bg stays visible while blob grows,
+   then snaps transparent). Variants: --border, --shadow.
+   ======================================================================== */
+
+.cue-delay-swap {
+  transition:
+    background-color 0ms var(--cue-ds-wait, 300ms),
+    color var(--cue-ds-color-duration, 200ms) var(--cue-ds-color-ease, ease-out);
+}
+
+.cue-delay-swap--border {
+  transition:
+    border-color 0ms var(--cue-ds-wait, 300ms),
+    color var(--cue-ds-color-duration, 200ms) ease-out;
+}
+
+.cue-delay-swap--shadow {
+  transition:
+    box-shadow 0ms var(--cue-ds-wait, 300ms),
+    color var(--cue-ds-color-duration, 200ms) ease-out;
+}
+
+/* ========================================================================
+   Issue #265 — cue-accordion
+   CSS-var-driven height accordion. @keyframes reference --cue-acc-
+   height (set by JS via scrollHeight). Solves max-height hack timing
+   mismatch + height:auto non-animatable problem. data-state=open/closed
+   triggers cue-acc-open/close keyframes. overflow:hidden clips content.
+   ======================================================================== */
+
+.cue-accordion {
+  overflow: hidden;
+}
+
+.cue-accordion[data-state="open"] {
+  animation: cue-acc-open var(--cue-acc-duration, 300ms) var(--cue-acc-ease, ease-out);
+}
+
+.cue-accordion[data-state="closed"] {
+  animation: cue-acc-close var(--cue-acc-duration, 300ms) var(--cue-acc-ease, ease-out);
+}
+
+@keyframes cue-acc-open {
+  from { height: 0; }
+  to   { height: var(--cue-acc-height, auto); }
+}
+
+@keyframes cue-acc-close {
+  from { height: var(--cue-acc-height, auto); }
+  to   { height: 0; }
+}
+
+.cue-accordion--spring[data-state="open"] {
+  animation: cue-acc-open var(--cue-acc-duration, 400ms) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ========================================================================
+   Issue #267 — cue-logo-reveal / cue-logo-reveal-tooltip
+   Grayscale-logo marquee with compound hover tooltip reveal. Logos
+   start opacity:0.4 grayscale(1). Hover: opacity:0.7 (partial color,
+   restrained). Tooltip slides up translateY(4px→0) + opacity 0→1.
+   200ms ease-out. Composes with cue-marquee for infinite scroll.
+   ======================================================================== */
+
+.cue-logo-reveal {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  opacity: var(--cue-logo-dim, 0.4);
+  filter: grayscale(1);
+  transition: opacity var(--cue-logo-hover-duration, 200ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.cue-logo-reveal:hover {
+  opacity: var(--cue-logo-bright, 0.7);
+}
+
+.cue-logo-reveal-tooltip {
+  position: absolute;
+  top: 100%;
+  margin-top: 0.5rem;
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 10px;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  background: var(--cue-logo-tooltip-bg, rgba(255, 255, 255, 0.1));
+  color: var(--cue-logo-tooltip-text, var(--cue-color-accent, #3b82f6));
+  pointer-events: none;
+  transform: translateY(var(--cue-logo-tooltip-offset, 4px));
+  opacity: 0;
+  transition: transform var(--cue-logo-hover-duration, 200ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+              opacity var(--cue-logo-hover-duration, 200ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.cue-logo-reveal:hover .cue-logo-reveal-tooltip {
+  pointer-events: auto;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ========================================================================
+   Issue #269 — cue-pill-toggle / cue-pill-toggle-option
+   Pill-segmented toggle with aria-selected state transition. No sliding
+   indicator (fragile). Background color simply changes on active option
+   with 300ms transition-colors. aria-selected drives BOTH accessibility
+   AND visual state — eliminates sync bug. Intentional understatement:
+   active bg barely distinguishable from hover bg.
+   ======================================================================== */
+
+.cue-pill-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.25rem;
+  background: var(--cue-pill-track-bg, rgba(255, 255, 255, 0.05));
+}
+
+.cue-pill-toggle-option {
+  border-radius: 9999px;
+  padding: 0.25rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  font-weight: 500;
+  color: var(--cue-pill-inactive-text, var(--cue-color-accent, #3b82f6));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--cue-duration-normal, 300ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+              background-color var(--cue-duration-normal, 300ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.cue-pill-toggle-option:hover {
+  background: var(--cue-pill-hover-bg, rgba(255, 255, 255, 0.05));
+  color: var(--cue-pill-active-text, currentColor);
+}
+
+.cue-pill-toggle-option[aria-selected="true"] {
+  background: var(--cue-pill-active-bg, rgba(255, 255, 255, 0.1));
+  color: var(--cue-pill-active-text, currentColor);
+}
+
+/* ========================================================================
+   Issue #272 — cue-scrollspy-nav / cue-scrollspy-item / cue-scrollspy-icon / cue-scrollspy-layout
+   Sticky scroll-spy sidebar with compound color+opacity transition.
+   Inactive: text secondary/70 + icon opacity 0.45. Active: text
+   primary + icon opacity 1. transition-colors 300ms. Icon also has
+   group-hover:opacity-100 for preview. aria-current="true" or .is-
+   active drives active state. Two-column grid layout pattern.
+   ======================================================================== */
+
+.cue-scrollspy-nav {
+  position: sticky;
+  top: var(--cue-scrollspy-top, 6rem);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cue-scrollspy-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--cue-scrollspy-border, rgba(255, 255, 255, 0.15));
+  text-decoration: none;
+  color: var(--cue-scrollspy-inactive-text, rgba(255, 255, 255, 0.45));
+  transition: color var(--cue-duration-normal, 300ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.cue-scrollspy-item:hover {
+  color: var(--cue-scrollspy-active-text, currentColor);
+}
+
+.cue-scrollspy-item[aria-current="true"],
+.cue-scrollspy-item.is-active {
+  color: var(--cue-scrollspy-active-text, currentColor);
+}
+
+.cue-scrollspy-icon {
+  transition: opacity var(--cue-duration-normal, 300ms) var(--cue-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  opacity: var(--cue-scrollspy-inactive-opacity, 0.45);
+}
+
+.cue-scrollspy-item:hover .cue-scrollspy-icon,
+.cue-scrollspy-item[aria-current="true"] .cue-scrollspy-icon,
+.cue-scrollspy-item.is-active .cue-scrollspy-icon {
+  opacity: 1;
+}
+
+.cue-scrollspy-layout {
+  display: grid;
+  grid-template-columns: var(--cue-scrollspy-nav-width, 320px) minmax(0, 1fr);
+  gap: var(--cue-scrollspy-gap, 3rem);
+}
+
+/* ========================================================================
+   Issue #273 — cue-spotlight
+   Cursor-following spotlight with mix-blend-mode: soft-light. Position
+   via --cue-spotlight-x/y CSS vars (set by JS on pointermove). NO
+   transition on transform (instant tracking, lag = broken). mix-blend-
+   mode: soft-light = spotlight becomes part of content, not overlay.
+   Offset by -size/2 so (0,0) origin = parent top-left. 500ms opacity
+   fade on hover. Variants: --always-on, --screen, --overlay.
+   ======================================================================== */
+
+.cue-spotlight {
+  position: absolute;
+  top: calc(var(--cue-spotlight-size, 200px) * -0.5);
+  left: calc(var(--cue-spotlight-size, 200px) * -0.5);
+  width: var(--cue-spotlight-size, 200px);
+  height: var(--cue-spotlight-size, 200px);
+  border-radius: 50%;
+  pointer-events: none;
+  --cue-spotlight-x: 0px;
+  --cue-spotlight-y: 0px;
+  transform: translateX(var(--cue-spotlight-x)) translateY(var(--cue-spotlight-y));
+  will-change: transform;
+  background-image: radial-gradient(
+    calc(var(--cue-spotlight-size, 200px) * 0.5),
+    var(--cue-spotlight-color, rgba(255, 255, 255, 0.8)),
+    transparent
+  );
+  mix-blend-mode: var(--cue-spotlight-blend, soft-light);
+  opacity: 0;
+  transition: opacity var(--cue-spotlight-fade, 500ms) ease-out;
+  z-index: 1;
+}
+
+.cue-group:hover .cue-spotlight,
+.cue-spotlight:hover,
+.cue-spotlight--visible {
+  opacity: 1;
+}
+
+.cue-spotlight--always-on {
+  opacity: 1;
+}
+
+.cue-spotlight--screen {
+  --cue-spotlight-blend: screen;
+}
+
+.cue-spotlight--overlay {
+  --cue-spotlight-blend: overlay;
+}
 
 /* ========================================================================
    Issue #474 — cue-scattered-float
@@ -5583,4 +6052,88 @@
   .cue-stroke-morph {
     animation: none !important;
   }
+
+  /* Issue #206 — slide-pattern paused (already paused default, stays paused) */
+  .cue-slide-pattern {
+    animation: none !important;
+  }
+
+  /* Issue #208 — live-dot static at mid opacity */
+  .cue-live-dot,
+  .cue-live-dot-svg {
+    animation: none !important;
+    opacity: 0.7 !important;
+  }
+
+  /* Issue #227 — lqip instant show, no fade */
+  .cue-lqip > img,
+  .cue-lqip-img,
+  .cue-lqip-cinematic > img,
+  .cue-lqip-cinematic .cue-lqip-img {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Issue #249 — tab-slide: only opacity transition */
+  .cue-tab-slide::before {
+    transition: opacity 150ms ease !important;
+  }
+
+  /* Issue #254 — shrink-out instant removal */
+  .cue-shrink-out {
+    animation: none !important;
+    transform: none !important;
+    opacity: 0 !important;
+  }
+  .cue-shrink-out-host {
+    animation: none !important;
+    grid-template-rows: 0fr !important;
+  }
+
+  /* Issue #264 — delay-swap: no delay, instant */
+  .cue-delay-swap,
+  .cue-delay-swap--border,
+  .cue-delay-swap--shadow {
+    transition: none !important;
+  }
+
+  /* Issue #265 — accordion: no animation, instant open/close */
+  .cue-accordion[data-state="open"],
+  .cue-accordion[data-state="closed"] {
+    animation: none !important;
+  }
+  .cue-accordion[data-state="closed"] {
+    height: 0 !important;
+  }
+
+  /* Issue #267 — logo-reveal: instant opacity, no tooltip slide */
+  .cue-logo-reveal {
+    transition: none !important;
+  }
+  .cue-logo-reveal-tooltip {
+    transition: none !important;
+  }
+
+  /* Issue #269 — pill-toggle: instant color change */
+  .cue-pill-toggle-option {
+    transition: none !important;
+  }
+
+  /* Issue #272 — scrollspy: instant color/opacity */
+  .cue-scrollspy-item,
+  .cue-scrollspy-icon {
+    transition: none !important;
+  }
+
+  /* Issue #273 — spotlight: static center, no cursor tracking */
+  .cue-spotlight {
+    transform: none !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: calc(var(--cue-spotlight-size, 200px) * -0.5) !important;
+    margin-left: calc(var(--cue-spotlight-size, 200px) * -0.5) !important;
+    will-change: auto !important;
+  }
+
 }
