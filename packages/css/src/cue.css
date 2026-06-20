@@ -21,6 +21,48 @@
   --cue-ease-linear: linear;
   --cue-ease-snappy: cubic-bezier(0.191, 0.703, 0.704, 0.952);
 
+  /* Hand-tuned linear() spring easings (Issue #431 — Notion 16-anchor curve).
+     Modern CSS Easing Level 4 — Chrome 113+/Safari 17.2+/Firefox 128+.
+     @supports fallback in the cue-spring-linear class swaps to cubic-bezier. */
+  --cue-spring-timing: linear(
+    0,
+    0.007 1.4%,
+    0.029 2.9%,
+    0.116 6.2%,
+    0.228 9.3%,
+    0.602 18.6%,
+    0.707 21.6%,
+    0.796 24.5%,
+    0.867 27.3%,
+    0.926 30.1%,
+    0.973 33%,
+    1.01 36.1%,
+    1.048 41.7%,
+    1.06 48.4%,
+    1.006 76.9%,
+    1
+  );
+  --cue-spring-timing-strong: linear(
+    0,
+    0.05 5%,
+    0.3 12%,
+    0.7 20%,
+    0.95 30%,
+    1.1 45%,
+    0.98 70%,
+    1.02 85%,
+    1
+  );
+  --cue-spring-timing-subtle: linear(
+    0,
+    0.4 25%,
+    0.95 50%,
+    1.03 60%,
+    0.99 80%,
+    1
+  );
+  --cue-spring-duration: 600ms;
+
   /* Durations */
   --cue-duration-fast: 150ms;
   --cue-duration-normal: 300ms;
@@ -3251,6 +3293,692 @@
 }
 
 /* ========================================================================
+   Issue #420 — cue-orbit-glow
+   Soft radial glow blob yang mengorbit perimeter element via CSS Motion
+   Path (offset-path: border-box). Browser computes path so glow auto-
+   adapts ke ukuran container. Default hidden; reveal via .cue-visible.
+   20s linear infinite = slow ambient orbit.
+   ======================================================================== */
+
+@property --cue-orbit-progress {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@keyframes cue-orbit-trace {
+  from { offset-distance: 0%; }
+  to   { offset-distance: 100%; }
+}
+
+.cue-orbit-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    100% 100% at right center,
+    var(--cue-orbit-color, hsla(249, 91%, 77%, 0)) 0%,
+    var(--cue-orbit-color, hsla(249, 91%, 77%, 0.55)) 5%,
+    var(--cue-orbit-color, hsla(249, 91%, 77%, 0)) 50%
+  );
+  offset-path: border-box;
+  offset-anchor: 100% 50%;
+  offset-rotate: 0deg;
+  animation: cue-orbit-trace var(--cue-orbit-duration, 20s) linear infinite;
+  opacity: 0;
+  transition: opacity var(--cue-orbit-fade, 0.5s) ease-out;
+  will-change: opacity, offset-distance;
+}
+
+.cue-visible .cue-orbit-glow,
+.cue-orbit-glow.cue-visible {
+  opacity: 1;
+}
+
+/* Fallback for browsers without offset-path */
+@supports not (offset-path: border-box) {
+  .cue-orbit-glow {
+    offset-path: none;
+    inset: -20% -20% auto auto;
+    width: 50%;
+    height: 50%;
+  }
+}
+
+/* ========================================================================
+   Issue #421 — cue-shimmer-border
+   1px gradient border pill with continuous shimmer sweep. Pattern:
+   `padding: 1px; overflow: hidden;` on wrapper creates 1px slot for
+   ::before sweep. Inner content has its own bg to "cut out" shimmer.
+   5s linear infinite stripe sweep with 45deg diagonal gradient.
+   ======================================================================== */
+
+.cue-shimmer-border {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--cue-shimmer-radius, 9999px);
+  padding: var(--cue-shimmer-border-width, 1px);
+  overflow: hidden;
+  background: var(--cue-shimmer-bg, rgba(255, 255, 255, 0.06));
+  transition: background var(--cue-shimmer-hover-duration, 0.2s) ease-in-out;
+  isolation: isolate;
+}
+
+.cue-shimmer-border > * {
+  position: relative;
+  z-index: 1;
+  border-radius: inherit;
+  background: var(--cue-shimmer-inner-bg, var(--cue-shimmer-bg, rgba(255, 255, 255, 0.06)));
+}
+
+.cue-shimmer-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    var(--cue-shimmer-angle, 45deg),
+    transparent 0%,
+    transparent 15%,
+    var(--cue-shimmer-color, hsla(249, 91%, 77%, 0.55)) 50%,
+    transparent 85%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: cue-shimmer-sweep var(--cue-shimmer-duration, 5s) linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes cue-shimmer-sweep {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ========================================================================
+   Issue #422 — cue-button-tactile
+   3-state asymmetric transition durations untuk tactile button feel:
+   - Hover  : 75ms  (near-instant snap, "I see you")
+   - Active : 150ms (slightly slower, "you did that")
+   - Base   : 300ms (slow return-to-rest, "settling back")
+   Ratio ~1:2:4 mimics physical button switches (Cherry MX etc).
+   ======================================================================== */
+
+.cue-button-tactile {
+  transition:
+    background-color var(--cue-tactile-base-duration, 0.3s) var(--cue-tactile-base-ease, ease),
+    color var(--cue-tactile-base-duration, 0.3s) var(--cue-tactile-base-ease, ease),
+    fill var(--cue-tactile-base-duration, 0.3s) var(--cue-tactile-base-ease, ease);
+  will-change: background-color;
+}
+
+.cue-button-tactile:hover,
+.cue-button-tactile.cue-hover {
+  transition:
+    background-color var(--cue-tactile-hover-duration, 0.075s) var(--cue-tactile-hover-ease, ease),
+    color var(--cue-tactile-hover-duration, 0.075s) var(--cue-tactile-hover-ease, ease),
+    fill var(--cue-tactile-hover-duration, 0.075s) var(--cue-tactile-hover-ease, ease);
+}
+
+.cue-button-tactile:active,
+.cue-button-tactile.cue-active {
+  transition:
+    background-color var(--cue-tactile-active-duration, 0.15s) var(--cue-tactile-active-ease, ease),
+    color var(--cue-tactile-active-duration, 0.15s) var(--cue-tactile-active-ease, ease),
+    fill var(--cue-tactile-active-duration, 0.15s) var(--cue-tactile-active-ease, ease);
+  transform: var(--cue-tactile-press-transform, scale(0.97));
+}
+
+/* ========================================================================
+   Issue #425 — cue-header-morph
+   Height-morphing scroll-spy header. Animates `height` property
+   (1px → expanded) with fast-then-settle cubic-bezier(0.4, 0.93, 0.42,
+   0.98). requires fixed height value (not `auto`). `will-change: height`
+   hints compositor. backdrop-filter blur for premium feel.
+   ======================================================================== */
+
+.cue-header-morph {
+  position: fixed;
+  top: var(--cue-header-morph-top, 0);
+  left: 0;
+  right: 0;
+  height: var(--cue-header-morph-collapsed, 1px);
+  overflow: hidden;
+  backdrop-filter: saturate(180%) blur(var(--cue-header-morph-blur, 20px));
+  -webkit-backdrop-filter: saturate(180%) blur(var(--cue-header-morph-blur, 20px));
+  background-color: var(--cue-header-morph-bg, rgba(0, 0, 0, 0.867));
+  will-change: height;
+  transition:
+    height var(--cue-header-morph-duration, 0.5s)
+    cubic-bezier(
+      var(--cue-header-morph-cb-x1, 0.4),
+      var(--cue-header-morph-cb-y1, 0.93),
+      var(--cue-header-morph-cb-x2, 0.42),
+      var(--cue-header-morph-cb-y2, 0.98)
+    );
+  z-index: var(--cue-header-morph-z, 10);
+}
+
+.cue-header-morph.cue-visible,
+.cue-header-morph[data-state="expanded"] {
+  height: var(--cue-header-morph-expanded, 60px);
+}
+
+/* Fallback for browsers without backdrop-filter */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cue-header-morph {
+    background-color: var(--cue-header-morph-bg-fallback, rgba(0, 0, 0, 0.95));
+  }
+}
+
+/* ========================================================================
+   Issue #427 — cue-scroll-counter
+   Scroll-driven integer counter via @property <integer> + counter-reset
+   + animation-timeline. Zero-JS: counter changes step-by-step as user
+   scrolls past element. Consumer must set view-timeline-name on a
+   section ancestor (e.g. style="view-timeline-name: --cue-section-scroll").
+   ======================================================================== */
+
+@property --cue-counter-step {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --cue-counter-start {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.cue-scroll-counter {
+  --cue-counter-start: 10;
+  --cue-counter-end: 1;
+  --cue-counter-timeline: --cue-section-scroll;
+  counter-reset: cue-counter max(1, var(--cue-counter-start) - var(--cue-counter-step, 0));
+}
+
+.cue-scroll-counter::after {
+  content: counter(cue-counter);
+}
+
+@keyframes cue-scroll-counter-progress {
+  0% { --cue-counter-step: 0; }
+  to { --cue-counter-step: var(--cue-counter-start); }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cue-scroll-counter {
+      animation-name: cue-scroll-counter-progress;
+      animation-timing-function: steps(var(--cue-counter-start, 10));
+      animation-timeline: var(--cue-counter-timeline);
+      animation-range: exit;
+      animation-fill-mode: forwards;
+    }
+  }
+}
+
+/* Fallback for browsers without animation-timeline — show end value */
+@supports not (animation-timeline: scroll()) {
+  .cue-scroll-counter {
+    --cue-counter-step: var(--cue-counter-start);
+  }
+}
+
+/* ========================================================================
+   Issue #430 — cue-hover-shadow-has
+   :has()-driven ::after hover-shadow dengan asymmetric in/out timing
+   tokens. Hover-in: 150ms ease-out (snappy). Hover-out: 200ms ease-in
+   (patient). `:has()` lets parent card react to inner anchor state.
+   `::after` overlay uses opacity-only (compositor-friendly).
+   ======================================================================== */
+
+.cue-hover-shadow-has {
+  --cue-hover-fade-in-duration: 150ms;
+  --cue-hover-fade-in-timing: cubic-bezier(0, 0, 0.58, 1);
+  --cue-hover-fade-out-duration: 200ms;
+  --cue-hover-fade-out-timing: cubic-bezier(0.42, 0, 1, 1);
+  --cue-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+
+.cue-hover-shadow-has:has(.cue-hover-shadow-has__anchor)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: transparent;
+  box-shadow: var(--cue-hover-shadow);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  transition-property: opacity;
+  transition-timing-function: var(--cue-hover-fade-out-timing);
+  transition-duration: var(--cue-hover-fade-out-duration);
+}
+
+.cue-hover-shadow-has:has(.cue-hover-shadow-has__anchor:hover)::after,
+.cue-hover-shadow-has:has(.cue-hover-shadow-has__anchor:focus-visible)::after,
+.cue-hover-shadow-has:has(.cue-hover-shadow-has__anchor:active)::after,
+.cue-hover-shadow-has:focus-within::after,
+.cue-hover-shadow-has:hover::after {
+  opacity: 1;
+  transition-timing-function: var(--cue-hover-fade-in-timing);
+  transition-duration: var(--cue-hover-fade-in-duration);
+}
+
+/* Fallback for browsers without :has() */
+@supports not selector(:has(*)) {
+  .cue-hover-shadow-has::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: var(--cue-hover-shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition-property: opacity;
+    transition-timing-function: var(--cue-hover-fade-out-timing);
+    transition-duration: var(--cue-hover-fade-out-duration);
+  }
+
+  .cue-hover-shadow-has:hover::after,
+  .cue-hover-shadow-has:focus-within::after {
+    opacity: 1;
+    transition-timing-function: var(--cue-hover-fade-in-timing);
+    transition-duration: var(--cue-hover-fade-in-duration);
+  }
+}
+
+/* ========================================================================
+   Issue #431 — cue-spring-linear
+   Hand-tuned damped spring via CSS linear() easing (Easing Level 4).
+   Notion's 16-anchor curve dengan 6% overshoot at 48.4%. Drop-in
+   upgrade over --cue-ease-spring (cubic-bezier). Three intensity
+   variants in :root: default (6%), strong (10%), subtle (3%).
+   ======================================================================== */
+
+.cue-spring-linear {
+  animation-timing-function: var(--cue-spring-timing);
+  animation-duration: var(--cue-spring-duration);
+}
+
+/* Fallback for browsers without linear() — swap to cubic-bezier overshoot */
+@supports not (animation-timing-function: linear(0, 1)) {
+  :root {
+    --cue-spring-timing: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --cue-spring-timing-strong: cubic-bezier(0.34, 1.8, 0.64, 1);
+    --cue-spring-timing-subtle: cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+}
+
+/* ========================================================================
+   Issue #432 — cue-offset-marquee
+   CSS Motion Path horizontal marquee via offset-path: polygon().
+   Alternative ke cue-marquee (translateX-based). Motion Path enables
+   non-linear paths (curve, wave, ellipse) via offset-rotate: auto.
+   Items follow 2-point horizontal polygon by default.
+   ======================================================================== */
+
+.cue-offset-marquee {
+  --cue-marquee-item-count: 5;
+  --cue-marquee-slot-width: 120px;
+  --cue-marquee-duration: 30s;
+  overflow: hidden;
+  display: flex;
+  gap: 0;
+  position: relative;
+}
+
+.cue-offset-marquee__item {
+  offset-path: polygon(
+    calc(var(--cue-marquee-slot-width) / -2) 50%,
+    calc(
+      var(--cue-marquee-item-count) *
+      max(100% / var(--cue-marquee-item-count), var(--cue-marquee-slot-width))
+      - var(--cue-marquee-slot-width) / 2
+    ) 50%
+  );
+  offset-rotate: 0deg;
+  position: absolute;
+  inset-inline-start: 0;
+  animation: cue-offset-marquee-slide var(--cue-marquee-duration) linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes cue-offset-marquee-slide {
+  from { offset-distance: 0%; }
+  to   { offset-distance: 100%; }
+}
+
+.cue-offset-marquee:hover .cue-offset-marquee__item {
+  animation-play-state: running;
+}
+
+/* Fallback — browsers without offset-path use transform translateX */
+@supports not (offset-path: polygon(0 0, 100% 100%)) {
+  .cue-offset-marquee__item {
+    offset-path: none;
+    position: relative;
+    animation: cue-offset-marquee-fallback var(--cue-marquee-duration) linear infinite;
+    animation-play-state: paused;
+  }
+  @keyframes cue-offset-marquee-fallback {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-100% * var(--cue-marquee-item-count))); }
+  }
+}
+
+/* ========================================================================
+   Issue #455 — cue-sprite
+   Sprite sheet character animation via background-position + steps().
+   Authentic stop-motion/flipbook feel — no smooth interpolation.
+   Per-action variants: --walk (4 iters), --jump (3 iters), --idle
+   (infinite). --oneshot holds last frame; --loop infinite; --reverse
+   / --alternate direction control.
+   ======================================================================== */
+
+@keyframes cue-sprite-cycle {
+  from { background-position: 0 0; }
+  to   {
+    background-position:
+      calc(var(--cue-sprite-sheet-width, 528px) * -1)
+      0;
+  }
+}
+
+.cue-sprite {
+  background-repeat: no-repeat;
+  background-size: var(--cue-sprite-sheet-width, 528px) var(--cue-sprite-sheet-height, 48px);
+  width: var(--cue-sprite-frame-width, 48px);
+  height: var(--cue-sprite-frame-height, 48px);
+  animation: cue-sprite-cycle
+    var(--cue-sprite-duration, 0.5s)
+    steps(var(--cue-sprite-frame-count, 11))
+    var(--cue-sprite-iteration, 1)
+    var(--cue-sprite-fill-mode, none);
+}
+
+/* Walk variant — short loops, multiple iterations (ambient movement) */
+.cue-sprite--walk {
+  --cue-sprite-duration: 0.5s;
+  --cue-sprite-iteration: 4;
+  background-image: var(--cue-sprite-walk-src, url(/images/sprite-walk.png));
+}
+
+/* Jump variant — longer duration, fewer iterations (action movement) */
+.cue-sprite--jump {
+  --cue-sprite-duration: 0.75s;
+  --cue-sprite-iteration: 3;
+  background-image: var(--cue-sprite-jump-src, url(/images/sprite-jump.png));
+}
+
+/* Idle variant — slow ambient loop (e.g., breathing, blinking) */
+.cue-sprite--idle {
+  --cue-sprite-duration: 2s;
+  --cue-sprite-iteration: infinite;
+  --cue-sprite-fill-mode: none;
+  background-image: var(--cue-sprite-idle-src, url(/images/sprite-idle.png));
+}
+
+/* Continuous loop (no stop, infinite iteration) */
+.cue-sprite--loop {
+  --cue-sprite-iteration: infinite;
+}
+
+/* Triggered one-shot (1 iteration, hold last frame) */
+.cue-sprite--oneshot {
+  --cue-sprite-iteration: 1;
+  --cue-sprite-fill-mode: forwards;
+}
+
+/* Reverse direction (sprite plays backwards) */
+.cue-sprite--reverse {
+  animation-direction: reverse;
+}
+
+/* Alternate (forward then backward, for back-and-forth motion) */
+.cue-sprite--alternate {
+  animation-direction: alternate;
+}
+
+/* ========================================================================
+   Issue #459 — cue-snappy-fade
+   80ms fade dengan data-visible / data-interactive attribute separation.
+   80ms is below "smooth" threshold (150-200ms) — reads as "instant but
+   smooth". data-visible and data-interactive are independent so user
+   can see toolbar while not yet able to click it.
+   Variants: --ultra (50ms), --smooth (120ms), --rise, --scale.
+   ======================================================================== */
+
+.cue-snappy-fade {
+  --cue-snappy-duration: 80ms;
+  --cue-snappy-ease: ease-in-out;
+  opacity: 0;
+  transition: opacity var(--cue-snappy-duration) var(--cue-snappy-ease);
+  pointer-events: none;
+}
+
+.cue-snappy-fade[data-visible="true"],
+.cue-snappy-fade.is-visible {
+  opacity: 1;
+}
+
+.cue-snappy-fade[data-interactive="true"],
+.cue-snappy-fade.is-interactive,
+.cue-snappy-fade[data-interactive="true"] *,
+.cue-snappy-fade.is-interactive * {
+  pointer-events: all;
+}
+
+/* Variant: faster (50ms — for ultra-snappy UIs) */
+.cue-snappy-fade--ultra {
+  --cue-snappy-duration: 50ms;
+}
+
+/* Variant: slightly slower (120ms — for less snappy UIs) */
+.cue-snappy-fade--smooth {
+  --cue-snappy-duration: 120ms;
+}
+
+/* Variant: with transform rise */
+.cue-snappy-fade--rise {
+  transition: opacity var(--cue-snappy-duration) var(--cue-snappy-ease),
+              transform var(--cue-snappy-duration) var(--cue-snappy-ease);
+  transform: translateY(4px);
+}
+.cue-snappy-fade--rise[data-visible="true"],
+.cue-snappy-fade--rise.is-visible {
+  transform: translateY(0);
+}
+
+/* Variant: with scale pop-in */
+.cue-snappy-fade--scale {
+  transition: opacity var(--cue-snappy-duration) var(--cue-snappy-ease),
+              transform var(--cue-snappy-duration) var(--cue-snappy-ease);
+  transform: scale(0.96);
+}
+.cue-snappy-fade--scale[data-visible="true"],
+.cue-snappy-fade--scale.is-visible {
+  transform: scale(1);
+}
+
+/* ========================================================================
+   Issue #464 — cue-develop
+   Film photograph develop reveal — 3-stop keyframe: B&W overexposed →
+   B&W normal → full color. Asymmetric phases: 30% appearance (opacity
+   fade-in + brightness decrease), 70% color development (grayscale
+   removal). ease-out = fast appearance, slow color development.
+   Variants: --fast, --slow, --sepia, --noir, --invert.
+   ======================================================================== */
+
+.cue-develop {
+  animation: cue-develop
+    var(--cue-develop-duration, 1.5s)
+    var(--cue-develop-ease, ease-out)
+    forwards;
+}
+
+@keyframes cue-develop {
+  0% {
+    filter: grayscale(var(--cue-develop-grayscale-start, 100%))
+            brightness(var(--cue-develop-brightness-start, 200%));
+    opacity: 0;
+  }
+  30% {
+    filter: grayscale(var(--cue-develop-grayscale-mid, 100%))
+            brightness(var(--cue-develop-brightness-mid, 150%));
+    opacity: 1;
+  }
+  100% {
+    filter: grayscale(0) brightness(100%);
+    opacity: 1;
+  }
+}
+
+.cue-develop--fast {
+  --cue-develop-duration: 0.8s;
+}
+
+.cue-develop--slow {
+  --cue-develop-duration: 3s;
+}
+
+.cue-develop--sepia {
+  animation: cue-develop-sepia
+    var(--cue-develop-duration, 1.5s)
+    var(--cue-develop-ease, ease-out)
+    forwards;
+}
+
+@keyframes cue-develop-sepia {
+  0%   { filter: sepia(100%) brightness(150%) contrast(50%); opacity: 0; }
+  30%  { filter: sepia(100%) brightness(120%) contrast(70%); opacity: 1; }
+  100% { filter: sepia(0) brightness(100%) contrast(100%); opacity: 1; }
+}
+
+.cue-develop--noir {
+  animation: cue-develop-noir
+    var(--cue-develop-duration, 1.5s)
+    var(--cue-develop-ease, ease-out)
+    forwards;
+}
+
+@keyframes cue-develop-noir {
+  0%   { filter: grayscale(100%) brightness(50%) contrast(200%); opacity: 0; }
+  30%  { filter: grayscale(100%) brightness(75%) contrast(150%); opacity: 1; }
+  100% { filter: grayscale(0) brightness(100%) contrast(100%); opacity: 1; }
+}
+
+.cue-develop--invert {
+  animation: cue-develop-invert
+    var(--cue-develop-duration, 1.5s)
+    var(--cue-develop-ease, ease-out)
+    forwards;
+}
+
+@keyframes cue-develop-invert {
+  0%   { filter: invert(100%) grayscale(100%); opacity: 0; }
+  30%  { filter: invert(100%) grayscale(50%); opacity: 1; }
+  100% { filter: invert(0) grayscale(0); opacity: 1; }
+}
+
+/* ========================================================================
+   Issue #469 — cue-breathe-scale
+   NOTE: issue #469 proposed the name `cue-breathe`, but PR #574 already
+   landed a class by that name (from issue #229 — multi-plane parallax
+   breathing, different mechanism: translate3d-based). To avoid
+   collision we use `cue-breathe-scale` for this 3% scale-based ambient
+   pulse. 3% amplitude = below conscious perception threshold; 3s
+   duration = ~20 breaths/minute (anticipatory breathing rhythm).
+   ======================================================================== */
+
+@keyframes cue-breathe-scale {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(var(--cue-breathe-amp, 1.03)); }
+}
+
+.cue-breathe-scale {
+  animation: cue-breathe-scale var(--cue-breathe-duration, 3s) ease-in-out infinite;
+  will-change: transform;
+  transform-origin: var(--cue-breathe-origin, center);
+}
+
+/* ========================================================================
+   Issue #470 — cue-progress-timer
+   CSS-driven auto-advance progress bar timer. width 0→100% linear
+   forwards. `linear` is critical for time indication (any other
+   easing makes progress look "fast then slow"). `forwards` holds
+   bar at 100% until JS resets. Variants: --vertical, --fast, --slow,
+   --pausable, --scale-x, --gradient.
+   ======================================================================== */
+
+.cue-progress-timer {
+  width: 0;
+  animation: cue-progress-timer
+    var(--cue-progress-timer-duration, 6s)
+    linear
+    forwards;
+}
+
+@keyframes cue-progress-timer {
+  0%   { width: 0; }
+  100% { width: 100%; }
+}
+
+.cue-progress-timer--vertical {
+  width: auto;
+  height: 0;
+  animation: cue-progress-timer-vertical
+    var(--cue-progress-timer-duration, 6s)
+    linear
+    forwards;
+}
+
+@keyframes cue-progress-timer-vertical {
+  0%   { height: 0; }
+  100% { height: 100%; }
+}
+
+.cue-progress-timer--fast {
+  --cue-progress-timer-duration: 3s;
+}
+
+.cue-progress-timer--slow {
+  --cue-progress-timer-duration: 10s;
+}
+
+.cue-progress-timer--pausable:hover {
+  animation-play-state: paused;
+}
+
+.cue-progress-timer--scale-x {
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: cue-progress-timer-scale
+    var(--cue-progress-timer-duration, 6s)
+    linear
+    forwards;
+}
+
+@keyframes cue-progress-timer-scale {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.cue-progress-timer--gradient {
+  background: linear-gradient(
+    to right,
+    var(--cue-progress-timer-color-start, #3b82f6),
+    var(--cue-progress-timer-color-end, #8b5cf6)
+  );
+}
+
+/* ========================================================================
    Issue #104 — prefers-reduced-motion (MUST be last)
    ======================================================================== */
 
@@ -3643,6 +4371,101 @@
   .cue-state-transition.is-visible {
     transition-duration: 0s !important;
     transition-delay: 0s !important;
+  }
+
+  /* Issue #420 — orbit-glow parks at static halo, no orbit */
+  .cue-orbit-glow {
+    animation: none !important;
+    offset-distance: 25% !important;
+  }
+
+  /* Issue #421 — shimmer-border parks stripe statically */
+  .cue-shimmer-border::before {
+    animation: none !important;
+    background-position: 50% 0 !important;
+    opacity: 0.5 !important;
+  }
+
+  /* Issue #422 — button-tactile collapses to single duration */
+  .cue-button-tactile,
+  .cue-button-tactile:hover,
+  .cue-button-tactile:active {
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
+
+  /* Issue #425 — header-morph instant height change */
+  .cue-header-morph {
+    transition: none !important;
+  }
+
+  /* Issue #427 — scroll-counter shows end value */
+  .cue-scroll-counter {
+    animation: none !important;
+    --cue-counter-step: var(--cue-counter-start) !important;
+  }
+
+  /* Issue #430 — hover-shadow-has instant opacity swap */
+  .cue-hover-shadow-has:has(.cue-hover-shadow-has__anchor)::after,
+  .cue-hover-shadow-has::after {
+    transition: none !important;
+  }
+
+  /* Issue #431 — spring-linear tokens snap to step-end */
+  :root {
+    --cue-spring-timing: step-end !important;
+    --cue-spring-timing-strong: step-end !important;
+    --cue-spring-timing-subtle: step-end !important;
+  }
+
+  /* Issue #432 — offset-marquee pauses; vertical scroll fallback */
+  .cue-offset-marquee__item {
+    animation: none !important;
+    position: relative !important;
+  }
+  .cue-offset-marquee {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Issue #455 — sprite shows first frame statically */
+  .cue-sprite {
+    animation: none !important;
+    background-position: 0 0 !important;
+  }
+
+  /* Issue #459 — snappy-fade instant appearance */
+  .cue-snappy-fade,
+  .cue-snappy-fade--rise,
+  .cue-snappy-fade--scale {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #464 — develop shows final image instantly */
+  .cue-develop,
+  .cue-develop--sepia,
+  .cue-develop--noir,
+  .cue-develop--invert {
+    animation: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Issue #469 — breathe-scale stops animating */
+  .cue-breathe-scale {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #470 — progress-timer instant fill */
+  .cue-progress-timer,
+  .cue-progress-timer--vertical,
+  .cue-progress-timer--scale-x {
+    animation: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: scaleX(1) !important;
   }
 
 }

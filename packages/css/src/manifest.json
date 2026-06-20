@@ -3967,5 +3967,753 @@
       "--cue-state-duration",
       "--cue-state-offset"
     ]
+  },
+  "cue-orbit-glow": {
+    "class": "cue-orbit-glow",
+    "category": "ambient",
+    "vibe": [
+      "premium",
+      "ambient",
+      "hero",
+      "spotlight",
+      "cinematic"
+    ],
+    "avoid-when": [
+      "compact UI elements (glow butuh area 200px+ untuk terlihat)",
+      "halaman dengan banyak card bersamaan (orbit glow akan compete untuk attention)",
+      "context di mana motion constant mengganggu reading (long-form articles, docs)"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-ambient",
+      "cue-group"
+    ],
+    "never-pair": [
+      "cue-marquee",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-orbit-duration, 20s) linear infinite (orbit); opacity fade var(--cue-orbit-fade, 0.5s)",
+    "css-vars": [
+      "--cue-orbit-color",
+      "--cue-orbit-duration",
+      "--cue-orbit-fade"
+    ]
+  },
+  "cue-shimmer-border": {
+    "class": "cue-shimmer-border",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "badge",
+      "cta",
+      "live",
+      "subtle-glow"
+    ],
+    "avoid-when": [
+      "text-dense contexts (shimmer distracts dari reading)",
+      "multiple badges berdekatan (visual noise — pick one to shimmer)",
+      "static info badges (Announcement, Version — should not feel 'live')"
+    ],
+    "pairs": [
+      "cue-button-tactile",
+      "cue-cinematic"
+    ],
+    "never-pair": [
+      "cue-marquee",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-shimmer-duration, 5s) linear infinite — 45deg stripe sweep around pill border",
+    "css-vars": [
+      "--cue-shimmer-color",
+      "--cue-shimmer-angle",
+      "--cue-shimmer-duration",
+      "--cue-shimmer-border-width",
+      "--cue-shimmer-radius",
+      "--cue-shimmer-bg",
+      "--cue-shimmer-inner-bg",
+      "--cue-shimmer-hover-duration"
+    ]
+  },
+  "cue-button-tactile": {
+    "class": "cue-button-tactile",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "tactile",
+      "clicky",
+      "responsive",
+      "physical"
+    ],
+    "avoid-when": [
+      "text links (links should feel light, not clicky)",
+      "icon-only ghost buttons (no visual weight to communicate press)",
+      "context dengan banyak button berdekatan (asymmetric timing akan feel chaotic — gunakan single duration)"
+    ],
+    "pairs": [
+      "cue-hover-lift",
+      "cue-hover-scale",
+      "cue-shimmer-border"
+    ],
+    "never-pair": [
+      "cue-hover-glow",
+      "cue-cinematic"
+    ],
+    "timing": "3-state asymmetric: base 300ms, hover 75ms, active 150ms (1:2:4 ratio mimics physical switch)",
+    "css-vars": [
+      "--cue-tactile-base-duration",
+      "--cue-tactile-base-ease",
+      "--cue-tactile-hover-duration",
+      "--cue-tactile-hover-ease",
+      "--cue-tactile-active-duration",
+      "--cue-tactile-active-ease",
+      "--cue-tactile-press-transform"
+    ]
+  },
+  "cue-header-morph": {
+    "class": "cue-header-morph",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "structural",
+      "section-spy",
+      "compression",
+      "deliberate"
+    ],
+    "avoid-when": [
+      "mobile (height animation pada mobile sering janky — prefer transform/opacity)",
+      "headers dengan dynamic content (height harus fixed value untuk animatable)",
+      "frequent state toggles (0.5s duration terlalu slow untuk rapid toggles)"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-button-tactile"
+    ],
+    "never-pair": [
+      "cue-hover-lift",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-header-morph-duration, 0.5s) cubic-bezier(0.4, 0.93, 0.42, 0.98) — fast-then-settle",
+    "css-vars": [
+      "--cue-header-morph-top",
+      "--cue-header-morph-collapsed",
+      "--cue-header-morph-expanded",
+      "--cue-header-morph-duration",
+      "--cue-header-morph-cb-x1",
+      "--cue-header-morph-cb-y1",
+      "--cue-header-morph-cb-x2",
+      "--cue-header-morph-cb-y2",
+      "--cue-header-morph-blur",
+      "--cue-header-morph-bg"
+    ]
+  },
+  "cue-scroll-counter": {
+    "class": "cue-scroll-counter",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "narrative",
+      "agent-activity",
+      "showcase",
+      "modern"
+    ],
+    "avoid-when": [
+      "static-landing",
+      "minimal",
+      "enterprise-data"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-enter",
+      "cue-step-enter"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-enter-bounce"
+    ],
+    "timing": "Scroll-driven via animation-timeline: exit; steps(--cue-counter-start) easing snaps integers",
+    "css-vars": [
+      "--cue-counter-start",
+      "--cue-counter-end",
+      "--cue-counter-timeline",
+      "--cue-counter-step"
+    ]
+  },
+  "cue-hover-shadow-has": {
+    "class": "cue-hover-shadow-has",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "modern",
+      "card-grid",
+      "saas"
+    ],
+    "avoid-when": [
+      "mobile-touch",
+      "flat-design"
+    ],
+    "pairs": [
+      "cue-hover-lift",
+      "cue-enter-scale",
+      "cue-squircle"
+    ],
+    "never-pair": [
+      "cue-hover-glow",
+      "cue-glow"
+    ],
+    "timing": "Asymmetric: fade-in 150ms ease-out (snappy), fade-out 200ms ease-in (patient) on ::after opacity only",
+    "css-vars": [
+      "--cue-hover-fade-in-duration",
+      "--cue-hover-fade-in-timing",
+      "--cue-hover-fade-out-duration",
+      "--cue-hover-fade-out-timing",
+      "--cue-hover-shadow"
+    ]
+  },
+  "cue-spring-linear": {
+    "class": "cue-spring-linear",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "playful",
+      "modern",
+      "crafted"
+    ],
+    "avoid-when": [
+      "enterprise-flat",
+      "minimal",
+      "corporate"
+    ],
+    "pairs": [
+      "cue-enter-scale",
+      "cue-enter-bounce",
+      "cue-hover-scale"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-fade"
+    ],
+    "timing": "var(--cue-spring-duration, 600ms) with var(--cue-spring-timing) — 16-anchor linear() curve, 6% overshoot",
+    "css-vars": [
+      "--cue-spring-timing",
+      "--cue-spring-timing-strong",
+      "--cue-spring-timing-subtle",
+      "--cue-spring-duration"
+    ]
+  },
+  "cue-offset-marquee": {
+    "class": "cue-offset-marquee",
+    "category": "marquee",
+    "vibe": [
+      "premium",
+      "showcase",
+      "logo-wall",
+      "modern"
+    ],
+    "avoid-when": [
+      "minimal",
+      "static-landing"
+    ],
+    "pairs": [
+      "cue-ambient",
+      "cue-group",
+      "cue-offset-marquee__item"
+    ],
+    "never-pair": [
+      "cue-marquee"
+    ],
+    "timing": "var(--cue-marquee-duration, 30s) linear infinite (paused unless hovered) — Motion Path variant",
+    "css-vars": [
+      "--cue-marquee-item-count",
+      "--cue-marquee-slot-width",
+      "--cue-marquee-duration"
+    ]
+  },
+  "cue-offset-marquee__item": {
+    "class": "cue-offset-marquee__item",
+    "category": "marquee",
+    "vibe": [
+      "premium",
+      "showcase",
+      "logo-wall"
+    ],
+    "avoid-when": [
+      "minimal"
+    ],
+    "pairs": [
+      "cue-offset-marquee"
+    ],
+    "never-pair": [],
+    "timing": "Same as parent cue-offset-marquee; each item follows polygon path via offset-path",
+    "css-vars": [
+      "--cue-marquee-item-count",
+      "--cue-marquee-slot-width",
+      "--cue-marquee-duration"
+    ]
+  },
+  "cue-sprite": {
+    "class": "cue-sprite",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "character",
+      "retro",
+      "game",
+      "intentional",
+      "illustrated"
+    ],
+    "avoid-when": [
+      "enterprise-flat",
+      "minimal",
+      "corporate-flat"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-sprite-duration, 0.5s) steps(var(--cue-sprite-frame-count, 11)) var(--cue-sprite-iteration, 1)",
+    "css-vars": [
+      "--cue-sprite-sheet-width",
+      "--cue-sprite-sheet-height",
+      "--cue-sprite-frame-width",
+      "--cue-sprite-frame-height",
+      "--cue-sprite-frame-count",
+      "--cue-sprite-duration",
+      "--cue-sprite-iteration",
+      "--cue-sprite-fill-mode",
+      "--cue-sprite-walk-src",
+      "--cue-sprite-jump-src",
+      "--cue-sprite-idle-src"
+    ]
+  },
+  "cue-sprite--walk": {
+    "class": "cue-sprite--walk",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "character",
+      "ambient-movement"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-sprite"
+    ],
+    "never-pair": [],
+    "timing": "0.5s per cycle, 4 iterations (2s total walk animation)",
+    "css-vars": [
+      "--cue-sprite-walk-src"
+    ]
+  },
+  "cue-sprite--jump": {
+    "class": "cue-sprite--jump",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "character",
+      "action"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-sprite"
+    ],
+    "never-pair": [],
+    "timing": "0.75s per cycle, 3 iterations (2.25s total jump animation)",
+    "css-vars": [
+      "--cue-sprite-jump-src"
+    ]
+  },
+  "cue-sprite--idle": {
+    "class": "cue-sprite--idle",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "character",
+      "ambient"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-sprite"
+    ],
+    "never-pair": [],
+    "timing": "2s per cycle, infinite iteration (ambient breathing/blink loop)",
+    "css-vars": [
+      "--cue-sprite-idle-src"
+    ]
+  },
+  "cue-snappy-fade": {
+    "class": "cue-snappy-fade",
+    "category": "transition",
+    "vibe": [
+      "snappy",
+      "responsive",
+      "premium",
+      "editor",
+      "contextual",
+      "modern",
+      "intentional"
+    ],
+    "avoid-when": [
+      "cinematic",
+      "hero",
+      "marketing",
+      "playful",
+      "long-form-text"
+    ],
+    "pairs": [
+      "cue-enter-fade"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-enter-bounce",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-snappy-duration, 80ms) var(--cue-snappy-ease, ease-in-out) — below 'smooth' threshold, reads as instant-but-smooth",
+    "css-vars": [
+      "--cue-snappy-duration",
+      "--cue-snappy-ease"
+    ]
+  },
+  "cue-snappy-fade--ultra": {
+    "class": "cue-snappy-fade--ultra",
+    "category": "transition",
+    "vibe": [
+      "ultra-snappy",
+      "editor"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-snappy-fade"
+    ],
+    "never-pair": [],
+    "timing": "50ms variant — for ultra-snappy UIs",
+    "css-vars": [
+      "--cue-snappy-duration"
+    ]
+  },
+  "cue-snappy-fade--smooth": {
+    "class": "cue-snappy-fade--smooth",
+    "category": "transition",
+    "vibe": [
+      "smooth",
+      "responsive"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-snappy-fade"
+    ],
+    "never-pair": [],
+    "timing": "120ms variant — for less snappy UIs",
+    "css-vars": [
+      "--cue-snappy-duration"
+    ]
+  },
+  "cue-snappy-fade--rise": {
+    "class": "cue-snappy-fade--rise",
+    "category": "transition",
+    "vibe": [
+      "snappy",
+      "contextual",
+      "rise"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-snappy-fade"
+    ],
+    "never-pair": [],
+    "timing": "80ms opacity + 80ms translateY(4px → 0) for subtle 'rise' effect",
+    "css-vars": [
+      "--cue-snappy-duration",
+      "--cue-snappy-ease"
+    ]
+  },
+  "cue-snappy-fade--scale": {
+    "class": "cue-snappy-fade--scale",
+    "category": "transition",
+    "vibe": [
+      "snappy",
+      "contextual",
+      "pop"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-snappy-fade"
+    ],
+    "never-pair": [],
+    "timing": "80ms opacity + 80ms scale(0.96 → 1) for subtle 'pop in' effect",
+    "css-vars": [
+      "--cue-snappy-duration",
+      "--cue-snappy-ease"
+    ]
+  },
+  "cue-develop": {
+    "class": "cue-develop",
+    "category": "entrance",
+    "vibe": [
+      "analog",
+      "premium",
+      "intentional",
+      "cinematic",
+      "editorial",
+      "photography"
+    ],
+    "avoid-when": [
+      "playful",
+      "energetic",
+      "indie-hacker",
+      "marketing-loud"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-stagger-1",
+      "cue-stagger-2",
+      "cue-stagger-3"
+    ],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-develop-duration, 1.5s) ease-out forwards, 3-stop keyframe (B&W overexposed → B&W → full color)",
+    "css-vars": [
+      "--cue-develop-duration",
+      "--cue-develop-ease",
+      "--cue-develop-grayscale-start",
+      "--cue-develop-grayscale-mid",
+      "--cue-develop-brightness-start",
+      "--cue-develop-brightness-mid"
+    ]
+  },
+  "cue-develop--fast": {
+    "class": "cue-develop--fast",
+    "category": "entrance",
+    "vibe": [
+      "analog",
+      "fast"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-develop"
+    ],
+    "never-pair": [],
+    "timing": "0.8s variant — for photo grids",
+    "css-vars": [
+      "--cue-develop-duration"
+    ]
+  },
+  "cue-develop--slow": {
+    "class": "cue-develop--slow",
+    "category": "entrance",
+    "vibe": [
+      "analog",
+      "cinematic"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-develop"
+    ],
+    "never-pair": [],
+    "timing": "3s variant — for cinematic hero image",
+    "css-vars": [
+      "--cue-develop-duration"
+    ]
+  },
+  "cue-develop--sepia": {
+    "class": "cue-develop--sepia",
+    "category": "entrance",
+    "vibe": [
+      "analog",
+      "vintage",
+      "editorial"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-develop"
+    ],
+    "never-pair": [],
+    "timing": "Same duration; sepia+contrast+brightness 3-stop keyframe",
+    "css-vars": [
+      "--cue-develop-duration",
+      "--cue-develop-ease"
+    ]
+  },
+  "cue-develop--noir": {
+    "class": "cue-develop--noir",
+    "category": "entrance",
+    "vibe": [
+      "analog",
+      "noir",
+      "newspaper",
+      "editorial"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-develop"
+    ],
+    "never-pair": [],
+    "timing": "Same duration; high-contrast B&W 3-stop keyframe",
+    "css-vars": [
+      "--cue-develop-duration",
+      "--cue-develop-ease"
+    ]
+  },
+  "cue-develop--invert": {
+    "class": "cue-develop--invert",
+    "category": "entrance",
+    "vibe": [
+      "analog",
+      "alternative"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-develop"
+    ],
+    "never-pair": [],
+    "timing": "Same duration; invert+grayscale 3-stop keyframe",
+    "css-vars": [
+      "--cue-develop-duration",
+      "--cue-develop-ease"
+    ]
+  },
+  "cue-breathe-scale": {
+    "class": "cue-breathe-scale",
+    "category": "ambient",
+    "vibe": [
+      "alive",
+      "organic",
+      "subtle",
+      "ambient",
+      "calm",
+      "premium",
+      "mascot"
+    ],
+    "avoid-when": [
+      "attention-demanding indicators (use cue-pulse or cue-glow instead — breathe is too subtle for alerts)",
+      "elements with text content (3% scale shift distorts text mid-cycle)",
+      "more than 8 breathing elements per viewport (creates subconscious unease)",
+      "elements in motion-heavy sections (compounds visual noise)"
+    ],
+    "pairs": [
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-pulse",
+      "cue-glow",
+      "cue-cinematic"
+    ],
+    "timing": "var(--cue-breathe-duration, 3s) ease-in-out infinite — 3% amplitude scale pulse (below conscious perception)",
+    "css-vars": [
+      "--cue-breathe-amp",
+      "--cue-breathe-duration",
+      "--cue-breathe-origin"
+    ]
+  },
+  "cue-progress-timer": {
+    "class": "cue-progress-timer",
+    "category": "utility",
+    "vibe": [
+      "predictable",
+      "transparent",
+      "premium",
+      "intentional",
+      "system"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-enter-fade",
+      "cue-step-enter"
+    ],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-progress-timer-duration, 6s) linear forwards — linear is critical for time indication",
+    "css-vars": [
+      "--cue-progress-timer-duration",
+      "--cue-progress-timer-color-start",
+      "--cue-progress-timer-color-end"
+    ]
+  },
+  "cue-progress-timer--vertical": {
+    "class": "cue-progress-timer--vertical",
+    "category": "utility",
+    "vibe": [
+      "predictable",
+      "vertical"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-progress-timer"
+    ],
+    "never-pair": [],
+    "timing": "Same duration; animates height instead of width",
+    "css-vars": [
+      "--cue-progress-timer-duration"
+    ]
+  },
+  "cue-progress-timer--fast": {
+    "class": "cue-progress-timer--fast",
+    "category": "utility",
+    "vibe": [
+      "fast",
+      "auto-advance"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-progress-timer"
+    ],
+    "never-pair": [],
+    "timing": "3s duration — for quick auto-advance (e.g., testimonials)",
+    "css-vars": [
+      "--cue-progress-timer-duration"
+    ]
+  },
+  "cue-progress-timer--slow": {
+    "class": "cue-progress-timer--slow",
+    "category": "utility",
+    "vibe": [
+      "slow",
+      "long-form"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-progress-timer"
+    ],
+    "never-pair": [],
+    "timing": "10s duration — for long-form content (e.g., hero slides)",
+    "css-vars": [
+      "--cue-progress-timer-duration"
+    ]
+  },
+  "cue-progress-timer--scale-x": {
+    "class": "cue-progress-timer--scale-x",
+    "category": "utility",
+    "vibe": [
+      "compositor-friendly",
+      "performance"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-progress-timer"
+    ],
+    "never-pair": [],
+    "timing": "Same duration; uses transform: scaleX(0 → 1) instead of width (compositor-only, no layout)",
+    "css-vars": [
+      "--cue-progress-timer-duration"
+    ]
+  },
+  "cue-progress-timer--gradient": {
+    "class": "cue-progress-timer--gradient",
+    "category": "utility",
+    "vibe": [
+      "colorful",
+      "premium"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-progress-timer"
+    ],
+    "never-pair": [],
+    "timing": "n/a (background variant — applies 2-stop linear gradient to bar)",
+    "css-vars": [
+      "--cue-progress-timer-color-start",
+      "--cue-progress-timer-color-end"
+    ]
   }
 }
