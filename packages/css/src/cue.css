@@ -3979,8 +3979,500 @@
 }
 
 /* ========================================================================
-   Issue #104 — prefers-reduced-motion (MUST be last)
+   Issue #275 — cue-thinking-dots
+   Thinking dots with exponential stagger (0.1s/0.2s/0.4s) + asymmetric
+   plop opacity curve (peak at 20% of cycle). Feels like "thoughts
+   arriving in succession" — later dots take longer. 1s ease-in-out
+   infinite. Variants: --linear, --extended, --fast, --slow.
    ======================================================================== */
+
+@keyframes cue-thinking-plop {
+  0%, 100% { opacity: var(--cue-thinking-min, 0.2); }
+  20%      { opacity: var(--cue-thinking-max, 1); }
+}
+
+.cue-thinking-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cue-thinking-gap, 4px);
+}
+
+.cue-thinking-dots > * {
+  width: var(--cue-thinking-size, 4px);
+  height: var(--cue-thinking-size, 4px);
+  border-radius: 50%;
+  background-color: var(--cue-thinking-color, currentColor);
+  opacity: 0.2;
+  animation: cue-thinking-plop
+    var(--cue-thinking-duration, 1s)
+    ease-in-out
+    var(--cue-thinking-delay, 0s)
+    infinite;
+}
+
+.cue-thinking-dots > *:nth-child(1) { --cue-thinking-delay: 0.1s; }
+.cue-thinking-dots > *:nth-child(2) { --cue-thinking-delay: 0.2s; }
+.cue-thinking-dots > *:nth-child(3) { --cue-thinking-delay: 0.4s; }
+
+.cue-thinking-dots--linear > *:nth-child(3) { --cue-thinking-delay: 0.3s; }
+
+.cue-thinking-dots--extended > *:nth-child(4) { --cue-thinking-delay: 0.6s; }
+.cue-thinking-dots--extended > *:nth-child(5) { --cue-thinking-delay: 0.8s; }
+
+.cue-thinking-dots--fast { --cue-thinking-duration: 0.6s; }
+.cue-thinking-dots--slow { --cue-thinking-duration: 1.8s; }
+
+/* ========================================================================
+   Issue #280 — cue-shimmer-text
+   Shimmer text with color-mix() — dynamic intensity highlight sweep.
+   5-stop gradient (base 0-30%, highlight 55%, base 70-100%) = wide
+   "band of light" not thin laser line. color-mix(in srgb, base 70%,
+   transparent) = theme-adaptive highlight. @supports fallback. 2.5s
+   linear infinite.
+   ======================================================================== */
+
+@keyframes cue-shimmer-text-sweep {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.cue-shimmer-text {
+  --cue-shimmer-base: var(--cue-shimmer-color, currentColor);
+  --cue-shimmer-highlight: color-mix(
+    in srgb,
+    var(--cue-shimmer-base) var(--cue-shimmer-intensity, 70%),
+    transparent
+  );
+  background-image: linear-gradient(
+    90deg,
+    var(--cue-shimmer-base) 0%,
+    var(--cue-shimmer-base) 30%,
+    var(--cue-shimmer-highlight) 55%,
+    var(--cue-shimmer-base) 70%,
+    var(--cue-shimmer-base) 100%
+  );
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: cue-shimmer-text-sweep
+             var(--cue-shimmer-duration, 2.5s)
+             linear
+             infinite;
+  will-change: background-position;
+}
+
+@supports not (color: color-mix(in lab, red, red)) {
+  .cue-shimmer-text {
+    --cue-shimmer-highlight: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* ========================================================================
+   Issue #285 — cue-submit-pulse
+   Newsletter submit pulse — aggressive opacity 1→0.3 dim, linear.
+   70% reduction (vs cue-pulse 50%). Linear timing = mechanical pulsing
+   (metronome). For "submit in progress" urgency. 2s linear infinite.
+   ======================================================================== */
+
+@keyframes cue-submit-pulse-run {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: var(--cue-submit-pulse-dim, 0.3); }
+}
+
+.cue-submit-pulse {
+  animation: cue-submit-pulse-run
+             var(--cue-submit-pulse-duration, 2s)
+             linear
+             infinite;
+  will-change: opacity;
+}
+
+/* ========================================================================
+   Issue #309 — cue-mention-pill
+   Mention pill — 6-color lab() gradient with 8s background-position
+   round-trip shift. lab() = perceptually-uniform color space. Alpha
+   .12 (light) / .24 (dark) for subtle tinting. background-size: 300%
+   = 3× wider, only 33% visible. Round-trip 0%→100%→0% = "breathing".
+   @supports lab() fallback to hex. @media dark doubles alpha.
+   ======================================================================== */
+
+@keyframes cue-mention-pill-shift {
+  0%, 100% { background-position: 0%; }
+  50%      { background-position: 100%; }
+}
+
+.cue-mention-pill {
+  background: linear-gradient(
+    var(--cue-mention-pill-angle, 274deg),
+    var(--cue-mention-pill-c1, #4e92ff1f) 0%,
+    var(--cue-mention-pill-c2, #486eff1f) 20%,
+    var(--cue-mention-pill-c3, #fb005b1f) 40%,
+    var(--cue-mention-pill-c4, #e100031f) 60%,
+    var(--cue-mention-pill-c5, #ff6c001f) 80%,
+    var(--cue-mention-pill-c6, #ffa0001f) 100%
+  ) 0 0 / 300% 100%;
+  animation: cue-mention-pill-shift
+             var(--cue-mention-pill-duration, 8s)
+             ease-in-out
+             infinite;
+  will-change: background-position;
+}
+
+@supports (background: lab(50% 0 0)) {
+  .cue-mention-pill {
+    background: linear-gradient(
+      var(--cue-mention-pill-angle, 274deg),
+      lab(59.274% 16.5406 -83.7487 / .12) 0%,
+      lab(49.3207% 41.8497 -99.1297 / .12) 20%,
+      lab(52.4564% 96.8122 29.1342 / .12) 40%,
+      lab(46.0504% 89.0713 85.5676 / .12) 60%,
+      lab(64.6101% 65.0243 131.751 / .12) 80%,
+      lab(74.8956% 40.8808 152.671 / .12) 100%
+    ) 0 0 / 300% 100%;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .cue-mention-pill {
+    --cue-mention-pill-c1: #4e92ff3d;
+    --cue-mention-pill-c2: #486eff3d;
+    --cue-mention-pill-c3: #fb005b3d;
+    --cue-mention-pill-c4: #e100033d;
+    --cue-mention-pill-c5: #ff6c003d;
+    --cue-mention-pill-c6: #ffa0003d;
+  }
+}
+
+/* ========================================================================
+   Issue #313 — cue-frost / cue-frost-intense / cue-frost-low / dark variants
+   Frost glass system — fixed 45px blur + 4 opacity variants (intense/low
+   × white/grey). Fixed blur = consistent depth-of-field. Variable opacity
+   = different privacy levels. 45px = deep photographic bokeh (f/1.4).
+   Auto dark mode via @media prefers-color-scheme.
+   ======================================================================== */
+
+.cue-frost {
+  -webkit-backdrop-filter: blur(var(--cue-frost-blur, 45px));
+  backdrop-filter: blur(var(--cue-frost-blur, 45px));
+}
+
+.cue-frost-intense {
+  background-color: var(--cue-frost-intense-bg, rgba(255, 255, 255, 0.8));
+}
+
+.cue-frost-low {
+  background-color: var(--cue-frost-low-bg, rgba(255, 255, 255, 0.05));
+}
+
+.cue-frost-dark-intense {
+  background-color: var(--cue-frost-dark-intense-bg, rgba(30, 30, 30, 0.6));
+}
+
+.cue-frost-dark-low {
+  background-color: var(--cue-frost-dark-low-bg, rgba(30, 30, 30, 0.05));
+}
+
+@media (prefers-color-scheme: dark) {
+  .cue-frost-intense {
+    background-color: var(--cue-frost-dark-intense-bg, rgba(30, 30, 30, 0.6));
+  }
+  .cue-frost-low {
+    background-color: var(--cue-frost-dark-low-bg, rgba(30, 30, 30, 0.05));
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cue-frost {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* ========================================================================
+   Issue #314 — cue-card-fan
+   Product image fan-out — rotated+translated card stack with diagonal
+   offset. 3 children: rotate(-15deg/0/+15deg) + translateY(∓15%) +
+   translateX(±15%). X = inverse of Y = diagonal fan. 82% size leaves
+   gaps at edges. 200ms ease transition. Math pattern: n∈[-1,0,1].
+   ======================================================================== */
+
+.cue-card-fan {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--cue-fan-ratio, 1 / 1);
+}
+
+.cue-card-fan > * {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--cue-fan-size, 82%);
+  border-radius: var(--cue-fan-radius, 0.5rem);
+  object-fit: cover;
+  transition: transform var(--cue-fan-duration, 200ms) var(--cue-fan-ease, ease);
+  transform-origin: center center;
+}
+
+.cue-card-fan > *:nth-child(1) {
+  transform: rotate(var(--cue-fan-angle, -15deg)) translate(-50%, -50%)
+             translateY(var(--cue-fan-spread, -15%)) translateX(calc(var(--cue-fan-spread, -15%) * -1));
+}
+.cue-card-fan > *:nth-child(2) {
+  transform: rotate(0deg) translate(-50%, -50%);
+}
+.cue-card-fan > *:nth-child(3) {
+  transform: rotate(calc(var(--cue-fan-angle, -15deg) * -1)) translate(-50%, -50%)
+             translateY(calc(var(--cue-fan-spread, -15%) * -1)) translateX(var(--cue-fan-spread, -15%));
+}
+
+/* ========================================================================
+   Issue #329 — cue-parallax / cue-parallax-bg / cue-parallax-content
+   Subtle parallax depth — will-change + 400ms ease transition on scroll
+   offset. Content floats above background. 400ms ease = "drifts behind
+   and catches up" (not jumpy). will-change:transform on content only.
+   CSS self-contained — JS companion sets transform on scroll (optional).
+   ======================================================================== */
+
+.cue-parallax {
+  position: relative;
+  overflow: hidden;
+}
+
+.cue-parallax-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.cue-parallax-content {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+  transition: transform var(--cue-parallax-duration, 400ms) var(--cue-parallax-ease, ease);
+}
+
+/* ========================================================================
+   Issue #364 — cue-video-mockup (designed from title — body was empty)
+   Video masked into phone mockup via mask-[url(...)] + OKLab gradient
+   overlay. mask-image clips video to phone shape. OKLab gradient overlay
+   adds premium color tint. Consumer provides mask SVG URL via CSS var.
+   ======================================================================== */
+
+.cue-video-mockup {
+  position: relative;
+  -webkit-mask-image: var(--cue-video-mockup-mask, none);
+  mask-image: var(--cue-video-mockup-mask, none);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.cue-video-mockup::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    var(--cue-video-mockup-angle, 135deg),
+    lab(50% -20 40 / 0.15),
+    lab(70% 30 -30 / 0.1)
+  );
+  mix-blend-mode: var(--cue-video-mockup-blend, overlay);
+  pointer-events: none;
+}
+
+@supports not (background: lab(50% 0 0)) {
+  .cue-video-mockup::after {
+    background: linear-gradient(
+      var(--cue-video-mockup-angle, 135deg),
+      rgba(255, 100, 50, 0.15),
+      rgba(100, 50, 255, 0.1)
+    );
+  }
+}
+
+/* ========================================================================
+   Issue #365 — cue-sticker (designed from title — body was empty)
+   Sticker badge — hard offset shadow `0 2px 0 0 #111` + counter-rotation.
+   Hard offset shadow = "sticker peeled from sheet" feel (no blur, solid
+   edge). Counter-rotation = slight tilt opposite to shadow direction
+   for playful physical feel. Variants: --tilt-left, --tilt-right.
+   ======================================================================== */
+
+.cue-sticker {
+  --cue-sticker-shadow-color: #111;
+  --cue-sticker-shadow-offset: 2px;
+  --cue-sticker-tilt: -3deg;
+  display: inline-block;
+  box-shadow: 0 var(--cue-sticker-shadow-offset) 0 0 var(--cue-sticker-shadow-color);
+  transform: rotate(var(--cue-sticker-tilt));
+  transition: transform var(--cue-sticker-duration, 150ms) ease;
+}
+
+.cue-sticker:hover {
+  transform: rotate(calc(var(--cue-sticker-tilt) * -1)) translateY(calc(var(--cue-sticker-shadow-offset) * -1));
+}
+
+.cue-sticker--tilt-left { --cue-sticker-tilt: 3deg; }
+.cue-sticker--tilt-right { --cue-sticker-tilt: -3deg; }
+
+/* ========================================================================
+   Issue #381 — cue-confetti-trig / cue-confetti-trig-glow
+   CSS trigonometry confetti burst — cos/sin radial particle positioning.
+   Per-particle --cue-confetti-angle + --cue-confetti-distance. translate
+   (cos(angle)*distance, sin(angle)*distance) = true radial explosion.
+   cubic-bezier(0.4,-0.02,0.07,1.02) overshoot. Glow: radial-gradient +
+   relative color rgb(from var()) + light-dark() + mix-blend-mode:screen.
+   ======================================================================== */
+
+.cue-confetti-trig {
+  position: absolute;
+  inset: 0;
+  width: var(--cue-confetti-size, 8px);
+  height: var(--cue-confetti-size, 8px);
+  margin: auto;
+  background: var(--cue-confetti-color, currentColor);
+  border-radius: var(--cue-confetti-radius, 9999px);
+  opacity: 0;
+  transform:
+    translate(
+      calc(cos(var(--cue-confetti-angle, 0deg)) * var(--cue-confetti-distance, 100px)),
+      calc(sin(var(--cue-confetti-angle, 0deg)) * var(--cue-confetti-distance, 100px))
+    )
+    scale(var(--cue-confetti-scale, 0.5));
+  animation: cue-confetti-trig-burst
+             var(--cue-confetti-lifetime, 1s)
+             var(--cue-confetti-ease, cubic-bezier(0.4, -0.02, 0.07, 1.02))
+             forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes cue-confetti-trig-burst {
+  0% {
+    transform: translate(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.cue-confetti-trig-glow {
+  --cue-confetti-glow-color: #f5eca8;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--cue-confetti-glow-size, 100px);
+  height: var(--cue-confetti-glow-size, 100px);
+  background: radial-gradient(
+    circle,
+    rgba(245, 236, 168, 0.6) 0,
+    rgba(245, 236, 168, 0.3) 20%,
+    rgba(245, 236, 168, 0.1) 40%,
+    rgba(245, 236, 168, 0.05) 60%,
+    transparent 100%
+  );
+  border-radius: 9999px;
+  filter: blur(20px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: scale(0);
+  animation: cue-confetti-trig-glow-run
+             var(--cue-confetti-glow-duration, 2s)
+             ease-in
+             forwards;
+  pointer-events: none;
+}
+
+@keyframes cue-confetti-trig-glow-run {
+  0%   { transform: scale(0); opacity: 1; }
+  20%  { transform: scale(0.3); opacity: 0.8; }
+  50%  { transform: scale(0.8); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ========================================================================
+   Issue #382 — cue-button-conic-rotate
+   Conic gradient angle rotation — @property <angle> + 10s linear infinite
+   on hover. ::before is conic-gradient(from var(--cue-conic-angle), c1,
+   c2, c1). @property enables smooth angle interpolation. animation-play-
+   state: paused default, running on :hover/:focus-visible. 3-stop
+   conic (c1→c2→c1) = seamless loop. 1turn unit.
+   ======================================================================== */
+
+@property --cue-conic-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes cue-button-conic-rotate-run {
+  to { --cue-conic-angle: 1turn; }
+}
+
+.cue-button-conic-rotate {
+  position: relative;
+  isolation: isolate;
+}
+
+.cue-button-conic-rotate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--cue-conic-angle),
+    var(--cue-conic-color-1, #1b1938),
+    var(--cue-conic-color-2, #4f46e5),
+    var(--cue-conic-color-1, #1b1938)
+  );
+  animation: cue-button-conic-rotate-run
+             var(--cue-conic-duration, 10s)
+             linear
+             infinite;
+  animation-play-state: paused;
+  will-change: --cue-conic-angle;
+}
+
+.cue-button-conic-rotate:hover::before,
+.cue-button-conic-rotate:focus-visible::before {
+  animation-play-state: running;
+}
+
+/* ========================================================================
+   Issue #384 — cue-tooltip-fade / cue-tooltip-fade-out
+   Tooltip fade-in — 200ms ease, no transform. 200ms = "instant feel"
+   (vs 300ms "noticeable animation"). ease = sharp start, smooth end
+   (asymmetric). opacity-only = no spatial movement (tooltips should
+   be lightweight). --fade-out variant reverses keyframe for dismiss.
+   ======================================================================== */
+
+@keyframes cue-tooltip-fade-run {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.cue-tooltip-fade {
+  opacity: 0;
+  animation: cue-tooltip-fade-run
+             var(--cue-tooltip-duration, 0.2s)
+             ease
+             forwards;
+  will-change: opacity;
+}
+
+.cue-tooltip-fade-out {
+  opacity: 1;
+  animation: cue-tooltip-fade-run
+             var(--cue-tooltip-duration, 0.2s)
+             ease
+             reverse
+             forwards;
+  will-change: opacity;
+}
 
 /* ========================================================================
    Issue #474 — cue-scattered-float
@@ -5583,4 +6075,74 @@
   .cue-stroke-morph {
     animation: none !important;
   }
+
+  /* Issue #275 — thinking-dots static at mid-opacity */
+  .cue-thinking-dots > * {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Issue #280 — shimmer-text parks gradient at center */
+  .cue-shimmer-text {
+    animation: none !important;
+    background-position: 0% 0 !important;
+  }
+
+  /* Issue #285 — submit-pulse static at full opacity */
+  .cue-submit-pulse {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Issue #309 — mention-pill parks gradient */
+  .cue-mention-pill {
+    animation: none !important;
+    background-position: 50% !important;
+  }
+
+  /* Issue #313 — frost: no blur (GPU-expensive), solid bg fallback */
+  .cue-frost {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Issue #314 — card-fan: no transition (static fan) */
+  .cue-card-fan > * {
+    transition: none !important;
+  }
+
+  /* Issue #329 — parallax: no transition (content stays put) */
+  .cue-parallax-content {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* Issue #364 — video-mockup: keep mask, no animation (static) */
+
+  /* Issue #365 — sticker: no hover transform, static tilt */
+  .cue-sticker,
+  .cue-sticker:hover {
+    transition: none !important;
+  }
+
+  /* Issue #381 — confetti hidden (one-shot, no reduced-motion variant) */
+  .cue-confetti-trig,
+  .cue-confetti-trig-glow {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Issue #382 — button-conic-rotate: static at mid-angle */
+  .cue-button-conic-rotate::before {
+    animation: none !important;
+    --cue-conic-angle: 45deg !important;
+  }
+
+  /* Issue #384 — tooltip-fade instant show */
+  .cue-tooltip-fade,
+  .cue-tooltip-fade-out {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
 }
