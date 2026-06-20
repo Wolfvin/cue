@@ -4715,5 +4715,556 @@
       "--cue-progress-timer-color-start",
       "--cue-progress-timer-color-end"
     ]
+  },
+  "cue-scattered-float": {
+    "class": "cue-scattered-float",
+    "category": "ambient",
+    "vibe": [
+      "ambient",
+      "particle",
+      "organic",
+      "alive",
+      "subtle",
+      "decorative",
+      "premium"
+    ],
+    "avoid-when": [
+      "interactive elements (drift makes click target unpredictable)",
+      "text content (drift on text feels jittery)",
+      "more than 12 floating elements per viewport (creates visual noise)",
+      "elements needing precise positioning (drift breaks alignment expectations)"
+    ],
+    "pairs": [
+      "cue-pulse",
+      "cue-glow"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-marquee"
+    ],
+    "timing": "var(--cue-float-duration, 8s) ease-in-out infinite — 4-stop non-symmetric position drift",
+    "css-vars": [
+      "--cue-float-duration",
+      "--cue-float-base-x",
+      "--cue-float-base-y",
+      "--cue-float-dx1",
+      "--cue-float-dy1",
+      "--cue-float-dx2",
+      "--cue-float-dy2",
+      "--cue-float-dx3",
+      "--cue-float-dy3"
+    ]
+  },
+  "cue-perspective-tilt-in": {
+    "class": "cue-perspective-tilt-in",
+    "category": "entrance",
+    "vibe": [
+      "premium",
+      "3d",
+      "dialog",
+      "modal",
+      "perspective",
+      "depth"
+    ],
+    "avoid-when": [
+      "flat 2D design systems (3D tilt will feel inconsistent)",
+      "frequently-toggled elements (0.2s × many toggles = annoying)",
+      "small UI elements (tilt effect imperceptible below 100px)"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-button-tactile",
+      "cue-perspective-stage"
+    ],
+    "never-pair": [
+      "cue-enter-scale",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-tilt-duration, 0.2s) var(--cue-tilt-ease, ease-out) both — 3D rotateX(-10deg) → 0 + scale(.9) → 1",
+    "css-vars": [
+      "--cue-tilt-angle",
+      "--cue-tilt-in-scale",
+      "--cue-tilt-duration",
+      "--cue-tilt-ease",
+      "--cue-tilt-origin",
+      "--cue-tilt-perspective",
+      "--cue-tilt-perspective-origin"
+    ]
+  },
+  "cue-perspective-tilt-out": {
+    "class": "cue-perspective-tilt-out",
+    "category": "entrance",
+    "vibe": [
+      "premium",
+      "3d",
+      "dialog",
+      "modal",
+      "perspective"
+    ],
+    "avoid-when": [
+      "flat 2D design systems",
+      "frequently-toggled elements"
+    ],
+    "pairs": [
+      "cue-perspective-tilt-in",
+      "cue-perspective-stage"
+    ],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-tilt-duration, 0.2s) var(--cue-tilt-ease, ease-out) both — rotateX(0) → -10deg + scale(1) → .95 (asymmetric)",
+    "css-vars": [
+      "--cue-tilt-angle",
+      "--cue-tilt-out-scale",
+      "--cue-tilt-duration",
+      "--cue-tilt-ease",
+      "--cue-tilt-origin"
+    ]
+  },
+  "cue-perspective-stage": {
+    "class": "cue-perspective-stage",
+    "category": "layout",
+    "vibe": [
+      "3d",
+      "premium",
+      "modal",
+      "perspective"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-perspective-tilt-in",
+      "cue-perspective-tilt-out"
+    ],
+    "never-pair": [],
+    "timing": "n/a (parent wrapper — sets perspective + perspective-origin for 3D children)",
+    "css-vars": [
+      "--cue-tilt-perspective",
+      "--cue-tilt-perspective-origin"
+    ]
+  },
+  "cue-content-swap": {
+    "class": "cue-content-swap",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "idle-attention",
+      "modern",
+      "consumer"
+    ],
+    "avoid-when": [
+      "enterprise",
+      "minimal",
+      "static-landing"
+    ],
+    "pairs": [
+      "cue-hover-lift",
+      "cue-enter-fade"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-swap-duration, 2s) linear infinite — 4-slot content: animation via pseudo-element",
+    "css-vars": [
+      "--cue-swap-slot-1",
+      "--cue-swap-slot-2",
+      "--cue-swap-slot-3",
+      "--cue-swap-slot-4",
+      "--cue-swap-duration"
+    ]
+  },
+  "cue-content-swap--arrows": {
+    "class": "cue-content-swap--arrows",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "directional"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-content-swap"
+    ],
+    "never-pair": [],
+    "timing": "Inherits parent; slot-2='→', slot-4='↗'",
+    "css-vars": [
+      "--cue-swap-slot-2",
+      "--cue-swap-slot-4"
+    ]
+  },
+  "cue-content-swap--shapes": {
+    "class": "cue-content-swap--shapes",
+    "category": "ambient",
+    "vibe": [
+      "playful",
+      "geometric"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-content-swap"
+    ],
+    "never-pair": [],
+    "timing": "Inherits parent; slot-2='●', slot-4='▲'",
+    "css-vars": [
+      "--cue-swap-slot-2",
+      "--cue-swap-slot-4"
+    ]
+  },
+  "cue-content-swap--status": {
+    "class": "cue-content-swap--status",
+    "category": "ambient",
+    "vibe": [
+      "status",
+      "indicator"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-content-swap"
+    ],
+    "never-pair": [],
+    "timing": "Inherits parent; slot-2='⏳', slot-4='✓' (working → done cycle)",
+    "css-vars": [
+      "--cue-swap-slot-2",
+      "--cue-swap-slot-4"
+    ]
+  },
+  "cue-hover-asymmetric": {
+    "class": "cue-hover-asymmetric",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "agency",
+      "crafted",
+      "modern"
+    ],
+    "avoid-when": [
+      "enterprise-flat",
+      "minimal"
+    ],
+    "pairs": [
+      "cue-hover-lift",
+      "cue-hover-scale",
+      "cue-hover-glow"
+    ],
+    "never-pair": [],
+    "timing": "Modifier: enter 0.45s easeOutExpo (slow, inviting); leave 0.2s easeOutExpo (quick, dismissive) — 2.25× ratio",
+    "css-vars": [
+      "--cue-hover-enter-duration",
+      "--cue-hover-leave-duration",
+      "--cue-hover-easing"
+    ]
+  },
+  "cue-pulse-beam": {
+    "class": "cue-pulse-beam",
+    "category": "ambient",
+    "vibe": [
+      "cinematic",
+      "futuristic",
+      "ambient",
+      "technical"
+    ],
+    "avoid-when": [
+      "content-heavy pages",
+      "small UI elements",
+      "playful/casual designs"
+    ],
+    "pairs": [
+      "cue-ambient",
+      "cue-group"
+    ],
+    "never-pair": [
+      "cue-marquee",
+      "cue-spinner"
+    ],
+    "timing": "var(--cue-beam-duration, 8s) var(--cue-beam-ease, ease-out) infinite — translateY(0% → 200%) upward beam",
+    "css-vars": [
+      "--cue-beam-color",
+      "--cue-beam-duration",
+      "--cue-beam-ease",
+      "--cue-beam-delay"
+    ]
+  },
+  "cue-pulse-beam--double": {
+    "class": "cue-pulse-beam--double",
+    "category": "ambient",
+    "vibe": [
+      "cinematic",
+      "futuristic",
+      "continuous-stream"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-pulse-beam"
+    ],
+    "never-pair": [],
+    "timing": "Adds second ::after pulse with delay offset = duration/3 for continuous stream",
+    "css-vars": [
+      "--cue-beam-duration",
+      "--cue-beam-delay"
+    ]
+  },
+  "cue-content-ellipsis": {
+    "class": "cue-content-ellipsis",
+    "category": "ambient",
+    "vibe": [
+      "loading",
+      "typing",
+      "AI-agent",
+      "minimal",
+      "patient",
+      "modern"
+    ],
+    "avoid-when": [
+      "important content the user must read fully (dots may distract)",
+      "elements where width: 3ch causes unwanted whitespace when not loading",
+      "very fast cycles <1.5s (dots become a blur — use cue-spinner instead)"
+    ],
+    "pairs": [
+      "cue-typewriter"
+    ],
+    "never-pair": [
+      "cue-spinner",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-ellipsis-duration, 3s) var(--cue-ellipsis-delay, 1s) infinite forwards — . → .. → ... cycle",
+    "css-vars": [
+      "--cue-ellipsis-duration",
+      "--cue-ellipsis-delay",
+      "--cue-ellipsis-width"
+    ]
+  },
+  "cue-typewriter": {
+    "class": "cue-typewriter",
+    "category": "entrance",
+    "vibe": [
+      "terminal",
+      "CLI",
+      "typing",
+      "AI-agent",
+      "code",
+      "premium"
+    ],
+    "avoid-when": [
+      "long text >30 chars (width: Nch may overflow container — use JS-driven typing instead)",
+      "proportional fonts with wide character variance",
+      "elements needing smooth reveal (use clip-path inset() instead — width is stepped)",
+      "interactive elements (typing animation blocks click target until complete)"
+    ],
+    "pairs": [
+      "cue-content-ellipsis"
+    ],
+    "never-pair": [
+      "cue-enter-fade",
+      "cue-cinematic"
+    ],
+    "timing": "var(--cue-typewriter-duration, 500ms) steps(var(--cue-typewriter-chars, 4)) var(--cue-typewriter-delay, 0ms) forwards — ch-unit width",
+    "css-vars": [
+      "--cue-typewriter-target",
+      "--cue-typewriter-duration",
+      "--cue-typewriter-chars",
+      "--cue-typewriter-delay",
+      "--cue-typewriter-easing"
+    ]
+  },
+  "cue-stream-color-handoff": {
+    "class": "cue-stream-color-handoff",
+    "category": "entrance",
+    "vibe": [
+      "AI-agent",
+      "streaming",
+      "chat",
+      "real-time",
+      "premium",
+      "modern"
+    ],
+    "avoid-when": [
+      "static content (no streaming semantic — use cue-enter-fade instead)",
+      "important content yang user must read immediately (white flash may distract)",
+      "non-text elements (color property only affects text and SVG fill)",
+      "dark themes with low-contrast currentColor (white-to-dark transition may be too dramatic)"
+    ],
+    "pairs": [
+      "cue-typewriter",
+      "cue-content-ellipsis"
+    ],
+    "never-pair": [
+      "cue-enter-fade",
+      "cue-cinematic"
+    ],
+    "timing": "var(--cue-stream-duration, 500ms) linear forwards — Phase 1 (0-25%): white flash + opacity 0→1; Phase 2 (25-100%): color white→currentColor",
+    "css-vars": [
+      "--cue-stream-flash",
+      "--cue-stream-duration",
+      "--cue-stream-delay",
+      "--cue-stream-easing"
+    ]
+  },
+  "cue-button-enable": {
+    "class": "cue-button-enable",
+    "category": "transition",
+    "vibe": [
+      "cta",
+      "state-transition",
+      "celebration",
+      "premium",
+      "feedback",
+      "energetic"
+    ],
+    "avoid-when": [
+      "hover",
+      "loading",
+      "static-button",
+      "frequent-toggle"
+    ],
+    "pairs": [
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-cinematic",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-button-enable-duration, 0.35s) ease-out 1 — 3 parallel: scale 0.97→1.04→1, brightness 1.05→1, bg-position sweep 120%→-120%",
+    "css-vars": [
+      "--cue-button-enable-scale-from",
+      "--cue-button-enable-scale-peak",
+      "--cue-button-enable-brightness-from",
+      "--cue-button-enable-brightness-peak",
+      "--cue-button-enable-sweep-color",
+      "--cue-button-enable-sweep-edge",
+      "--cue-button-enable-sweep-size",
+      "--cue-button-enable-sweep-start",
+      "--cue-button-enable-sweep-mid",
+      "--cue-button-enable-sweep-end",
+      "--cue-button-enable-angle",
+      "--cue-button-enable-duration"
+    ]
+  },
+  "cue-text-roll": {
+    "class": "cue-text-roll",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "intentional",
+      "crafted",
+      "expensive",
+      "editorial"
+    ],
+    "avoid-when": [
+      "mobile-only interfaces (hover doesn't exist)",
+      "high-frequency interaction buttons (save, submit) where 800ms feels sluggish",
+      "buttons with dynamic text that changes (data-text must stay in sync)",
+      "single-line status indicators that don't benefit from motion"
+    ],
+    "pairs": [
+      "cue-button-tactile"
+    ],
+    "never-pair": [
+      "cue-hover-scale",
+      "cue-hover-lift",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-text-roll-duration, 0.8s) cubic-bezier(0.16, 1, 0.3, 1) easeOutExpo — 110% offset clears descenders",
+    "css-vars": [
+      "--cue-text-roll-duration",
+      "--cue-text-roll-easing",
+      "--cue-text-roll-offset",
+      "--cue-text-roll-alt-color"
+    ]
+  },
+  "cue-cursor-exclusion": {
+    "class": "cue-cursor-exclusion",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "interactive",
+      "playful",
+      "crafted",
+      "agentic"
+    ],
+    "avoid-when": [
+      "content-heavy reading sites where cursor obscures text",
+      "forms with text inputs (cursor interferes with caret visibility)",
+      "accessibility-first interfaces (custom cursors hurt some users)",
+      "mobile/touch-only contexts (auto-disabled via @media hover: none)"
+    ],
+    "pairs": [
+      "cue-text-roll",
+      "cue-hamburger-choreography"
+    ],
+    "never-pair": [],
+    "timing": "transform: var(--cue-cursor-transform-duration, 0.3s); opacity: var(--cue-cursor-opacity-duration, 0.1s); color/blend: 999999s delay freeze (instant snap)",
+    "css-vars": [
+      "--cue-cursor-size",
+      "--cue-cursor-scale",
+      "--cue-cursor-color",
+      "--cue-cursor-z",
+      "--cue-cursor-transform-duration",
+      "--cue-cursor-opacity-duration",
+      "--cue-cursor-color-duration"
+    ]
+  },
+  "cue-hamburger-choreography": {
+    "class": "cue-hamburger-choreography",
+    "category": "transition",
+    "vibe": [
+      "crafted",
+      "choreographed",
+      "playful",
+      "intentional",
+      "premium"
+    ],
+    "avoid-when": [
+      "simple mobile menus where 750ms feels slow (use simple rotate instead)",
+      "hamburger buttons with 3+ bars (keyframes assume 2 bars)",
+      "navigation that opens via slide-in panel (choreography competes with panel)"
+    ],
+    "pairs": [
+      "cue-cursor-exclusion"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-hamburger-duration, 0.75s) forwards — 3-phase clip-path wipe + asymmetric top(30%)/bottom(50%) timing",
+    "css-vars": [
+      "--cue-hamburger-width",
+      "--cue-hamburger-height",
+      "--cue-hamburger-bar-thickness",
+      "--cue-hamburger-bar-gap",
+      "--cue-hamburger-duration",
+      "--cue-hamburger-hitbox"
+    ]
+  },
+  "cue-stroke-morph": {
+    "class": "cue-stroke-morph",
+    "category": "ambient",
+    "vibe": [
+      "ambient",
+      "alive",
+      "premium",
+      "crafted",
+      "subtle"
+    ],
+    "avoid-when": [
+      "data viz charts where stroke variation implies data (would be confusing)",
+      "text/letterforms (animation harms readability)",
+      "performance-critical pages with 10+ SVG icons (animation cost adds up)",
+      "icons smaller than 24px (dash pattern not visible)"
+    ],
+    "pairs": [
+      "cue-ambient",
+      "cue-marquee"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-pulse"
+    ],
+    "timing": "var(--cue-stroke-morph-duration, 5s) linear infinite — dual motion: stroke-dashoffset (flow) + stroke-dasharray (breathe)",
+    "css-vars": [
+      "--cue-stroke-morph-width",
+      "--cue-stroke-morph-dash",
+      "--cue-stroke-morph-gap",
+      "--cue-stroke-morph-duration"
+    ]
   }
 }
