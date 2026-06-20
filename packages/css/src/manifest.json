@@ -7198,5 +7198,439 @@
     "css-vars": [
       "--cue-tooltip-duration"
     ]
+  },
+  "cue-state-cut": {
+    "class": "cue-state-cut",
+    "category": "utility",
+    "vibe": [
+      "state-machine",
+      "discrete",
+      "zero-js"
+    ],
+    "avoid-when": [
+      "smooth-transitions"
+    ],
+    "pairs": [],
+    "never-pair": [],
+    "timing": "1ms steps(1) forwards — instant discrete CSS-var swap",
+    "css-vars": [
+      "--cue-state-cut-value"
+    ]
+  },
+  "cue-theme-crossfade": {
+    "class": "cue-theme-crossfade",
+    "category": "transition",
+    "vibe": [
+      "theme",
+      "crossfade",
+      "modern-css"
+    ],
+    "avoid-when": [
+      "no-theme-switching"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-cinematic"
+    ],
+    "timing": "var(--cue-theme-duration, 600ms) ease-in-out forwards — @property <percentage> drives crossfade",
+    "css-vars": [
+      "--cue-theme-progress",
+      "--cue-theme-duration"
+    ]
+  },
+  "cue-orbit-spotlight": {
+    "class": "cue-orbit-spotlight",
+    "category": "ambient",
+    "vibe": [
+      "ambient",
+      "spotlight",
+      "orbiting",
+      "premium"
+    ],
+    "avoid-when": [
+      "static-landing",
+      "mobile-touch"
+    ],
+    "pairs": [
+      "cue-ambient",
+      "cue-group"
+    ],
+    "never-pair": [
+      "cue-shake"
+    ],
+    "timing": "var(--cue-orbit-spotlight-duration, 20s) linear infinite — @property <angle> + cos/sin positioning",
+    "css-vars": [
+      "--cue-orbit-spotlight-angle",
+      "--cue-orbit-spotlight-size",
+      "--cue-orbit-spotlight-color",
+      "--cue-orbit-spotlight-radius",
+      "--cue-orbit-spotlight-duration"
+    ]
+  },
+  "cue-timeline-scope": {
+    "class": "cue-timeline-scope",
+    "category": "utility",
+    "vibe": [
+      "scroll-driven",
+      "cross-tree",
+      "modern-css"
+    ],
+    "avoid-when": [
+      "browsers without timeline-scope support"
+    ],
+    "pairs": [
+      "cue-timeline-scope-source",
+      "cue-timeline-scope-consumer"
+    ],
+    "never-pair": [],
+    "timing": "n/a (container — declares timeline-scope for cross-tree scroll animations)",
+    "css-vars": []
+  },
+  "cue-timeline-scope-source": {
+    "class": "cue-timeline-scope-source",
+    "category": "utility",
+    "vibe": [
+      "scroll-driven",
+      "source"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-timeline-scope"
+    ],
+    "never-pair": [],
+    "timing": "n/a (sets view-timeline-name: --cue-timeline on element)",
+    "css-vars": []
+  },
+  "cue-timeline-scope-consumer": {
+    "class": "cue-timeline-scope-consumer",
+    "category": "transition",
+    "vibe": [
+      "scroll-driven",
+      "consumer"
+    ],
+    "avoid-when": [
+      "browsers without timeline-scope"
+    ],
+    "pairs": [
+      "cue-timeline-scope"
+    ],
+    "never-pair": [],
+    "timing": "animation-timeline: --cue-timeline (driven by source element's scroll position)",
+    "css-vars": [
+      "--cue-timeline-scope-animation"
+    ]
+  },
+  "cue-display-discrete": {
+    "class": "cue-display-discrete",
+    "category": "transition",
+    "vibe": [
+      "modern-css",
+      "display-animation",
+      "modal"
+    ],
+    "avoid-when": [
+      "browsers without transition-behavior: allow-discrete"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-cinematic"
+    ],
+    "timing": "var(--cue-display-duration, 200ms) ease allow-discrete — display:none→block with @starting-style",
+    "css-vars": [
+      "--cue-display-duration"
+    ]
+  },
+  "cue-offset-move": {
+    "class": "cue-offset-move",
+    "category": "transition",
+    "vibe": [
+      "orbital",
+      "trajectory",
+      "particle",
+      "premium",
+      "fluid"
+    ],
+    "avoid-when": [
+      "simple straight-line motion",
+      "mobile devices with >5 path-animated elements"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-marquee"
+    ],
+    "timing": "var(--cue-offset-duration, 10s) linear infinite — offset-distance along arbitrary path()",
+    "css-vars": [
+      "--cue-offset-path",
+      "--cue-offset-start",
+      "--cue-offset-end",
+      "--cue-offset-rotate",
+      "--cue-offset-duration",
+      "--cue-offset-easing",
+      "--cue-offset-iteration"
+    ]
+  },
+  "cue-offset-orbit": {
+    "class": "cue-offset-orbit",
+    "category": "ambient",
+    "vibe": [
+      "orbital",
+      "circular",
+      "ambient",
+      "premium"
+    ],
+    "avoid-when": [
+      "rectangular paths"
+    ],
+    "pairs": [],
+    "never-pair": [
+      "cue-spinner",
+      "cue-radar-sweep"
+    ],
+    "timing": "var(--cue-offset-duration, 10s) linear infinite — circular orbit via offset-path: circle()",
+    "css-vars": [
+      "--cue-offset-radius",
+      "--cue-offset-cx",
+      "--cue-offset-cy",
+      "--cue-offset-rotate",
+      "--cue-offset-duration"
+    ]
+  },
+  "cue-offset-travel": {
+    "class": "cue-offset-travel",
+    "category": "entrance",
+    "vibe": [
+      "trajectory",
+      "entrance",
+      "premium",
+      "fluid"
+    ],
+    "avoid-when": [
+      "loading indicators"
+    ],
+    "pairs": [
+      "cue-cinematic"
+    ],
+    "never-pair": [
+      "cue-enter",
+      "cue-enter-scale"
+    ],
+    "timing": "var(--cue-offset-duration, 2s) ease-out both — one-shot path traversal entrance",
+    "css-vars": [
+      "--cue-offset-path",
+      "--cue-offset-rotate",
+      "--cue-offset-duration"
+    ]
+  },
+  "cue-melt": {
+    "class": "cue-melt",
+    "category": "transition",
+    "vibe": [
+      "bold",
+      "playful",
+      "brand",
+      "product-launch",
+      "hero"
+    ],
+    "avoid-when": [
+      "enterprise",
+      "minimal",
+      "editorial",
+      "docs"
+    ],
+    "pairs": [
+      "cue-hover-scale"
+    ],
+    "never-pair": [
+      "cue-shake",
+      "cue-glow"
+    ],
+    "timing": "var(--cue-melt-duration, 2s) ease forwards — clip-path:path() Bézier keyframe interpolation",
+    "css-vars": [
+      "--cue-melt-color",
+      "--cue-melt-duration",
+      "--cue-melt-ease",
+      "--cue-melt-path-start",
+      "--cue-melt-path-end"
+    ]
+  },
+  "cue-melt-overlay": {
+    "class": "cue-melt-overlay",
+    "category": "transition",
+    "vibe": [
+      "bold",
+      "melt",
+      "overlay"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-melt"
+    ],
+    "never-pair": [],
+    "timing": "Inherits from cue-melt:hover — animates clip-path from drip-tips to full-coverage",
+    "css-vars": [
+      "--cue-melt-color",
+      "--cue-melt-path-start",
+      "--cue-melt-path-end"
+    ]
+  },
+  "cue-slide-nav": {
+    "class": "cue-slide-nav",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "editorial",
+      "industrial",
+      "brand"
+    ],
+    "avoid-when": [
+      "playful",
+      "soft",
+      "rounded"
+    ],
+    "pairs": [
+      "cue-marquee"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-duration-normal, 300ms) — opacity transition on rectangular bar pagination",
+    "css-vars": [
+      "--cue-slide-nav-width",
+      "--cue-slide-nav-height",
+      "--cue-slide-nav-radius",
+      "--cue-slide-nav-bg",
+      "--cue-slide-nav-inactive-opacity",
+      "--cue-slide-nav-active-opacity",
+      "--cue-slide-nav-focus-color",
+      "--cue-slide-nav-focus-width",
+      "--cue-slide-nav-focus-offset"
+    ]
+  },
+  "cue-skeleton": {
+    "class": "cue-skeleton",
+    "category": "ambient",
+    "vibe": [
+      "premium",
+      "loading",
+      "ecommerce",
+      "saas"
+    ],
+    "avoid-when": [
+      "static-content",
+      "no-loading-state"
+    ],
+    "pairs": [
+      "cue-frost"
+    ],
+    "never-pair": [],
+    "timing": "var(--cue-skeleton-duration, 1.5s) linear infinite — :has() auto-hide on data-loaded",
+    "css-vars": [
+      "--cue-skeleton-base",
+      "--cue-skeleton-highlight",
+      "--cue-skeleton-duration",
+      "--cue-skeleton-radius"
+    ]
+  },
+  "cue-skeleton-dark": {
+    "class": "cue-skeleton-dark",
+    "category": "ambient",
+    "vibe": [
+      "loading",
+      "dark-mode"
+    ],
+    "avoid-when": [],
+    "pairs": [
+      "cue-skeleton"
+    ],
+    "never-pair": [],
+    "timing": "Inherits; dark mode colors (#2a2a2a / #3a3a3a)",
+    "css-vars": [
+      "--cue-skeleton-base",
+      "--cue-skeleton-highlight"
+    ]
+  },
+  "cue-overshoot-pop": {
+    "class": "cue-overshoot-pop",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "playful",
+      "spring",
+      "secondary",
+      "subtle-overshoot"
+    ],
+    "avoid-when": [
+      "primary hero content",
+      "critical CTAs",
+      "rapid state changes"
+    ],
+    "pairs": [
+      "cue-cinematic",
+      "cue-button-tactile"
+    ],
+    "never-pair": [
+      "cue-enter-bounce"
+    ],
+    "timing": "var(--cue-pop-duration, 0.4s) cubic-bezier(0.37, 1.2, 0.42, 1.02) var(--cue-pop-delay, 0.1s) — 20% overshoot",
+    "css-vars": [
+      "--cue-pop-duration",
+      "--cue-pop-delay",
+      "--cue-pop-cb-y1",
+      "--cue-pop-cb-y2",
+      "--cue-pop-props"
+    ]
+  },
+  "cue-icon-swap": {
+    "class": "cue-icon-swap",
+    "category": "transition",
+    "vibe": [
+      "premium",
+      "tactile",
+      "stateful",
+      "media-control",
+      "responsive"
+    ],
+    "avoid-when": [
+      "one-shot entrances",
+      "icon sets with 3+ states",
+      "compact inline icons < 32px"
+    ],
+    "pairs": [
+      "cue-button-tactile",
+      "cue-hover-lift"
+    ],
+    "never-pair": [
+      "cue-cinematic",
+      "cue-shake"
+    ],
+    "timing": "var(--cue-icon-swap-duration, 0.2s) ease — paired scale+opacity crossfade, data-state driven",
+    "css-vars": [
+      "--cue-icon-swap-size",
+      "--cue-icon-swap-duration",
+      "--cue-icon-swap-ease",
+      "--cue-icon-swap-active-scale",
+      "--cue-icon-swap-inactive-scale"
+    ]
+  },
+  "cue-overflow-detect": {
+    "class": "cue-overflow-detect",
+    "category": "utility",
+    "vibe": [
+      "premium",
+      "perf-conscious",
+      "accessibility-first",
+      "modern"
+    ],
+    "avoid-when": [
+      "static-content",
+      "fixed-width"
+    ],
+    "pairs": [
+      "cue-marquee",
+      "cue-ambient"
+    ],
+    "never-pair": [],
+    "timing": "animation-timeline: scroll(self inline) — sets --cue-has-overflow:1 only when element overflows",
+    "css-vars": [
+      "--cue-has-overflow"
+    ]
   }
 }
