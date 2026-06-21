@@ -1487,35 +1487,6 @@
       "--cue-word-i"
     ]
   },
-  "cue-word": {
-    "class": "cue-word",
-    "category": "entrance",
-    "vibe": [
-      "premium",
-      "cinematic",
-      "hero"
-    ],
-    "avoid-when": [
-      "playful",
-      "dashboard",
-      "casual"
-    ],
-    "pairs": [
-      "cue-words-rise"
-    ],
-    "never-pair": [
-      "cue-shake",
-      "cue-enter-bounce"
-    ],
-    "timing": "var(--cue-word-duration, 600ms)",
-    "css-vars": [
-      "--cue-word-y",
-      "--cue-word-blur",
-      "--cue-word-duration",
-      "--cue-word-ease",
-      "--cue-word-i"
-    ]
-  },
   "cue-shine-text": {
     "class": "cue-shine-text",
     "category": "ambient",
