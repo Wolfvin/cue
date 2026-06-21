@@ -169,13 +169,68 @@ const LEGACY_PRESET_NAMES = Object.keys(LEGACY_PRESETS) as Array<
 >;
 
 /**
+ * Common English function words (articles, prepositions, conjunctions,
+ * pronouns, be-verbs) that carry no vibe signal and must be filtered out
+ * of the token stream BEFORE scoring.
+ *
+ * Why this list exists:
+ *   The scoring loop in `scoreEntries()` does a bidirectional substring
+ *   match — `vibe.includes(token) || token.includes(vibe)`. Without
+ *   stopword filtering, short function words like "for" substring-match
+ *   unrelated vibe tags (e.g. "form-validation".includes("for") === true,
+ *   "forward-nav".includes("for") === true, "long-form".includes("for")
+ *   === true). That falsely boosted `cue-shake` (vibe: form-validation,
+ *   an error-feedback technique) into recommendations for "saas-launch"
+ *   intents — clearly irrelevant for a premium launch page.
+ *
+ * Why a stopword list and not just a longer minimum-token-length:
+ *   Raising the minimum length from 2 to 3 or 4 would also drop genuinely
+ *   meaningful short tokens like "ai", "ui", "ux", "saas", "b2b", "app",
+ *   "css", "vr", "ar" — all of which carry strong vibe signal and must
+ *   be preserved. An explicit allowlist-by-exclusion (i.e. stopword list)
+ *   is precise: only the listed function words are dropped; every other
+ *   short token survives.
+ *
+ * Deliberately NOT in the list (preserved as meaningful):
+ *   ai, ui, ux, saas, b2b, app, css, vr, ar, ml, gpu, api, sdk, ios,
+ *   atm, ceo, cfo — domain terms that look like function words but are
+ *   not.
+ */
+const STOPWORDS = new Set<string>([
+  // articles
+  "a", "an", "the",
+  // common prepositions (length 2+ to slip past the length filter)
+  "for", "to", "in", "on", "at", "of", "by", "with", "from", "up", "into",
+  "about", "above", "below", "over", "under",
+  // common conjunctions
+  "and", "or", "but", "so", "if", "as", "nor", "yet",
+  // common pronouns (subject + possessive + demonstrative)
+  "my", "your", "his", "her", "its", "our", "their",
+  "i", "you", "he", "she", "it", "we", "they",
+  "me", "him", "us", "them",
+  "this", "that", "these", "those",
+  // be-verbs + common auxiliaries
+  "is", "am", "are", "was", "were", "be", "been", "being",
+  "do", "does", "did", "doing",
+  "have", "has", "had", "having",
+  "will", "would", "can", "could", "should", "shall", "may", "might", "must",
+]);
+
+/**
  * Tokenize the intent + context into lowercase individual words.
  * Splits on any run of whitespace or punctuation (hyphens, underscores,
  * slashes, commas, periods, etc.) — so "saas-launch", "saas_launch", and
  * "saas launch" all produce the same token stream.
  *
- * Returns de-duplicated tokens, length 2+, to avoid noise from single-char
- * punctuation fragments.
+ * Returns de-duplicated tokens that:
+ *   - have length >= 2 (drops single-char noise fragments), AND
+ *   - are NOT in the STOPWORDS set (drops common English function words
+ *     that would otherwise substring-match unrelated vibe tags — see
+ *     STOPWORDS docstring for the bug this prevents).
+ *
+ * Short meaningful tokens like "ai", "ui", "ux", "saas" are preserved
+ * because they are not in STOPWORDS — only listed function words are
+ * dropped, never by length alone.
  */
 function tokenize(...sources: string[]): string[] {
   const tokens = new Set<string>();
@@ -184,7 +239,7 @@ function tokenize(...sources: string[]): string[] {
     const parts = src
       .toLowerCase()
       .split(/[^a-z0-9]+/i)
-      .filter((t) => t.length >= 2);
+      .filter((t) => t.length >= 2 && !STOPWORDS.has(t));
     for (const p of parts) tokens.add(p);
   }
   return [...tokens];
