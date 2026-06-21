@@ -140,6 +140,9 @@ importers:
       '@cue-vin/core':
         specifier: workspace:*
         version: link:../core
+      '@cue-vin/css':
+        specifier: workspace:*
+        version: link:../css
       '@cue-vin/player':
         specifier: workspace:*
         version: link:../player
