@@ -42,11 +42,9 @@ export const presets: Record<string, CuePreset> = {
       // Primary entrance for above-the-fold content
       "cue-enter",
       "cue-enter-fade",
-      // Feature grid stagger (apply cue-enter + cue-stagger-N to each card)
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-stagger-3",
-      "cue-stagger-4",
+      // Feature grid stagger (apply cue-stagger-flow to each card — CSS-var
+      // parameterized, configurable step via --cue-stagger-step)
+      "cue-stagger-flow",
       // Tunable rise for secondary reveals
       "fx-rise",
       // CTA — hover-driven ambient glow (not constant motion)
@@ -147,10 +145,8 @@ export const presets: Record<string, CuePreset> = {
       "cue-enter-slide-left",
       "cue-enter-slide-right",
       "cue-enter",
-      // Fast staggered grid
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-stagger-3",
+      // Fast staggered grid (CSS-var-parameterized — tune step via --cue-stagger-step)
+      "cue-stagger-flow",
       // Tunable slide for hero copy
       "fx-slide-in",
       // Bold hover interaction
@@ -195,10 +191,8 @@ export const presets: Record<string, CuePreset> = {
       // Tunable rise for case-study cards (slow, intentional)
       "fx-rise",
       "fx-fade-in",
-      // Long stagger for grid reveals
-      "cue-stagger-2",
-      "cue-stagger-4",
-      "cue-stagger-6",
+      // Long stagger for grid reveals (cue-stagger-flow with larger --cue-stagger-step)
+      "cue-stagger-flow",
       // Subtle hover affordance only
       "cue-hover-lift",
     ],

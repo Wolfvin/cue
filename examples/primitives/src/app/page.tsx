@@ -79,8 +79,8 @@ function CSSCard() {
     >
       <h3 style={{ color: "#1e293b", fontSize: 16, marginBottom: 8 }}>CSS Primitives</h3>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <span className="cue-enter cue-stagger-1" style={badge}>.cue-enter</span>
-        <span className="cue-enter-fade cue-stagger-2" style={badge}>.cue-enter-fade</span>
+        <span className="cue-enter cue-stagger-flow" style={badge}>.cue-enter</span>
+        <span className="cue-enter-fade cue-stagger-flow" style={{ ...badge, ['--cue-stagger-base-delay' as any]: '100ms' }}>.cue-enter-fade</span>
         <span className="cue-hover-lift" style={{ ...badge, cursor: "pointer" }}>.cue-hover-lift</span>
         <span className="cue-glow" style={{ ...badge, background: "#3b82f6", color: "#fff" }}>.cue-glow</span>
       </div>

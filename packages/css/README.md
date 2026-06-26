@@ -19,8 +19,8 @@ npm install @cue-vin/css
   <h1>Slides up on mount</h1>
 </div>
 
-<div class="cue-enter-scale cue-stagger-2 card">Scale-in with 100ms delay</div>
-<div class="cue-enter-fade cue-stagger-3 card">Fade-in with 150ms delay</div>
+<div class="cue-enter-scale cue-stagger-flow card">Scale-in with staggered delay</div>
+<div class="cue-enter-fade cue-stagger-flow card" style="--cue-stagger-base-delay: 150ms">Fade-in with 150ms delay</div>
 
 <button class="cue-hover-lift">Lifts on hover</button>
 <button class="cue-hover-glow">Glows on hover</button>
@@ -77,18 +77,30 @@ Override in your own CSS to change defaults globally:
 | `.cue-hover-scale` | `scale(1.05)` |
 | `.cue-hover-glow` | Blue glow box shadow |
 
-### Stagger Delays (pair with `.cue-enter-*`)
+### Stagger Flow (parameterized — pair with `.cue-enter-*`)
 
-| Class | Delay |
-|-------|-------|
-| `.cue-stagger-1` | 50ms |
-| `.cue-stagger-2` | 100ms |
-| `.cue-stagger-3` | 150ms |
-| `.cue-stagger-4` | 200ms |
-| `.cue-stagger-5` | 250ms |
-| `.cue-stagger-6` | 300ms |
-| `.cue-stagger-7` | 350ms |
-| `.cue-stagger-8` | 400ms |
+Use `.cue-stagger-flow` for CSS-var-driven staggered list reveals. The
+animation delay is computed automatically per `:nth-of-type()` position,
+so a single class scales to any list length. Tune the cadence with
+`--cue-stagger-step` (default `100ms`) and the base offset with
+`--cue-stagger-base-delay` (default `0ms`).
+
+```html
+<div class="cue-enter-fade cue-stagger-flow">Item 1 — delay 0ms</div>
+<div class="cue-enter-fade cue-stagger-flow">Item 2 — delay 100ms</div>
+<div class="cue-enter-fade cue-stagger-flow">Item 3 — delay 200ms</div>
+<!-- ...up to 10 children supported by default :nth-of-type rules -->
+```
+
+For finer control, set the CSS vars on the parent and let all children
+inherit:
+
+```html
+<ul style="--cue-stagger-step: 60ms; --cue-stagger-base-delay: 200ms">
+  <li class="cue-enter-fade cue-stagger-flow">Staggered at 200/260/320ms…</li>
+  <li class="cue-enter-fade cue-stagger-flow">…</li>
+</ul>
+```
 
 ### Effects
 

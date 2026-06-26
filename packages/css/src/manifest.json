@@ -17,9 +17,6 @@
       "cinematic"
     ],
     "pairs": [
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-stagger-3",
       "cue-hover-lift",
       "fx-fade-in"
     ],
@@ -52,9 +49,6 @@
       "cinematic"
     ],
     "pairs": [
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-stagger-3",
       "cue-hover-lift"
     ],
     "never-pair": [
@@ -85,9 +79,7 @@
     ],
     "pairs": [
       "cue-hover-lift",
-      "cue-hover-scale",
-      "cue-stagger-2",
-      "cue-stagger-3"
+      "cue-hover-scale"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -116,7 +108,6 @@
       "cinematic"
     ],
     "pairs": [
-      "cue-stagger-1",
       "cue-hover-lift",
       "cue-step-enter"
     ],
@@ -145,8 +136,7 @@
     ],
     "pairs": [
       "cue-enter-slide-right",
-      "cue-step-enter",
-      "cue-stagger-2"
+      "cue-step-enter"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -173,8 +163,7 @@
     ],
     "pairs": [
       "cue-enter-slide-left",
-      "cue-step-enter",
-      "cue-stagger-2"
+      "cue-step-enter"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -204,8 +193,6 @@
       "cinematic"
     ],
     "pairs": [
-      "cue-stagger-2",
-      "cue-stagger-3",
       "cue-hover-scale"
     ],
     "never-pair": [
@@ -395,9 +382,7 @@
     ],
     "pairs": [
       "fx-fade-in",
-      "fx-rise",
-      "cue-stagger-1",
-      "cue-stagger-2"
+      "fx-rise"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -430,9 +415,7 @@
     ],
     "pairs": [
       "fx-slide-in",
-      "fx-rise",
-      "cue-stagger-1",
-      "cue-stagger-2"
+      "fx-rise"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -461,9 +444,7 @@
     ],
     "pairs": [
       "fx-fade-in",
-      "fx-slide-in",
-      "cue-stagger-1",
-      "cue-stagger-2"
+      "fx-slide-in"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -759,8 +740,7 @@
     "pairs": [
       "cue-hover-scale",
       "cue-enter",
-      "cue-enter-scale",
-      "cue-stagger-2"
+      "cue-enter-scale"
     ],
     "never-pair": [],
     "timing": "var(--cue-duration-fast, 150ms)",
@@ -785,8 +765,7 @@
     ],
     "pairs": [
       "cue-hover-lift",
-      "cue-enter-scale",
-      "cue-stagger-2"
+      "cue-enter-scale"
     ],
     "never-pair": [],
     "timing": "var(--cue-duration-fast, 150ms)",
@@ -821,203 +800,6 @@
       "--cue-ease-out",
       "--cue-color-glow"
     ]
-  },
-  "cue-stagger-1": {
-    "class": "cue-stagger-1",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise",
-      "cue-enter-slide-down",
-      "cue-enter-slide-left",
-      "cue-enter-slide-right"
-    ],
-    "never-pair": [],
-    "timing": "50ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-2": {
-    "class": "cue-stagger-2",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise",
-      "cue-enter-bounce"
-    ],
-    "never-pair": [],
-    "timing": "100ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-3": {
-    "class": "cue-stagger-3",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise",
-      "cue-enter-bounce"
-    ],
-    "never-pair": [],
-    "timing": "150ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-4": {
-    "class": "cue-stagger-4",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise"
-    ],
-    "never-pair": [],
-    "timing": "200ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-5": {
-    "class": "cue-stagger-5",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise"
-    ],
-    "never-pair": [],
-    "timing": "250ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-6": {
-    "class": "cue-stagger-6",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise"
-    ],
-    "never-pair": [],
-    "timing": "300ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-7": {
-    "class": "cue-stagger-7",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise"
-    ],
-    "never-pair": [],
-    "timing": "350ms delay",
-    "css-vars": []
-  },
-  "cue-stagger-8": {
-    "class": "cue-stagger-8",
-    "category": "utility",
-    "vibe": [
-      "rhythmic",
-      "premium",
-      "modern",
-      "list-reveal"
-    ],
-    "avoid-when": [
-      "single-element"
-    ],
-    "pairs": [
-      "cue-enter",
-      "cue-enter-fade",
-      "cue-enter-scale",
-      "fx-slide-in",
-      "fx-fade-in",
-      "fx-rise"
-    ],
-    "never-pair": [],
-    "timing": "400ms delay",
-    "css-vars": []
   },
   "cue-hidden": {
     "class": "cue-hidden",
@@ -1306,10 +1088,7 @@
       "cue-enter",
       "cue-cinematic"
     ],
-    "never-pair": [
-      "cue-stagger-1",
-      "cue-stagger-2"
-    ],
+    "never-pair": [],
     "timing": "var(--cue-stagger-duration, 750ms) with var(--cue-stagger-step, 100ms) increment",
     "css-vars": [
       "--cue-stagger-base-delay",
@@ -1431,7 +1210,6 @@
       "cinematic"
     ],
     "pairs": [
-      "cue-stagger-1",
       "cue-hover-lift"
     ],
     "never-pair": [
@@ -1468,7 +1246,6 @@
     "pairs": [
       "cue-cinematic",
       "cue-enter-fade",
-      "cue-stagger-2",
       "cue-shine-text"
     ],
     "never-pair": [
@@ -1845,7 +1622,6 @@
     ],
     "pairs": [
       "cue-enter-fade",
-      "cue-stagger-2",
       "cue-hover-lift",
       "cue-cinematic"
     ],
@@ -1992,10 +1768,7 @@
     ],
     "never-pair": [
       "cue-cinematic",
-      "cue-enter-bounce",
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-stagger-3"
+      "cue-enter-bounce"
     ],
     "timing": "var(--cue-chrome-duration, 520ms) per item, custom delay",
     "css-vars": [
@@ -2003,83 +1776,6 @@
       "--cue-chrome-ease",
       "--cue-chrome-shift",
       "--cue-stagger-delay"
-    ]
-  },
-  "cue-stagger-duration-1": {
-    "class": "cue-stagger-duration-1",
-    "category": "entrance",
-    "vibe": [
-      "organic",
-      "settling",
-      "soft",
-      "modern",
-      "patient"
-    ],
-    "avoid-when": [
-      "more than 5 staggered elements",
-      "list reveals that need crisp sequential feel",
-      "loading sequences"
-    ],
-    "pairs": [
-      "cue-stagger-duration-2",
-      "cue-stagger-duration-3"
-    ],
-    "never-pair": [
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-enter"
-    ],
-    "timing": "var(--cue-sd-1, 280ms)",
-    "css-vars": [
-      "--cue-sd-1"
-    ]
-  },
-  "cue-stagger-duration-2": {
-    "class": "cue-stagger-duration-2",
-    "category": "entrance",
-    "vibe": [
-      "organic",
-      "settling",
-      "soft",
-      "modern"
-    ],
-    "avoid-when": [
-      "more than 5 staggered elements"
-    ],
-    "pairs": [
-      "cue-stagger-duration-1",
-      "cue-stagger-duration-3"
-    ],
-    "never-pair": [
-      "cue-stagger-2"
-    ],
-    "timing": "var(--cue-sd-2, 320ms)",
-    "css-vars": [
-      "--cue-sd-2"
-    ]
-  },
-  "cue-stagger-duration-3": {
-    "class": "cue-stagger-duration-3",
-    "category": "entrance",
-    "vibe": [
-      "organic",
-      "settling",
-      "soft",
-      "modern"
-    ],
-    "avoid-when": [
-      "more than 5 staggered elements"
-    ],
-    "pairs": [
-      "cue-stagger-duration-1",
-      "cue-stagger-duration-2"
-    ],
-    "never-pair": [
-      "cue-stagger-3"
-    ],
-    "timing": "var(--cue-sd-3, 360ms)",
-    "css-vars": [
-      "--cue-sd-3"
     ]
   },
   "cue-stagger-duration-var": {
@@ -2093,14 +1789,8 @@
     "avoid-when": [
       "fixed 1-3 item lists"
     ],
-    "pairs": [
-      "cue-stagger-duration-1",
-      "cue-stagger-duration-2",
-      "cue-stagger-duration-3"
-    ],
-    "never-pair": [
-      "cue-stagger-1"
-    ],
+    "pairs": [],
+    "never-pair": [],
     "timing": "var(--cue-sd-duration, 320ms)",
     "css-vars": [
       "--cue-sd-duration"
@@ -2116,7 +1806,7 @@
       "list-reveal"
     ],
     "avoid-when": [
-      "fixed 1-8 item lists (cue-stagger-1..8 is more discoverable)",
+      "fixed 1-8 item lists (use cue-stagger-flow with --cue-stagger-base-delay per item)",
       "no JS / no server rendering"
     ],
     "pairs": [
@@ -2125,10 +1815,7 @@
       "fx-rise",
       "cue-stagger-enter"
     ],
-    "never-pair": [
-      "cue-stagger-1",
-      "cue-stagger-2"
-    ],
+    "never-pair": [],
     "timing": "var(--cue-stagger-delay, 0ms) delay modifier",
     "css-vars": [
       "--cue-stagger-delay"
@@ -2149,8 +1836,7 @@
       "cue-stagger-var"
     ],
     "never-pair": [
-      "cue-enter",
-      "cue-stagger-1"
+      "cue-enter"
     ],
     "timing": "var(--cue-duration-normal, 300ms) with var(--cue-stagger-delay, 0ms)",
     "css-vars": [
@@ -3395,7 +3081,6 @@
       "cue-cinematic"
     ],
     "never-pair": [
-      "cue-stagger-1",
       "cue-enter-bounce",
       "cue-shake"
     ],
@@ -4434,10 +4119,7 @@
       "marketing-loud"
     ],
     "pairs": [
-      "cue-cinematic",
-      "cue-stagger-1",
-      "cue-stagger-2",
-      "cue-stagger-3"
+      "cue-cinematic"
     ],
     "never-pair": [
       "cue-shake"
@@ -5327,7 +5009,6 @@
     ],
     "pairs": [
       "cue-enter",
-      "cue-stagger-1",
       "cue-hover-lift"
     ],
     "never-pair": [
@@ -5454,8 +5135,7 @@
       "single-word text"
     ],
     "pairs": [
-      "cue-marquee",
-      "cue-stagger-1"
+      "cue-marquee"
     ],
     "never-pair": [],
     "timing": "n/a (static mask-image; horizontal fade left/right)",
@@ -5917,7 +5597,6 @@
       "cue-enter",
       "cue-enter-fade",
       "cue-enter-scale",
-      "cue-stagger-2",
       "cue-pulse"
     ],
     "never-pair": [
@@ -6274,8 +5953,7 @@
       "very tall content (> 2000px)"
     ],
     "pairs": [
-      "cue-enter-fade",
-      "cue-stagger-2"
+      "cue-enter-fade"
     ],
     "never-pair": [
       "cue-cinematic",
@@ -7799,40 +7477,6 @@
     "timing": "Same as cue-jump-bounce but uses transform: translateY (GPU-composited, no layout reflow)",
     "css-vars": []
   },
-  "cue-jump-bounce--large": {
-    "class": "cue-jump-bounce--large",
-    "category": "transition",
-    "vibe": [
-      "dramatic"
-    ],
-    "avoid-when": [],
-    "pairs": [
-      "cue-jump-bounce"
-    ],
-    "never-pair": [],
-    "timing": "-48px peak, 0.6s duration",
-    "css-vars": [
-      "--cue-jump-peak",
-      "--cue-jump-duration"
-    ]
-  },
-  "cue-jump-bounce--small": {
-    "class": "cue-jump-bounce--small",
-    "category": "transition",
-    "vibe": [
-      "subtle"
-    ],
-    "avoid-when": [],
-    "pairs": [
-      "cue-jump-bounce"
-    ],
-    "never-pair": [],
-    "timing": "-12px peak, 0.3s duration",
-    "css-vars": [
-      "--cue-jump-peak",
-      "--cue-jump-duration"
-    ]
-  },
   "cue-jump-bounce--triple": {
     "class": "cue-jump-bounce--triple",
     "category": "transition",
@@ -7846,24 +7490,6 @@
     "never-pair": [],
     "timing": "7-stop triple bounce with decreasing amplitude",
     "css-vars": []
-  },
-  "cue-jump-bounce--loop": {
-    "class": "cue-jump-bounce--loop",
-    "category": "ambient",
-    "vibe": [
-      "ambient-bouncing"
-    ],
-    "avoid-when": [],
-    "pairs": [
-      "cue-jump-bounce"
-    ],
-    "never-pair": [],
-    "timing": "1.2s ease-in-out infinite — ambient idle bounce",
-    "css-vars": [
-      "--cue-jump-iteration",
-      "--cue-jump-duration",
-      "--cue-jump-ease"
-    ]
   },
   "cue-scroll-var-parallax": {
     "class": "cue-scroll-var-parallax",
